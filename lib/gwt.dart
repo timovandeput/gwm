@@ -12,5 +12,12 @@ export 'src/models/config.dart';
 export 'src/models/hook.dart';
 export 'src/models/exit_codes.dart';
 
+// Export commands
+export 'src/commands/base.dart';
+export 'src/commands/add.dart';
+export 'src/commands/switch.dart';
+export 'src/commands/clean.dart';
+export 'src/commands/list.dart';
+
 // Export exceptions
 export 'src/exceptions.dart';
