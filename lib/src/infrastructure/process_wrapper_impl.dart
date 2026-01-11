@@ -17,7 +17,6 @@ class ProcessWrapperImpl implements ProcessWrapper {
       command,
       arguments,
       workingDirectory: workingDirectory,
-      runInShell: true,
     );
 
     final stdoutBuffer = StringBuffer();
@@ -46,12 +45,7 @@ class ProcessWrapperImpl implements ProcessWrapper {
   }) {
     final controller = StreamController<String>();
 
-    Process.start(
-          command,
-          arguments,
-          workingDirectory: workingDirectory,
-          runInShell: true,
-        )
+    Process.start(command, arguments, workingDirectory: workingDirectory)
         .then((process) {
           process.stdout
               .transform(utf8.decoder)
