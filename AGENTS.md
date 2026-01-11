@@ -11,16 +11,10 @@ The project uses these Dart packages:
 - `args` (^2.7.0) - CLI argument parsing
 - `yaml` (^3.1.0) - YAML configuration support
 - `glob` (^2.1.0) - File pattern matching
-- `process_runner` (^4.2.0) - Process execution with test fakes
 
 Add dependencies via:
 ```bash
-dart pub add args yaml glob process_runner
-```
-
-Add dev dependencies:
-```bash
-dart pub add --dev lints test mockito build_runner
+dart pub add args yaml glob 
 ```
 
 ## Task tracking
@@ -318,7 +312,7 @@ Future<void> processFile(String path) async {
 When creating tests (in `test/` directory):
 
 - Use `package:test` for unit tests
-- Use `package:mockito` for mocks (run `dart run build_runner build` to generate mocks)
+- Use `package:mocktail` for mocks 
 - Follow naming convention: `*_test.dart`
 - Group related tests in `group()` blocks
 - Use descriptive test names: `'parses valid arguments'`
