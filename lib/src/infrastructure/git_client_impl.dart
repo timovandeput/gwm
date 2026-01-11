@@ -110,6 +110,62 @@ class GitClientImpl implements GitClient {
     return 'unknown';
   }
 
+  @override
+  Future<String> getRepoRoot() async {
+    final result = await _processWrapper.run('git', [
+      'rev-parse',
+      '--show-toplevel',
+    ]);
+    _printOutput(result);
+    if (result.exitCode != 0) {
+      throw Exception('Git command failed: git rev-parse --show-toplevel');
+    }
+    return (result.stdout as String).trim();
+  }
+
+  @override
+  Future<bool> isWorktree() async {
+    final result = await _processWrapper.run('git', [
+      'rev-parse',
+      '--is-inside-work-tree',
+    ]);
+    _printOutput(result);
+    if (result.exitCode != 0) {
+      return false; // Not in a git repository
+    }
+    // Check if .git is a file (worktree) or directory (main repo)
+    final gitDir = File('.git');
+    if (await gitDir.exists()) {
+      return await gitDir.stat().then(
+        (stat) => stat.type == FileSystemEntityType.file,
+      );
+    }
+    return false;
+  }
+
+  @override
+  Future<String> getMainRepoPath() async {
+    final result = await _processWrapper.run('git', ['rev-parse', '--git-dir']);
+    _printOutput(result);
+    if (result.exitCode != 0) {
+      throw Exception('Git command failed: git rev-parse --git-dir');
+    }
+    final gitDir = (result.stdout as String).trim();
+    if (gitDir.endsWith('.git')) {
+      // This is the main repo
+      return Directory.current.path;
+    } else {
+      // This is a worktree, .git file contains path to main .git
+      final gitFile = File('.git');
+      if (await gitFile.exists()) {
+        final content = await gitFile.readAsString();
+        final gitPath = content.split(': ').last.trim();
+        return Directory(gitPath).parent.parent.path;
+      }
+    }
+    throw Exception('Unable to determine main repository path');
+  }
+
   void _printOutput(ProcessResult result) {
     if (result.stdout.isNotEmpty) {
       print(result.stdout);

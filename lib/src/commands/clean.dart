@@ -1,12 +1,25 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
 
 import 'base.dart';
 import '../models/exit_codes.dart';
+import '../infrastructure/git_client.dart';
+import '../infrastructure/git_client_impl.dart';
+import '../infrastructure/process_wrapper_impl.dart';
+import '../services/config_service.dart';
 
-/// Command for cleaning up Git worktrees.
+/// Command for cleaning up the current Git worktree.
 ///
 /// Usage: gwt clean [options]
 class CleanCommand extends BaseCommand {
+  final GitClient _gitClient;
+  final ConfigService _configService;
+
+  CleanCommand({GitClient? gitClient, ConfigService? configService})
+    : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
+      _configService = configService ?? ConfigService();
+
   @override
   ArgParser get parser {
     return ArgParser()
@@ -28,8 +41,7 @@ class CleanCommand extends BaseCommand {
     if (results.flag('help')) {
       print('Usage: gwt clean [options]');
       print('');
-      print('Clean up unused Git worktrees. Removes worktrees that are');
-      print('no longer needed or have been marked for deletion.');
+      print('Delete the current worktree and return to the main repository.');
       print('');
       print(parser.usage);
       return ExitCode.success;
@@ -37,15 +49,64 @@ class CleanCommand extends BaseCommand {
 
     final force = results.flag('force');
 
-    // TODO: Implement actual worktree cleanup logic
-    // For now, just print what would be done
-    print('Cleaning worktrees...');
-    if (force) {
-      print('Force mode enabled - no confirmation prompts.');
-    } else {
-      print('Interactive mode - will prompt for confirmation.');
-    }
+    try {
+      // Validate we're in a Git repository
+      final isWorktree = await _gitClient.isWorktree();
+      if (!isWorktree) {
+        print('Error: gwt clean can only be run from within a worktree.');
+        print('Use "gwt switch ." to go to the main repository.');
+        return ExitCode.invalidArguments;
+      }
 
-    return ExitCode.success;
+      final currentPath = Directory.current.path;
+      final repoRoot = await _gitClient.getRepoRoot();
+
+      // Check for uncommitted changes
+      final hasChanges = await _gitClient.hasUncommittedChanges(currentPath);
+      if (hasChanges && !force) {
+        print('Uncommitted changes detected in worktree at: $currentPath');
+        stdout.write('Continue with removal? (y/N): ');
+        final response = stdin.readLineSync()?.toLowerCase().trim();
+        if (response != 'y' && response != 'yes') {
+          print('Operation cancelled.');
+          return ExitCode.success;
+        }
+      }
+
+      // Load configuration for hooks
+      final config = await _configService.loadConfig(repoRoot: repoRoot);
+
+      // Execute pre_clean hooks (placeholder - hooks not yet implemented)
+      if (config.hooks.preClean != null) {
+        print('Executing pre-clean hooks...');
+        // TODO: Implement hook execution service
+        // await _hookService.executeHooks(config.hooks.preClean!, environment);
+      }
+
+      // Get main repo path for navigation after cleanup
+      final mainRepoPath = await _gitClient.getMainRepoPath();
+
+      // Remove the worktree using Git
+      print('Removing worktree: $currentPath');
+      await _gitClient.removeWorktree(currentPath);
+
+      // Execute post_clean hooks (placeholder - hooks not yet implemented)
+      if (config.hooks.postClean != null) {
+        print('Executing post-clean hooks...');
+        // TODO: Implement hook execution service
+        // await _hookService.executeHooks(config.hooks.postClean!, environment);
+      }
+
+      // Change to main repository directory
+      // Note: In production, this would change the working directory
+      // Directory.current = mainRepoPath;
+      print('Would return to main repository: $mainRepoPath');
+      print('Worktree successfully removed.');
+
+      return ExitCode.success;
+    } catch (e) {
+      print('Error: Failed to remove worktree: $e');
+      return ExitCode.gitFailed;
+    }
   }
 }

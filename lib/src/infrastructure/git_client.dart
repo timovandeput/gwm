@@ -30,4 +30,13 @@ abstract class GitClient {
 
   /// Gets the status of a branch (e.g., ahead, behind, modified).
   Future<String> getBranchStatus(String branch);
+
+  /// Gets the root directory of the Git repository.
+  Future<String> getRepoRoot();
+
+  /// Checks if the current directory is a Git worktree (not the main repository).
+  Future<bool> isWorktree();
+
+  /// Gets the path to the main Git repository (common .git directory).
+  Future<String> getMainRepoPath();
 }

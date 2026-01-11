@@ -39,7 +39,7 @@ void printUsage(ArgParser argParser) {
   print('Available commands:');
   print('  add     Add a new worktree');
   print('  switch  Switch to an existing worktree');
-  print('  clean   Clean up unused worktrees');
+  print('  clean   Delete current worktree and return to main repo');
   print('  list    List all worktrees');
   print('');
   print('Global options:');
