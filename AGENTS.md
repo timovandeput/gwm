@@ -1,7 +1,27 @@
 # AGENTS.md - Development Guidelines for GWT CLI Tool
 
 ## Project Overview
-GWT is a Dart command-line application that provides basic argument parsing functionality. This document outlines development practices, build commands, and coding standards for agents working on this codebase.
+GWT (Git Worktree Manager) is a Dart CLI tool that simplifies Git worktree management. It provides streamlined commands for creating, switching, and managing worktrees with automatic directory navigation, configurable hooks, and cross-platform support.
+
+**Architecture Reference**: See `docs/ARCHITECTURE.md` for complete system architecture, component diagrams, data flow, and testing strategy.
+
+## Project Dependencies
+
+The project uses these Dart packages:
+- `args` (^2.7.0) - CLI argument parsing
+- `yaml` (^3.1.0) - YAML configuration support
+- `glob` (^2.1.0) - File pattern matching
+- `process_runner` (^4.2.0) - Process execution with test fakes
+
+Add dependencies via:
+```bash
+dart pub add args yaml glob process_runner
+```
+
+Add dev dependencies:
+```bash
+dart pub add --dev lints test mockito build_runner
+```
 
 ## Build, Lint, and Test Commands
 
@@ -41,11 +61,46 @@ Note: Currently no test files exist. Create tests in `test/` directory following
 
 ### File Organization
 ```
-lib/           # Library code (if added later)
-bin/           # Executable entry points
-  gwt.dart     # Main CLI application
-test/          # Test files (create as needed)
-  *_test.dart  # Test files follow this naming convention
+bin/                        # Executable entry points
+  gwt.dart                  # Main CLI application
+
+lib/
+  src/
+    commands/               # Command handlers
+      add.dart
+      switch.dart
+      clean.dart
+      list.dart
+      base.dart            # Base command interface
+    services/               # Business logic
+      worktree_service.dart
+      config_service.dart
+      hook_service.dart
+      copy_service.dart
+      shell_integration.dart
+    models/                 # Domain models
+      worktree.dart
+      config.dart
+      hook.dart
+      exit_codes.dart
+    infrastructure/          # External integrations
+      git_client.dart
+      file_system_adapter.dart
+      process_wrapper.dart
+      prompt_selector.dart
+      platform_detector.dart
+    utils/                  # Utilities
+      path_utils.dart
+      validation.dart
+      output_formatter.dart
+    exceptions.dart          # Custom exceptions
+  gwt.dart                 # Library entry point
+
+test/
+  unit/                    # Unit tests for individual components
+  integration/             # End-to-end workflow tests
+  fixtures/                # Test data and fake configs
+  mock_objects/            # Test doubles (FakeProcessWrapper, MockGitClient, etc.)
 ```
 
 ### Naming Conventions
@@ -239,14 +294,34 @@ Future<void> processFile(String path) async {
 ```
 
 ### Testing Guidelines
+**IMPORTANT**: Read `docs/ARCHITECTURE.md` Section 8 for comprehensive testing strategy.
+
+**Core Testing Principle**: Never invoke actual external tools (Git, npm, etc.) in tests. All tests MUST use test doubles (mocks/fakes) to ensure:
+- Fast test execution
+- Deterministic behavior
+- Cross-platform consistency
+- No side effects on user environment
+
 When creating tests (in `test/` directory):
 
 - Use `package:test` for unit tests
+- Use `package:mockito` for mocks (run `dart run build_runner build` to generate mocks)
 - Follow naming convention: `*_test.dart`
 - Group related tests in `group()` blocks
 - Use descriptive test names: `'parses valid arguments'`
 - Test both success and error cases
 - Use `setUp()` and `tearDown()` for test fixtures
+- Create test fixtures in `test/fixtures/` directory
+- Create mock objects in `test/mock_objects/` directory
+
+**Test Structure**:
+```
+test/
+├── unit/           # Unit tests for individual components
+├── integration/    # End-to-end workflow tests
+├── fixtures/       # Test data and fake configs
+└── mock_objects/   # Test doubles (FakeProcessWrapper, MockGitClient, etc.)
+```
 
 ```dart
 import 'package:test/test.dart';
@@ -268,6 +343,13 @@ void main() {
 }
 ```
 
+**Key Testing Requirements**:
+1. All external process calls must be mocked
+2. All file system operations must be mocked
+3. All error conditions must be tested
+4. Target 90%+ code coverage
+5. Tests should run in < 5 seconds
+
 ### Version Management
 - Update version in `pubspec.yaml` following semantic versioning
 - Update `CHANGELOG.md` with changes for each version
@@ -286,3 +368,29 @@ void main() {
 - Consider memory usage for large data sets
 
 Remember: This is a CLI tool focused on argument parsing. Keep the codebase simple, well-tested, and maintainable. Always run `dart analyze` and `dart format` before committing changes.
+
+## Landing the Plane (Session Completion)
+
+**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+
+**MANDATORY WORKFLOW:**
+
+1. **File issues for remaining work** - Create issues for anything that needs follow-up
+2. **Run quality gates** (if code changed) - Tests, linters, builds
+3. **Update issue status** - Close finished work, update in-progress items
+4. **PUSH TO REMOTE** - This is MANDATORY:
+   ```bash
+   git pull --rebase
+   bd sync
+   git push
+   git status  # MUST show "up to date with origin"
+   ```
+5. **Clean up** - Clear stashes, prune remote branches
+6. **Verify** - All changes committed AND pushed
+7. **Hand off** - Provide context for next session
+
+**CRITICAL RULES:**
+- Work is NOT complete until `git push` succeeds
+- NEVER stop before pushing - that leaves work stranded locally
+- NEVER say "ready to push when you are" - YOU must push
+- If push fails, resolve and retry until it succeeds
