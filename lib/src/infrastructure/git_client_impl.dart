@@ -203,9 +203,7 @@ class GitClientImpl implements GitClient {
       } else if (line.startsWith('branch ')) {
         branch = line.substring('branch refs/heads/'.length);
       } else if (line.startsWith('HEAD ')) {
-        if (branch == null) {
-          branch = 'HEAD';
-        }
+        branch ??= 'HEAD';
       }
     }
     // Add the last worktree

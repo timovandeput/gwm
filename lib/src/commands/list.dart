@@ -1,12 +1,25 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
 
 import 'base.dart';
 import '../models/exit_codes.dart';
+import '../infrastructure/git_client.dart';
+import '../infrastructure/git_client_impl.dart';
+import '../infrastructure/process_wrapper_impl.dart';
+import '../utils/output_formatter.dart';
 
 /// Command for listing Git worktrees.
 ///
 /// Usage: gwt list [options]
 class ListCommand extends BaseCommand {
+  final GitClient _gitClient;
+  final OutputFormatter _formatter;
+
+  ListCommand({GitClient? gitClient, OutputFormatter? formatter})
+    : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
+      _formatter = formatter ?? OutputFormatter();
+
   @override
   ArgParser get parser {
     return ArgParser()
@@ -38,17 +51,24 @@ class ListCommand extends BaseCommand {
     final verbose = results.flag('verbose');
     final json = results.flag('json');
 
-    // TODO: Implement actual worktree listing logic
-    // For now, just print what would be done
-    print('Listing worktrees...');
-    if (json) {
-      print('Output format: JSON');
-    } else if (verbose) {
-      print('Output format: verbose text');
-    } else {
-      print('Output format: concise text');
-    }
+    try {
+      // Get current directory path
+      final currentPath = Directory.current.path;
 
-    return ExitCode.success;
+      // List all worktrees
+      final worktrees = await _gitClient.listWorktrees();
+
+      // Output in requested format
+      if (json) {
+        print(_formatter.formatJson(worktrees, currentPath));
+      } else {
+        print(_formatter.formatTable(worktrees, currentPath, verbose: verbose));
+      }
+
+      return ExitCode.success;
+    } catch (e) {
+      print('Error: Failed to list worktrees: $e');
+      return ExitCode.gitFailed;
+    }
   }
 }

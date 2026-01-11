@@ -1,4 +1,5 @@
 import 'package:test/test.dart';
+import 'package:glob/glob.dart';
 
 import 'package:gwt/src/services/copy_service.dart';
 import 'package:gwt/src/models/config.dart';
@@ -49,27 +50,13 @@ class FakeFileSystemAdapter implements FileSystemAdapter {
     final result = <String>[];
     final pathPrefix = path.endsWith('/') ? path : '$path/';
 
-    // Simple glob matching (basic implementation for testing)
     if (pattern != null) {
-      if (pattern == '*.env') {
-        for (final filePath in _files.keys) {
-          if (filePath.startsWith(pathPrefix) && filePath.endsWith('.env')) {
-            result.add(filePath.substring(pathPrefix.length));
-          }
-        }
-      } else if (pattern == 'config/*.json') {
-        for (final filePath in _files.keys) {
-          if (filePath.startsWith('${pathPrefix}config/') &&
-              filePath.endsWith('.json')) {
-            result.add(filePath.substring(pathPrefix.length));
-          }
-        }
-      } else if (pattern == 'deep/**/*.txt') {
-        for (final filePath in _files.keys) {
-          if (filePath.startsWith(pathPrefix) &&
-              filePath.contains('deep/') &&
-              filePath.endsWith('.txt')) {
-            result.add(filePath.substring(pathPrefix.length));
+      final glob = Glob(pattern);
+      for (final filePath in _files.keys) {
+        if (filePath.startsWith(pathPrefix)) {
+          final relativePath = filePath.substring(pathPrefix.length);
+          if (glob.matches(relativePath)) {
+            result.add(relativePath);
           }
         }
       }
@@ -135,7 +122,7 @@ void main() {
       fakeFileSystem.addDirectory('/source/config');
 
       final config = CopyConfig(
-        files: ['*.env', 'config/*.json'],
+        files: ['.env*', 'config/*.json'],
         directories: [],
       );
 
