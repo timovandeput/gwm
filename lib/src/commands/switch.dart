@@ -2,11 +2,29 @@ import 'package:args/args.dart';
 
 import 'base.dart';
 import '../models/exit_codes.dart';
+import '../models/worktree.dart';
+import '../infrastructure/git_client.dart';
+import '../infrastructure/git_client_impl.dart';
+import '../infrastructure/process_wrapper_impl.dart';
+import '../infrastructure/prompt_selector.dart';
+import '../services/shell_integration.dart';
 
 /// Command for switching to an existing Git worktree.
 ///
 /// Usage: gwt switch [worktree-name]
 class SwitchCommand extends BaseCommand {
+  final GitClient _gitClient;
+  final PromptSelector _promptSelector;
+  final ShellIntegration _shellIntegration;
+
+  SwitchCommand({
+    GitClient? gitClient,
+    PromptSelector? promptSelector,
+    ShellIntegration? shellIntegration,
+  }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
+       _promptSelector = promptSelector ?? PromptSelectorImpl(),
+       _shellIntegration = shellIntegration ?? ShellIntegration();
+
   @override
   ArgParser get parser {
     return ArgParser()..addFlag(
@@ -23,24 +41,44 @@ class SwitchCommand extends BaseCommand {
       print('Usage: gwt switch [worktree-name]');
       print('');
       print('Switch to the specified worktree. If no worktree is specified,');
-      print('lists available worktrees for selection.');
+      print('shows an interactive menu to select from available worktrees.');
+      print('Use "." to switch to the main workspace.');
       print('');
       print(parser.usage);
       return ExitCode.success;
     }
 
-    final args = results.rest;
-    final worktreeName = args.isNotEmpty ? args[0] : null;
+    try {
+      // Validate execution context
+      final contextValid = await _validateExecutionContext();
+      if (!contextValid) {
+        return ExitCode.generalError;
+      }
 
-    // TODO: Implement actual worktree switching logic
-    // For now, just print what would be done
-    if (worktreeName != null) {
-      print('Switching to worktree: $worktreeName');
-    } else {
-      print('No worktree specified. Would show interactive selection.');
+      final args = results.rest;
+      final worktreeName = args.isNotEmpty ? args[0] : null;
+
+      final worktrees = await _gitClient.listWorktrees();
+      final targetWorktree = await _resolveTargetWorktree(
+        worktreeName,
+        worktrees,
+      );
+
+      if (targetWorktree == null) {
+        if (worktreeName != null) {
+          print('Error: Worktree "$worktreeName" does not exist.');
+        }
+        return ExitCode.generalError;
+      }
+
+      // Output the cd command for shell integration
+      _shellIntegration.outputCdCommand(targetWorktree.path);
+
+      return ExitCode.success;
+    } catch (e) {
+      print('Error: Failed to switch worktree: $e');
+      return ExitCode.gitFailed;
     }
-
-    return ExitCode.success;
   }
 
   @override
@@ -51,5 +89,49 @@ class SwitchCommand extends BaseCommand {
       return ExitCode.invalidArguments;
     }
     return ExitCode.success;
+  }
+
+  /// Validates that the command is being executed in a valid context.
+  ///
+  /// Must be run from the main repository or an existing worktree.
+  Future<bool> _validateExecutionContext() async {
+    // Check if we're in a git repository at all
+    try {
+      await _gitClient.getRepoRoot();
+    } catch (e) {
+      print('Error: Not in a Git repository.');
+      return false;
+    }
+
+    // The command should work from main repo or existing worktrees
+    // We don't restrict it further as the requirements don't specify
+    return true;
+  }
+
+  /// Resolves the target worktree based on the provided name or interactive selection.
+  ///
+  /// Returns null if the worktree is not found or selection is cancelled.
+  Future<Worktree?> _resolveTargetWorktree(
+    String? worktreeName,
+    List<Worktree> worktrees,
+  ) async {
+    if (worktreeName != null) {
+      // Direct specification
+      if (worktreeName == '.') {
+        // Switch to main workspace
+        final mainWorktrees = worktrees.where((w) => w.isMain);
+        return mainWorktrees.isNotEmpty ? mainWorktrees.first : null;
+      } else {
+        // Find worktree by name
+        final matchingWorktrees = worktrees.where(
+          (w) => w.name == worktreeName,
+        );
+        return matchingWorktrees.isNotEmpty ? matchingWorktrees.first : null;
+      }
+    } else {
+      // Interactive selection
+      final selected = _promptSelector.selectWorktree(worktrees);
+      return selected;
+    }
   }
 }
