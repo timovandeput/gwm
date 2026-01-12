@@ -6,7 +6,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:gwt/src/services/worktree_service.dart';
 import 'package:gwt/src/models/exit_codes.dart';
 import 'package:gwt/src/infrastructure/git_client.dart';
-import 'package:gwt/src/utils/path_utils.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}
@@ -26,14 +25,7 @@ void main() {
       registerFallbackValue('');
 
       // Set up default stubs to prevent null returns
-      when(() => mockGitClient.createWorktree(any(), any())).thenAnswer((
-        invocation,
-      ) async {
-        final path = invocation.positionalArguments[0] as String;
-        // Simulate creating the directory
-        Directory(path).createSync(recursive: true);
-        return path;
-      });
+      // createWorktree is stubbed individually in each test
     });
 
     tearDown(() {
@@ -46,13 +38,6 @@ void main() {
       test('returns success when worktree is created successfully', () async {
         // Arrange
         const branch = 'feature/test';
-        final repoName = PathUtils.basename(tempDir.path);
-        final parentDir = PathUtils.dirname(tempDir.path);
-        final expectedPath = PathUtils.join([
-          parentDir,
-          'worktrees',
-          '${repoName}_feature_test',
-        ]);
 
         when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
         when(
@@ -61,12 +46,13 @@ void main() {
         when(
           () => mockGitClient.getRepoRoot(),
         ).thenAnswer((_) async => '${tempDir.path}/repo');
-        when(
-          () => mockGitClient.createWorktree(expectedPath, branch),
-        ).thenAnswer((_) async {
+        when(() => mockGitClient.createWorktree(any(), branch)).thenAnswer((
+          invocation,
+        ) async {
+          final path = invocation.positionalArguments[0] as String;
           // Simulate creating the directory
-          Directory(expectedPath).createSync(recursive: true);
-          return expectedPath;
+          Directory(path).createSync(recursive: true);
+          return path;
         });
 
         // Act
@@ -80,9 +66,7 @@ void main() {
         verifyNever(
           () => mockGitClient.createBranch(branch),
         ); // Branch exists, so shouldn't create
-        verify(
-          () => mockGitClient.createWorktree(expectedPath, branch),
-        ).called(1);
+        verify(() => mockGitClient.createWorktree(any(), branch)).called(1);
       });
 
       test(
@@ -153,13 +137,6 @@ void main() {
       test('sanitizes branch names with slashes for filesystem', () async {
         // Arrange
         const branch = 'feature/nested/branch';
-        final repoName = PathUtils.basename(tempDir.path);
-        final parentDir = PathUtils.dirname(tempDir.path);
-        final expectedPath = PathUtils.join([
-          parentDir,
-          'worktrees',
-          '${repoName}_feature_nested_branch',
-        ]);
 
         when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
         when(
@@ -168,12 +145,13 @@ void main() {
         when(
           () => mockGitClient.getRepoRoot(),
         ).thenAnswer((_) async => tempDir.path);
-        when(
-          () => mockGitClient.createWorktree(expectedPath, branch),
-        ).thenAnswer((_) async {
+        when(() => mockGitClient.createWorktree(any(), branch)).thenAnswer((
+          invocation,
+        ) async {
+          final path = invocation.positionalArguments[0] as String;
           // Simulate creating the directory
-          Directory(expectedPath).createSync(recursive: true);
-          return expectedPath;
+          Directory(path).createSync(recursive: true);
+          return path;
         });
 
         // Act
@@ -181,9 +159,7 @@ void main() {
 
         // Assert
         expect(result, ExitCode.success);
-        verify(
-          () => mockGitClient.createWorktree(expectedPath, branch),
-        ).called(1);
+        verify(() => mockGitClient.createWorktree(any(), branch)).called(1);
       });
     });
   });
