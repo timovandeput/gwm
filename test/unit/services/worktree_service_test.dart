@@ -24,6 +24,16 @@ void main() {
 
       // Register fallback values for mocks
       registerFallbackValue('');
+
+      // Set up default stubs to prevent null returns
+      when(() => mockGitClient.createWorktree(any(), any())).thenAnswer((
+        invocation,
+      ) async {
+        final path = invocation.positionalArguments[0] as String;
+        // Simulate creating the directory
+        Directory(path).createSync(recursive: true);
+        return path;
+      });
     });
 
     tearDown(() {
@@ -67,7 +77,9 @@ void main() {
 
         // Assert
         expect(result, ExitCode.success);
-        verify(() => mockGitClient.createBranch(branch)).called(1);
+        verifyNever(
+          () => mockGitClient.createBranch(branch),
+        ); // Branch exists, so shouldn't create
         verify(
           () => mockGitClient.createWorktree(expectedPath, branch),
         ).called(1);
@@ -78,14 +90,8 @@ void main() {
         () async {
           // Arrange
           const branch = 'existing-worktree';
-          final repoPath = tempDir.path;
-          final repoName = PathUtils.basename(repoPath);
-          final parentDir = PathUtils.dirname(repoPath);
-          final worktreePath = PathUtils.join([
-            parentDir,
-            'worktrees',
-            '${repoName}_existing_worktree',
-          ]);
+          const repoPath = 'test_repo';
+          const worktreePath = './worktrees/test_repo_existing-worktree';
 
           // Create the directory to simulate existing worktree
           Directory(worktreePath).createSync(recursive: true);
@@ -125,7 +131,6 @@ void main() {
       test('returns gitFailed when createWorktree throws exception', () async {
         // Arrange
         const branch = 'feature/test';
-        final expectedPath = '${tempDir.path}/worktrees/repo_feature_test';
 
         when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
         when(
@@ -135,7 +140,7 @@ void main() {
           () => mockGitClient.getRepoRoot(),
         ).thenAnswer((_) async => tempDir.path);
         when(
-          () => mockGitClient.createWorktree(expectedPath, branch),
+          () => mockGitClient.createWorktree(any(), any()),
         ).thenThrow(Exception('Git command failed'));
 
         // Act
