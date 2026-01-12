@@ -2,11 +2,22 @@ import 'package:args/args.dart';
 
 import 'base.dart';
 import '../models/exit_codes.dart';
+import '../services/worktree_service.dart';
+import '../infrastructure/git_client.dart';
+import '../infrastructure/git_client_impl.dart';
+import '../infrastructure/process_wrapper_impl.dart';
 
 /// Command for adding a new Git worktree.
 ///
 /// Usage: gwt add `<branch>` [options]
 class AddCommand extends BaseCommand {
+  final WorktreeService _worktreeService;
+
+  AddCommand({WorktreeService? worktreeService, GitClient? gitClient})
+    : _worktreeService =
+          worktreeService ??
+          WorktreeService(gitClient ?? GitClientImpl(ProcessWrapperImpl()));
+
   @override
   ArgParser get parser {
     return ArgParser()
@@ -44,14 +55,11 @@ class AddCommand extends BaseCommand {
     final branch = args[0];
     final createBranch = results.flag('create-branch');
 
-    // TODO: Implement actual worktree creation logic
-    // For now, just print what would be done
-    print('Adding worktree for branch: $branch');
-    if (createBranch) {
-      print('Will create branch if it does not exist.');
-    }
-
-    return ExitCode.success;
+    // Use the worktree service to create the worktree
+    return await _worktreeService.addWorktree(
+      branch,
+      createBranch: createBranch,
+    );
   }
 
   @override
