@@ -8,6 +8,7 @@ import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../infrastructure/prompt_selector.dart';
 import '../services/shell_integration.dart';
+import '../models/config.dart';
 
 /// Command for switching to an existing Git worktree.
 ///
@@ -21,9 +22,15 @@ class SwitchCommand extends BaseCommand {
     GitClient? gitClient,
     PromptSelector? promptSelector,
     ShellIntegration? shellIntegration,
+    Config? config,
   }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
        _promptSelector = promptSelector ?? PromptSelectorImpl(),
-       _shellIntegration = shellIntegration ?? ShellIntegration();
+       _shellIntegration =
+           shellIntegration ??
+           ShellIntegration(
+             config?.shellIntegration ??
+                 ShellIntegrationConfig(enableEvalOutput: true),
+           );
 
   @override
   ArgParser get parser {

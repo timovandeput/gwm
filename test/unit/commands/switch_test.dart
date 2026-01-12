@@ -124,7 +124,7 @@ void main() {
       ).thenAnswer((_) async => worktrees);
       when(
         () => mockPromptSelector.selectWorktree(worktrees),
-      ).thenReturn(worktrees[0]);
+      ).thenAnswer((_) async => worktrees[0]);
 
       final results = switchCommand.parser.parse([]);
       final exitCode = await switchCommand.execute(results);
