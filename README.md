@@ -1,6 +1,8 @@
 # GWT - Git Worktree Manager
 
-GWT (Git Worktree Manager) is a command-line tool that simplifies the management of Git worktrees, enabling parallel development sessions on the same Git repository. It's designed for both manual worktree workflows and AI-assisted development scenarios where multiple tool instances work in parallel on different features.
+GWT (Git Worktree Manager) is a command-line tool that simplifies the management of Git worktrees, enabling parallel
+development sessions on the same Git repository. It's designed for both manual worktree workflows and AI-assisted
+development scenarios where multiple tool instances work in parallel on different features.
 
 ## Features
 
@@ -156,6 +158,7 @@ gwt add --branch feature/authentication
 ```
 
 **Options:**
+
 - `-b, --branch`: Create a new Git branch instead of using an existing one
 - `-h, --help`: Show help message
 
@@ -187,6 +190,7 @@ gwt clean --force
 ```
 
 **Options:**
+
 - `-f, --force`: Bypass safety checks and delete immediately
 - `-h, --help`: Show help message
 
@@ -206,6 +210,7 @@ gwt list -j
 ```
 
 **Options:**
+
 - `-v, --verbose`: Show additional information (branch status, last modified)
 - `-j, --json`: Output in JSON format for scripting
 - `-h, --help`: Show help message
@@ -239,13 +244,26 @@ Repository-specific settings that can be committed to Git and shared with the te
 {
   "version": "1.0",
   "copy": {
-    "files": [".env", "*.env.*"],
-    "directories": ["node_modules", ".cache"]
+    "files": [
+      ".env",
+      "*.env.*"
+    ],
+    "directories": [
+      "node_modules",
+      ".cache"
+    ]
   },
   "hooks": {
-    "post_add": ["npm install", "npm run build"],
-    "post_switch": ["npm run dev"],
-    "pre_clean": ["git stash"]
+    "post_add": [
+      "npm install",
+      "npm run build"
+    ],
+    "post_switch": [
+      "npm run dev"
+    ],
+    "pre_clean": [
+      "git stash"
+    ]
   },
   "shell_integration": {
     "enable_eval_output": true
@@ -263,10 +281,15 @@ Local-only overrides that should be added to `.gitignore`.
 {
   "version": "1.0",
   "copy": {
-    "files": [".env.local", ".secrets"]
+    "files": [
+      ".env.local",
+      ".secrets"
+    ]
   },
   "hooks": {
-    "post_add_append": ["npm run typecheck"]
+    "post_add_append": [
+      "npm run typecheck"
+    ]
   }
 }
 ```
@@ -286,8 +309,15 @@ Files and directories to copy from the main repository to each worktree.
 ```json
 {
   "copy": {
-    "files": [".env", "*.env.*", "config/*.json"],
-    "directories": ["node_modules", ".cache"]
+    "files": [
+      ".env",
+      "*.env.*",
+      "config/*.json"
+    ],
+    "directories": [
+      "node_modules",
+      ".cache"
+    ]
   }
 }
 ```
@@ -313,8 +343,13 @@ Hooks are shell commands that run at specific points during worktree operations.
 {
   "hooks": {
     "timeout": 30,
-    "pre_add": ["echo 'Creating worktree...'"],
-    "post_add": ["npm install", "npm run build"]
+    "pre_add": [
+      "echo 'Creating worktree...'"
+    ],
+    "post_add": [
+      "npm install",
+      "npm run build"
+    ]
   }
 }
 ```
@@ -326,7 +361,10 @@ Hooks are shell commands that run at specific points during worktree operations.
   "hooks": {
     "post_add": {
       "timeout": 120,
-      "commands": ["npm install", "npm run build"]
+      "commands": [
+        "npm install",
+        "npm run build"
+      ]
     }
   }
 }
@@ -349,6 +387,7 @@ GWT creates worktrees in a shared directory structure:
 ```
 
 **Key Points:**
+
 - The `worktrees` directory is in the parent directory of the Git workspace
 - Multiple Git repositories share the same `worktrees` directory
 - Worktree names: `<repo-name>_<branch-name>`
@@ -406,16 +445,16 @@ gwt list -v
 
 ## Exit Codes 📊
 
-| Code | Meaning                                   |
-|------|-------------------------------------------|
-| 0    | ✅ Success                                  |
-| 1    | ❌ General error                            |
-| 2    | ❌ Invalid usage (wrong arguments)          |
-| 3    | ❌ Worktree already exists                |
-| 4    | ❌ Branch not found                       |
-| 5    | ❌ Hook execution failed                  |
-| 6    | ❌ Configuration error                    |
-| 7    | ❌ Git command failed                     |
+| Code | Meaning                           |
+|------|-----------------------------------|
+| 0    | ✅ Success                         |
+| 1    | ❌ General error                   |
+| 2    | ❌ Invalid usage (wrong arguments) |
+| 3    | ❌ Worktree already exists         |
+| 4    | ❌ Branch not found                |
+| 5    | ❌ Hook execution failed           |
+| 6    | ❌ Configuration error             |
+| 7    | ❌ Git command failed              |
 
 ## Development
 
@@ -471,6 +510,7 @@ dart test --coverage=coverage
 ### Worktree creation fails with "branch not found" ❌
 
 Use `-b` flag to create a new Git branch before creating the worktree:
+
 ```bash
 gwt add -b feature/new-ui
 ```
@@ -485,7 +525,8 @@ Check `copy` configuration in `.gwt.json` and `.gwt.local.json` and verify file 
 
 ### Hook execution fails ❌
 
-GWT will display the error output from the failed command. Review the output to understand the failure, fix the issue, and retry.
+GWT will display the error output from the failed command. Review the output to understand the failure, fix the issue,
+and retry.
 
 ## Contributing 🤝
 
