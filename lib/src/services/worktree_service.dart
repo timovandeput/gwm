@@ -4,6 +4,9 @@ import '../infrastructure/git_client.dart';
 import '../models/exit_codes.dart';
 import '../models/config.dart';
 import '../services/hook_service.dart';
+import '../services/copy_service.dart';
+import '../infrastructure/file_system_adapter.dart';
+import '../infrastructure/file_system_adapter_impl.dart';
 import '../infrastructure/process_wrapper.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../utils/path_utils.dart';
@@ -16,13 +19,19 @@ import '../cli_utils.dart';
 class WorktreeService {
   final GitClient _gitClient;
   final HookService _hookService;
+  final CopyService _copyService;
 
   WorktreeService(
     this._gitClient, {
     HookService? hookService,
+    CopyService? copyService,
     ProcessWrapper? processWrapper,
+    FileSystemAdapter? fileSystemAdapter,
   }) : _hookService =
-           hookService ?? HookService(processWrapper ?? ProcessWrapperImpl());
+           hookService ?? HookService(processWrapper ?? ProcessWrapperImpl()),
+       _copyService =
+           copyService ??
+           CopyService(fileSystemAdapter ?? FileSystemAdapterImpl());
 
   /// Adds a new worktree for the specified branch.
   ///
@@ -42,6 +51,8 @@ class WorktreeService {
         printSafe('Error: Must run from main Git repository, not a worktree');
         return ExitCode.generalError;
       }
+
+      final originPath = await _gitClient.getRepoRoot();
 
       // Check if branch exists (unless createBranch is true)
       if (!createBranch && !await _gitClient.branchExists(branch)) {
@@ -74,7 +85,6 @@ class WorktreeService {
 
       // Execute pre-add hooks
       if (config?.hooks.preAdd != null) {
-        final originPath = await _gitClient.getRepoRoot();
         try {
           await _hookService.executePreAdd(
             config!.hooks,
@@ -101,9 +111,18 @@ class WorktreeService {
         return ExitCode.gitFailed;
       }
 
+      // Copy files and directories to the new worktree
+      if (config?.copy != null) {
+        try {
+          await _copyService.copyFiles(config!.copy, originPath, actualPath);
+        } catch (e) {
+          printSafe('Warning: Failed to copy some files to worktree: $e');
+          // Continue anyway - copying failure shouldn't prevent worktree creation
+        }
+      }
+
       // Execute post-add hooks
       if (config?.hooks.postAdd != null) {
-        final originPath = await _gitClient.getRepoRoot();
         try {
           await _hookService.executePostAdd(
             config!.hooks,

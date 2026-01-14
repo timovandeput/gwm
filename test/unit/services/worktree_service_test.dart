@@ -6,19 +6,35 @@ import 'package:mocktail/mocktail.dart';
 import 'package:gwm/src/services/worktree_service.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/infrastructure/git_client.dart';
+import 'package:gwm/src/services/copy_service.dart';
+import 'package:gwm/src/models/config.dart';
+
+// Fake classes for fallbacks
+class FakeCopyConfig extends Fake implements CopyConfig {}
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}
 
+class MockCopyService extends Mock implements CopyService {}
+
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeCopyConfig());
+  });
+
   group('WorktreeService', () {
     late WorktreeService worktreeService;
     late MockGitClient mockGitClient;
+    late MockCopyService mockCopyService;
     late Directory tempDir;
 
     setUp(() {
       mockGitClient = MockGitClient();
-      worktreeService = WorktreeService(mockGitClient);
+      mockCopyService = MockCopyService();
+      worktreeService = WorktreeService(
+        mockGitClient,
+        copyService: mockCopyService,
+      );
       tempDir = Directory.systemTemp.createTempSync('gwm_worktree_test_');
 
       // Register fallback values for mocks
@@ -191,6 +207,55 @@ void main() {
             any(),
             branch,
             createBranch: any(named: 'createBranch'),
+          ),
+        ).called(1);
+      });
+
+      test('calls copyFiles when config contains copy settings', () async {
+        // Arrange
+        const branch = 'feature/copy';
+        final config = Config(
+          version: '1.0',
+          copy: CopyConfig(files: ['*.md'], directories: ['docs']),
+          hooks: HooksConfig(timeout: 30),
+          shellIntegration: ShellIntegrationConfig(enableEvalOutput: false),
+        );
+
+        when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
+        when(
+          () => mockGitClient.branchExists(branch),
+        ).thenAnswer((_) async => true);
+        when(
+          () => mockGitClient.getRepoRoot(),
+        ).thenAnswer((_) async => '${tempDir.path}/repo');
+        when(
+          () => mockGitClient.createWorktree(
+            any(),
+            branch,
+            createBranch: any(named: 'createBranch'),
+          ),
+        ).thenAnswer((invocation) async {
+          final path = invocation.positionalArguments[0] as String;
+          Directory(path).createSync(recursive: true);
+          return path;
+        });
+        when(
+          () => mockCopyService.copyFiles(any(), any(), any()),
+        ).thenAnswer((_) async {});
+
+        // Act
+        final result = await worktreeService.addWorktree(
+          branch,
+          config: config,
+        );
+
+        // Assert
+        expect(result, ExitCode.success);
+        verify(
+          () => mockCopyService.copyFiles(
+            config.copy,
+            '${tempDir.path}/repo',
+            any(),
           ),
         ).called(1);
       });
