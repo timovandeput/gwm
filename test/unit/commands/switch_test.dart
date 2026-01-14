@@ -150,9 +150,29 @@ void main() {
     test(
       'returns error when interactive selection requested but eval check not skipped',
       () async {
+        final worktrees = [
+          Worktree(
+            name: 'main',
+            branch: 'main',
+            path: '/repo',
+            isMain: true,
+            status: WorktreeStatus.clean,
+          ),
+          Worktree(
+            name: 'feature-auth',
+            branch: 'feature/auth',
+            path: '/repo/worktrees/feature-auth',
+            isMain: false,
+            status: WorktreeStatus.clean,
+          ),
+        ];
+
         when(
           () => mockGitClient.getRepoRoot(),
         ).thenAnswer((_) async => '/repo');
+        when(
+          () => mockGitClient.listWorktrees(),
+        ).thenAnswer((_) async => worktrees);
 
         final results = switchCommand.parser.parse([]);
         final exitCode = await switchCommand.execute(results);

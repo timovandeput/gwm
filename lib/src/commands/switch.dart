@@ -70,17 +70,19 @@ class SwitchCommand extends BaseCommand {
       final args = results.rest;
       final worktreeName = args.isNotEmpty ? args[0] : null;
 
+      final worktrees = await _gitClient.listWorktrees();
+
       // Check if interactive mode is requested but we're in eval context
       if (worktreeName == null && !skipEvalCheck) {
+        final worktreeList = worktrees.map((w) => w.name).join(', ');
         printSafe(
           'Error: Interactive worktree selection is not available when using the shell wrapper.\n'
+          'Available worktrees: $worktreeList\n'
           'Please specify a worktree name: gwm switch <worktree-name>\n'
           'Or use --no-eval-check for interactive mode (not recommended).',
         );
         return ExitCode.invalidArguments;
       }
-
-      final worktrees = await _gitClient.listWorktrees();
       final targetWorktree = await _resolveTargetWorktree(
         worktreeName,
         worktrees,
