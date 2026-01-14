@@ -37,12 +37,16 @@ void main() {
     });
 
     test('fails when not in a worktree', () async {
+      when(
+        () => mockGitClient.getRepoRoot(),
+      ).thenAnswer((_) async => '/path/to/repo');
       when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
 
       final results = cleanCommand.parser.parse([]);
       final exitCode = await cleanCommand.execute(results);
 
       expect(exitCode, ExitCode.invalidArguments);
+      verify(() => mockGitClient.getRepoRoot()).called(1);
       verify(() => mockGitClient.isWorktree()).called(1);
     });
 

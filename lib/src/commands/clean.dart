@@ -69,11 +69,16 @@ class CleanCommand extends BaseCommand {
     try {
       // Validate we're in eval wrapper
       EvalValidator.validate(skipCheck: skipEvalCheck);
-      // Validate we're in a Git repository
+
       final isWorktree = await _gitClient.isWorktree();
       if (!isWorktree) {
-        printSafe('Error: gwm clean can only be run from within a worktree.');
-        printSafe('Use "gwm switch ." to go to the main repository.');
+        // Check if we're in a git repository at all
+        try {
+          await _gitClient.getRepoRoot();
+          printSafe('Error: gwm clean can only be run from within a worktree.');
+        } catch (e) {
+          printSafe('Error: Not in a Git repository.');
+        }
         return ExitCode.invalidArguments;
       }
 
