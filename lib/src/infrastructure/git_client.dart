@@ -7,11 +7,12 @@ import '../models/worktree.dart';
 /// This abstraction allows for different implementations in production code
 /// (using actual Git CLI) and test code (using mock implementations).
 abstract class GitClient {
-  /// Creates a new Git branch with the given name.
-  Future<void> createBranch(String name);
-
   /// Creates a new worktree at the specified path for the given branch.
-  Future<String> createWorktree(String path, String branch);
+  Future<String> createWorktree(
+    String path,
+    String branch, {
+    bool createBranch = false,
+  });
 
   /// Lists all worktrees in the repository.
   Future<List<Worktree>> listWorktrees();

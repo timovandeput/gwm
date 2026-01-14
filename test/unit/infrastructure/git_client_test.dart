@@ -18,34 +18,6 @@ void main() {
       fakeProcessWrapper.clearResponses();
     });
 
-    group('createBranch', () {
-      test('creates branch successfully', () async {
-        fakeProcessWrapper.addResponse('git', ['branch', 'feature/new']);
-
-        await expectLater(gitClient.createBranch('feature/new'), completes);
-      });
-
-      test('throws exception on git failure', () async {
-        fakeProcessWrapper.addResponse(
-          'git',
-          ['branch', 'invalid'],
-          exitCode: 1,
-          stderr: 'error: invalid branch name',
-        );
-
-        await expectLater(
-          gitClient.createBranch('invalid'),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Git command failed: git branch invalid'),
-            ),
-          ),
-        );
-      });
-    });
-
     group('createWorktree', () {
       test('creates worktree successfully', () async {
         fakeProcessWrapper.addResponse('git', [
@@ -82,6 +54,25 @@ void main() {
               ),
             ),
           ),
+        );
+      });
+
+      test('creates worktree with new branch', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'worktree',
+          'add',
+          '-b',
+          'new-branch',
+          '/path/to/worktree',
+        ]);
+
+        await expectLater(
+          gitClient.createWorktree(
+            '/path/to/worktree',
+            'new-branch',
+            createBranch: true,
+          ),
+          completes,
         );
       });
     });

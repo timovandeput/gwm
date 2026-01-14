@@ -38,11 +38,6 @@ class WorktreeService {
         return ExitCode.branchNotFound;
       }
 
-      // Create branch if requested and it doesn't exist
-      if (createBranch && !await _gitClient.branchExists(branch)) {
-        await _gitClient.createBranch(branch);
-      }
-
       // Determine worktree path
       final worktreePath = await _resolveWorktreePath(branch);
       final worktreeDir = Directory(worktreePath);
@@ -53,6 +48,11 @@ class WorktreeService {
         return ExitCode.worktreeExists;
       }
 
+      // If createBranch is true and branch doesn't exist, create it along with worktree
+      // If createBranch is false, assume branch exists
+      final shouldCreateBranch =
+          createBranch && !await _gitClient.branchExists(branch);
+
       // Ensure parent directory exists
       final parentDir = worktreeDir.parent;
       if (!await parentDir.exists()) {
@@ -60,7 +60,11 @@ class WorktreeService {
       }
 
       // Create the worktree
-      final actualPath = await _gitClient.createWorktree(worktreePath, branch);
+      final actualPath = await _gitClient.createWorktree(
+        worktreePath,
+        branch,
+        createBranch: shouldCreateBranch,
+      );
 
       // Verify the worktree was created successfully
       if (!await Directory(actualPath).exists()) {

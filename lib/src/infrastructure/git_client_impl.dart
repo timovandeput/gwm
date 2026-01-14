@@ -13,25 +13,21 @@ class GitClientImpl implements GitClient {
   GitClientImpl(this._processWrapper);
 
   @override
-  Future<void> createBranch(String name) async {
-    final result = await _processWrapper.run('git', ['branch', name]);
-    _printOutput(result);
-    if (result.exitCode != 0) {
-      throw Exception('Git command failed: git branch $name');
+  Future<String> createWorktree(
+    String path,
+    String branch, {
+    bool createBranch = false,
+  }) async {
+    final args = ['worktree', 'add'];
+    if (createBranch) {
+      args.addAll(['-b', branch, path]);
+    } else {
+      args.addAll([path, branch]);
     }
-  }
-
-  @override
-  Future<String> createWorktree(String path, String branch) async {
-    final result = await _processWrapper.run('git', [
-      'worktree',
-      'add',
-      path,
-      branch,
-    ]);
+    final result = await _processWrapper.run('git', args);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git worktree add $path $branch');
+      throw Exception('Git command failed: git ${args.join(' ')}');
     }
     return path;
   }

@@ -46,9 +46,13 @@ void main() {
         when(
           () => mockGitClient.getRepoRoot(),
         ).thenAnswer((_) async => '${tempDir.path}/repo');
-        when(() => mockGitClient.createWorktree(any(), branch)).thenAnswer((
-          invocation,
-        ) async {
+        when(
+          () => mockGitClient.createWorktree(
+            any(),
+            branch,
+            createBranch: any(named: 'createBranch'),
+          ),
+        ).thenAnswer((invocation) async {
           final path = invocation.positionalArguments[0] as String;
           // Simulate creating the directory
           Directory(path).createSync(recursive: true);
@@ -63,10 +67,13 @@ void main() {
 
         // Assert
         expect(result, ExitCode.success);
-        verifyNever(
-          () => mockGitClient.createBranch(branch),
-        ); // Branch exists, so shouldn't create
-        verify(() => mockGitClient.createWorktree(any(), branch)).called(1);
+        verify(
+          () => mockGitClient.createWorktree(
+            any(),
+            branch,
+            createBranch: any(named: 'createBranch'),
+          ),
+        ).called(1);
       });
 
       test(
@@ -93,7 +100,13 @@ void main() {
 
           // Assert
           expect(result, ExitCode.worktreeExists);
-          verifyNever(() => mockGitClient.createWorktree(any(), any()));
+          verifyNever(
+            () => mockGitClient.createWorktree(
+              any(),
+              any(),
+              createBranch: any(named: 'createBranch'),
+            ),
+          );
         },
       );
 
@@ -109,7 +122,13 @@ void main() {
         // Assert
         expect(result, ExitCode.generalError);
         verifyNever(() => mockGitClient.branchExists(any()));
-        verifyNever(() => mockGitClient.createWorktree(any(), any()));
+        verifyNever(
+          () => mockGitClient.createWorktree(
+            any(),
+            any(),
+            createBranch: any(named: 'createBranch'),
+          ),
+        );
       });
 
       test('returns gitFailed when createWorktree throws exception', () async {
@@ -124,7 +143,11 @@ void main() {
           () => mockGitClient.getRepoRoot(),
         ).thenAnswer((_) async => tempDir.path);
         when(
-          () => mockGitClient.createWorktree(any(), any()),
+          () => mockGitClient.createWorktree(
+            any(),
+            any(),
+            createBranch: any(named: 'createBranch'),
+          ),
         ).thenThrow(Exception('Git command failed'));
 
         // Act
@@ -145,9 +168,13 @@ void main() {
         when(
           () => mockGitClient.getRepoRoot(),
         ).thenAnswer((_) async => tempDir.path);
-        when(() => mockGitClient.createWorktree(any(), branch)).thenAnswer((
-          invocation,
-        ) async {
+        when(
+          () => mockGitClient.createWorktree(
+            any(),
+            branch,
+            createBranch: any(named: 'createBranch'),
+          ),
+        ).thenAnswer((invocation) async {
           final path = invocation.positionalArguments[0] as String;
           // Simulate creating the directory
           Directory(path).createSync(recursive: true);
@@ -159,7 +186,13 @@ void main() {
 
         // Assert
         expect(result, ExitCode.success);
-        verify(() => mockGitClient.createWorktree(any(), branch)).called(1);
+        verify(
+          () => mockGitClient.createWorktree(
+            any(),
+            branch,
+            createBranch: any(named: 'createBranch'),
+          ),
+        ).called(1);
       });
     });
   });
