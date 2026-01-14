@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
 
 import 'base.dart';
@@ -74,7 +76,12 @@ class SwitchCommand extends BaseCommand {
 
       // Check if interactive mode is requested but we're in eval context
       if (worktreeName == null && !skipEvalCheck) {
-        final worktreeList = worktrees.map((w) => w.name).join(', ');
+        // Filter out the current worktree from the list
+        final currentPath = Directory.current.path;
+        final availableWorktrees = worktrees.where(
+          (w) => w.path != currentPath,
+        );
+        final worktreeList = availableWorktrees.map((w) => w.name).join(', ');
         printSafe(
           'Error: Interactive worktree selection is not available when using the shell wrapper.\n'
           'Available worktrees: $worktreeList\n'

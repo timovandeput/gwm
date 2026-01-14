@@ -155,7 +155,7 @@ class GitClientImpl implements GitClient {
       if (await gitFile.exists()) {
         final content = await gitFile.readAsString();
         final gitPath = content.split(': ').last.trim();
-        return Directory(gitPath).parent.parent.path;
+        return Directory(gitPath).parent.parent.parent.path;
       }
     }
     throw Exception('Unable to determine main repository path');
