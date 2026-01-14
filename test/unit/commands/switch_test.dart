@@ -9,6 +9,8 @@ import 'package:gwm/src/models/worktree.dart';
 import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/infrastructure/prompt_selector.dart';
 import 'package:gwm/src/services/shell_integration.dart';
+import 'package:gwm/src/services/copy_service.dart';
+import 'package:gwm/src/models/config.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}
@@ -17,7 +19,16 @@ class MockPromptSelector extends Mock implements PromptSelector {}
 
 class MockShellIntegration extends Mock implements ShellIntegration {}
 
+class MockCopyService extends Mock implements CopyService {}
+
+// Fake classes for fallbacks
+class FakeCopyConfig extends Fake implements CopyConfig {}
+
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeCopyConfig());
+  });
+
   late MockGitClient mockGitClient;
   late MockPromptSelector mockPromptSelector;
   late MockShellIntegration mockShellIntegration;
@@ -27,10 +38,12 @@ void main() {
     mockGitClient = MockGitClient();
     mockPromptSelector = MockPromptSelector();
     mockShellIntegration = MockShellIntegration();
+    final mockCopyService = MockCopyService();
     switchCommand = SwitchCommand(
       gitClient: mockGitClient,
       promptSelector: mockPromptSelector,
       shellIntegration: mockShellIntegration,
+      copyService: mockCopyService,
     );
 
     // Register fallback values
@@ -269,6 +282,54 @@ void main() {
       expect(exitCode, ExitCode.invalidArguments);
       verifyNever(() => mockPromptSelector.selectWorktree(any()));
       verifyNever(() => mockShellIntegration.outputCdCommand(any()));
+    });
+
+    test('reconfigures worktree when --reconfigure flag is used', () async {
+      final mockCopyService = MockCopyService();
+      final switchCommandWithCopy = SwitchCommand(
+        gitClient: mockGitClient,
+        promptSelector: mockPromptSelector,
+        shellIntegration: mockShellIntegration,
+        copyService: mockCopyService,
+      );
+
+      final worktrees = [
+        Worktree(
+          name: 'feature-branch',
+          branch: 'feature-branch',
+          path: '/repo/worktrees/feature-branch',
+          isMain: false,
+          status: WorktreeStatus.clean,
+        ),
+      ];
+
+      when(() => mockGitClient.getRepoRoot()).thenAnswer((_) async => '/repo');
+      when(
+        () => mockGitClient.listWorktrees(),
+      ).thenAnswer((_) async => worktrees);
+      when(
+        () => mockCopyService.copyFiles(any(), any(), any()),
+      ).thenAnswer((_) async {});
+
+      final results = switchCommandWithCopy.parser.parse([
+        'feature-branch',
+        '--reconfigure',
+      ]);
+      final exitCode = await switchCommandWithCopy.execute(results);
+
+      expect(exitCode, ExitCode.success);
+      verify(
+        () => mockCopyService.copyFiles(
+          any(),
+          '/repo',
+          '/repo/worktrees/feature-branch',
+        ),
+      ).called(1);
+      verify(
+        () => mockShellIntegration.outputCdCommand(
+          '/repo/worktrees/feature-branch',
+        ),
+      ).called(1);
     });
   });
 }

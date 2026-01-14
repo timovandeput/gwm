@@ -9,9 +9,12 @@ import '../infrastructure/git_client.dart';
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../infrastructure/prompt_selector.dart';
+import '../infrastructure/file_system_adapter_impl.dart';
 import '../services/shell_integration.dart';
 import '../services/config_service.dart';
 import '../services/hook_service.dart';
+import '../services/copy_service.dart';
+import '../infrastructure/file_system_adapter.dart';
 import '../models/config.dart';
 import '../utils/eval_validator.dart';
 import '../exceptions.dart';
@@ -25,6 +28,7 @@ class SwitchCommand extends BaseCommand {
   final PromptSelector _promptSelector;
   final ConfigService _configService;
   final HookService _hookService;
+  final CopyService _copyService;
   final ShellIntegration _shellIntegration;
 
   SwitchCommand({
@@ -32,6 +36,8 @@ class SwitchCommand extends BaseCommand {
     PromptSelector? promptSelector,
     ConfigService? configService,
     HookService? hookService,
+    CopyService? copyService,
+    FileSystemAdapter? fileSystemAdapter,
     ShellIntegration? shellIntegration,
     Config? config,
     super.skipEvalCheck = false,
@@ -39,6 +45,9 @@ class SwitchCommand extends BaseCommand {
        _promptSelector = promptSelector ?? PromptSelectorImpl(),
        _configService = configService ?? ConfigService(),
        _hookService = hookService ?? HookService(ProcessWrapperImpl()),
+       _copyService =
+           copyService ??
+           CopyService(fileSystemAdapter ?? FileSystemAdapterImpl()),
        _shellIntegration =
            shellIntegration ??
            ShellIntegration(
@@ -48,19 +57,27 @@ class SwitchCommand extends BaseCommand {
 
   @override
   ArgParser get parser {
-    return ArgParser()..addFlag(
-      'help',
-      abbr: 'h',
-      negatable: false,
-      help: 'Print usage information for this command.',
-    );
+    return ArgParser()
+      ..addFlag(
+        'help',
+        abbr: 'h',
+        negatable: false,
+        help: 'Print usage information for this command.',
+      )
+      ..addFlag(
+        'reconfigure',
+        abbr: 'r',
+        negatable: false,
+        help:
+            'Reconfigure the worktree by copying files and running add hooks.',
+      );
   }
 
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
       printCommandUsage(
-        'switch [worktree-name]',
+        'switch [worktree-name] [options]',
         'Switch to the specified worktree. If no worktree is specified,\nshows an interactive menu to select from available worktrees.\nUse "." to switch to the main workspace.',
         parser,
       );
@@ -79,6 +96,7 @@ class SwitchCommand extends BaseCommand {
 
       final args = results.rest;
       final worktreeName = args.isNotEmpty ? args[0] : null;
+      final reconfigure = results.flag('reconfigure');
 
       final worktrees = await _gitClient.listWorktrees();
 
@@ -116,40 +134,90 @@ class SwitchCommand extends BaseCommand {
           ? await _configService.loadConfig(repoRoot: repoRoot)
           : null;
 
-      // Execute pre-switch hooks
-      if (config?.hooks.preSwitch != null) {
-        final originPath = repoRoot ?? Directory.current.path;
-        final branch = targetWorktree.branch;
-        try {
-          await _hookService.executePreSwitch(
-            config!.hooks,
-            targetWorktree.path,
-            originPath,
-            branch,
-          );
-        } catch (e) {
-          printSafe('Error: Pre-switch hook failed: $e');
-          return ExitCode.hookFailed;
+      if (reconfigure) {
+        // Reconfigure mode: copy files and run add hooks
+        if (config?.copy != null) {
+          try {
+            await _copyService.copyFiles(
+              config!.copy,
+              repoRoot!,
+              targetWorktree.path,
+            );
+          } catch (e) {
+            printSafe('Warning: Failed to copy some files to worktree: $e');
+            // Continue anyway
+          }
         }
-      }
 
-      // Output the cd command for shell integration
-      _shellIntegration.outputCdCommand(targetWorktree.path);
+        // Execute pre-add hooks (for reconfiguration)
+        if (config?.hooks.preAdd != null) {
+          try {
+            await _hookService.executePreAdd(
+              config!.hooks,
+              targetWorktree.path,
+              repoRoot!,
+              targetWorktree.branch,
+            );
+          } catch (e) {
+            printSafe('Error: Pre-add hook failed: $e');
+            return ExitCode.hookFailed;
+          }
+        }
 
-      // Execute post-switch hooks
-      if (config?.hooks.postSwitch != null) {
-        final originPath = repoRoot ?? Directory.current.path;
-        final branch = targetWorktree.branch;
-        try {
-          await _hookService.executePostSwitch(
-            config!.hooks,
-            targetWorktree.path,
-            originPath,
-            branch,
-          );
-        } catch (e) {
-          printSafe('Error: Post-switch hook failed: $e');
-          return ExitCode.hookFailed;
+        // Output the cd command for shell integration
+        _shellIntegration.outputCdCommand(targetWorktree.path);
+
+        // Execute post-add hooks (for reconfiguration)
+        if (config?.hooks.postAdd != null) {
+          try {
+            await _hookService.executePostAdd(
+              config!.hooks,
+              targetWorktree.path,
+              repoRoot!,
+              targetWorktree.branch,
+            );
+          } catch (e) {
+            printSafe('Error: Post-add hook failed: $e');
+            return ExitCode.hookFailed;
+          }
+        }
+      } else {
+        // Normal switch mode: run switch hooks
+        // Execute pre-switch hooks
+        if (config?.hooks.preSwitch != null) {
+          final originPath = repoRoot ?? Directory.current.path;
+          final branch = targetWorktree.branch;
+          try {
+            await _hookService.executePreSwitch(
+              config!.hooks,
+              targetWorktree.path,
+              originPath,
+              branch,
+            );
+          } catch (e) {
+            printSafe('Error: Pre-switch hook failed: $e');
+            return ExitCode.hookFailed;
+          }
+        }
+
+        // Output the cd command for shell integration
+        _shellIntegration.outputCdCommand(targetWorktree.path);
+
+        // Execute post-switch hooks
+        if (config?.hooks.postSwitch != null) {
+          final originPath = repoRoot ?? Directory.current.path;
+          final branch = targetWorktree.branch;
+          try {
+            await _hookService.executePostSwitch(
+              config!.hooks,
+              targetWorktree.path,
+              originPath,
+              branch,
+            );
+          } catch (e) {
+            printSafe('Error: Post-switch hook failed: $e');
+            return ExitCode.hookFailed;
+          }
         }
       }
 
