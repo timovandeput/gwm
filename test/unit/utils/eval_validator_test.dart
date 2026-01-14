@@ -10,11 +10,6 @@ void main() {
         expect(() => EvalValidator.validate(skipCheck: true), returnsNormally);
       });
 
-      test('returns true when check is skipped', () {
-        final result = EvalValidator.validate(skipCheck: true);
-        expect(result, isTrue);
-      });
-
       test('throws ShellWrapperMissingException when stdout has terminal', () {
         // In this test environment, stdout is not a terminal (piped to test runner)
         // The actual terminal detection is tested in manual integration testing

@@ -10,11 +10,11 @@ class EvalValidator {
   /// When running in an eval wrapper, stdout is not connected to a terminal
   /// because output is being captured by shell wrapper for evaluation.
   ///
-  /// Returns [true] if validation passes, throws exception otherwise.
+  /// Throws exception if validation fails.
   ///
   /// [skipCheck] if true, bypasses validation (used with --no-eval-check flag).
-  static bool validate({bool skipCheck = false}) {
-    if (skipCheck) return true;
+  static void validate({bool skipCheck = false}) {
+    if (skipCheck) return;
 
     // Check if stdout is connected to a terminal
     // If it is, we're NOT in an eval wrapper (wrapper pipes output away from TTY)
@@ -29,7 +29,5 @@ class EvalValidator {
         'Or use --no-eval-check to bypass this validation (not recommended).',
       );
     }
-
-    return true;
   }
 }
