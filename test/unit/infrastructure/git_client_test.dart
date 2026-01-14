@@ -59,24 +59,20 @@ void main() {
         );
       });
 
-      test('creates worktree with new branch', () async {
+      test('removes worktree with force flag', () async {
         fakeProcessWrapper.addResponse('git', [
           'worktree',
-          'add',
-          '-b',
-          'new-branch',
-          '/path/to/worktree',
+          'remove',
+          '--force',
+          '/path/to/remove',
         ]);
 
         await expectLater(
-          gitClient.createWorktree(
-            '/path/to/worktree',
-            'new-branch',
-            createBranch: true,
-          ),
+          gitClient.removeWorktree('/path/to/remove', force: true),
           completes,
         );
       });
+    });
     });
 
     group('listWorktrees', () {
@@ -179,6 +175,20 @@ HEAD abc123def456
               contains('Git command failed: git worktree remove /nonexistent'),
             ),
           ),
+        );
+      });
+
+      test('removes worktree with force flag', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'worktree',
+          'remove',
+          '--force',
+          '/path/to/remove',
+        ]);
+
+        await expectLater(
+          gitClient.removeWorktree('/path/to/remove', force: true),
+          completes,
         );
       });
     });

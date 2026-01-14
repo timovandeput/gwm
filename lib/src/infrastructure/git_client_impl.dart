@@ -47,15 +47,19 @@ class GitClientImpl implements GitClient {
   }
 
   @override
-  Future<void> removeWorktree(String path) async {
-    final result = await _processWrapper.run('git', [
-      'worktree',
-      'remove',
-      path,
-    ]);
+  Future<void> removeWorktree(String path, {bool force = false}) async {
+    final args = ['worktree', 'remove'];
+    if (force) {
+      args.add('--force');
+    }
+    args.add(path);
+
+    final result = await _processWrapper.run('git', args);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git worktree remove $path');
+      throw Exception(
+        'Git command failed: git worktree remove${force ? ' --force' : ''} $path',
+      );
     }
   }
 

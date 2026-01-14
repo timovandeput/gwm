@@ -18,7 +18,8 @@ abstract class GitClient {
   Future<List<Worktree>> listWorktrees();
 
   /// Removes the worktree at the specified path.
-  Future<void> removeWorktree(String path);
+  /// [force] - If true, forces removal even if the worktree contains modified files.
+  Future<void> removeWorktree(String path, {bool force = false});
 
   /// Gets the name of the currently checked out branch.
   Future<String> getCurrentBranch();

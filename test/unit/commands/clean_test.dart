@@ -74,13 +74,17 @@ void main() {
       when(
         () => mockGitClient.getMainRepoPath(),
       ).thenAnswer((_) async => '/path/to/main');
-      when(() => mockGitClient.removeWorktree(any())).thenAnswer((_) async {});
+      when(
+        () => mockGitClient.removeWorktree(any(), force: any(named: 'force')),
+      ).thenAnswer((_) async {});
 
       final results = cleanCommand.parser.parse(['--force']);
       final exitCode = await cleanCommand.execute(results);
 
       expect(exitCode, ExitCode.success);
-      verify(() => mockGitClient.removeWorktree(any())).called(1);
+      verify(
+        () => mockGitClient.removeWorktree(any(), force: any(named: 'force')),
+      ).called(1);
     });
 
     test('successfully removes worktree when no uncommitted changes', () async {
@@ -104,13 +108,17 @@ void main() {
       when(
         () => mockGitClient.getMainRepoPath(),
       ).thenAnswer((_) async => '/path/to/main');
-      when(() => mockGitClient.removeWorktree(any())).thenAnswer((_) async {});
+      when(
+        () => mockGitClient.removeWorktree(any(), force: any(named: 'force')),
+      ).thenAnswer((_) async {});
 
       final results = cleanCommand.parser.parse([]);
       final exitCode = await cleanCommand.execute(results);
 
       expect(exitCode, ExitCode.success);
-      verify(() => mockGitClient.removeWorktree(any())).called(1);
+      verify(
+        () => mockGitClient.removeWorktree(any(), force: any(named: 'force')),
+      ).called(1);
     });
 
     test('fails when uncommitted changes exist without force flag', () async {

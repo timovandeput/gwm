@@ -109,7 +109,7 @@ class CleanCommand extends BaseCommand {
 
       // Remove the worktree using Git
       printSafe('Removing worktree: $repoRoot');
-      await _gitClient.removeWorktree(repoRoot);
+      await _gitClient.removeWorktree(repoRoot, force: force);
 
       // Execute post_clean hooks (placeholder - hooks not yet implemented)
       if (config.hooks.postClean != null) {
