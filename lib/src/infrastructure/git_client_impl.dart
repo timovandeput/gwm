@@ -162,9 +162,6 @@ class GitClientImpl implements GitClient {
   }
 
   void _printOutput(ProcessResult result) {
-    if (result.stdout.isNotEmpty) {
-      printSafe(result.stdout);
-    }
     if (result.stderr.isNotEmpty) {
       printSafe(result.stderr);
     }
