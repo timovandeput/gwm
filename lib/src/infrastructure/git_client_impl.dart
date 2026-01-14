@@ -4,6 +4,7 @@ import 'dart:io';
 import 'git_client.dart';
 import 'process_wrapper.dart';
 import '../models/worktree.dart';
+import '../cli_utils.dart';
 
 /// Implementation of GitClient using ProcessWrapper for Git operations.
 class GitClientImpl implements GitClient {
@@ -168,10 +169,10 @@ class GitClientImpl implements GitClient {
 
   void _printOutput(ProcessResult result) {
     if (result.stdout.isNotEmpty) {
-      print(result.stdout);
+      printSafe(result.stdout);
     }
     if (result.stderr.isNotEmpty) {
-      print(result.stderr);
+      printSafe(result.stderr);
     }
   }
 

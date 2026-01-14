@@ -82,8 +82,8 @@ Future<void> main(List<String> arguments) async {
         command = ListCommand(skipEvalCheck: skipEvalCheck);
         break;
       default:
-        print('Error: Unknown command "$commandName".');
-        print('');
+        printSafe('Error: Unknown command "$commandName".');
+        printSafe('');
         printUsage(argParser);
         exit(ExitCode.invalidArguments.value);
     }

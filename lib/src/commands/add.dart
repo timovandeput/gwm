@@ -63,8 +63,8 @@ class AddCommand extends BaseCommand {
 
     final args = results.rest;
     if (args.isEmpty) {
-      print('Error: Branch name is required.');
-      print('Usage: gwm add <branch> [options]');
+      printSafe('Error: Branch name is required.');
+      printSafe('Usage: gwm add <branch> [options]');
       return ExitCode.invalidArguments;
     }
 
@@ -89,10 +89,10 @@ class AddCommand extends BaseCommand {
 
       return exitCode;
     } on ShellWrapperMissingException catch (e) {
-      print(e.message);
+      printSafe(e.message);
       return e.exitCode;
     } catch (e) {
-      print('Error: Failed to create worktree: $e');
+      printSafe('Error: Failed to create worktree: $e');
       return ExitCode.gitFailed;
     }
   }
@@ -101,7 +101,7 @@ class AddCommand extends BaseCommand {
   ExitCode validate(ArgResults results) {
     final args = results.rest;
     if (args.length > 1) {
-      print('Error: Too many arguments. Expected exactly one branch name.');
+      printSafe('Error: Too many arguments. Expected exactly one branch name.');
       return ExitCode.invalidArguments;
     }
     return ExitCode.success;

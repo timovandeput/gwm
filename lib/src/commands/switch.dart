@@ -78,7 +78,7 @@ class SwitchCommand extends BaseCommand {
 
       if (targetWorktree == null) {
         if (worktreeName != null) {
-          print('Error: Worktree "$worktreeName" does not exist.');
+          printSafe('Error: Worktree "$worktreeName" does not exist.');
         }
         return ExitCode.generalError;
       }
@@ -88,10 +88,10 @@ class SwitchCommand extends BaseCommand {
 
       return ExitCode.success;
     } on ShellWrapperMissingException catch (e) {
-      print(e.message);
+      printSafe(e.message);
       return e.exitCode;
     } catch (e) {
-      print('Error: Failed to switch worktree: $e');
+      printSafe('Error: Failed to switch worktree: $e');
       return ExitCode.gitFailed;
     }
   }
@@ -100,7 +100,9 @@ class SwitchCommand extends BaseCommand {
   ExitCode validate(ArgResults results) {
     final args = results.rest;
     if (args.length > 1) {
-      print('Error: Too many arguments. Expected at most one worktree name.');
+      printSafe(
+        'Error: Too many arguments. Expected at most one worktree name.',
+      );
       return ExitCode.invalidArguments;
     }
     return ExitCode.success;
@@ -114,7 +116,7 @@ class SwitchCommand extends BaseCommand {
     try {
       await _gitClient.getRepoRoot();
     } catch (e) {
-      print('Error: Not in a Git repository.');
+      printSafe('Error: Not in a Git repository.');
       return false;
     }
 

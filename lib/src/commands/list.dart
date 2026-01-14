@@ -64,14 +64,16 @@ class ListCommand extends BaseCommand {
 
       // Output in requested format
       if (json) {
-        print(_formatter.formatJson(worktrees, currentPath));
+        printSafe(_formatter.formatJson(worktrees, currentPath));
       } else {
-        print(_formatter.formatTable(worktrees, currentPath, verbose: verbose));
+        printSafe(
+          _formatter.formatTable(worktrees, currentPath, verbose: verbose),
+        );
       }
 
       return ExitCode.success;
     } catch (e) {
-      print('Error: Failed to list worktrees: $e');
+      printSafe('Error: Failed to list worktrees: $e');
       return ExitCode.gitFailed;
     }
   }

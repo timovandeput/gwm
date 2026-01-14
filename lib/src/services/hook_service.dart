@@ -5,6 +5,7 @@ import '../infrastructure/process_wrapper.dart';
 import '../models/config.dart';
 import '../models/hook.dart';
 import '../exceptions.dart';
+import '../cli_utils.dart';
 
 /// Service for executing hooks during worktree operations.
 ///
@@ -195,7 +196,7 @@ class HookService {
   ) async {
     final expandedCommand = _expandVariables(command, environment);
 
-    print('Executing hook "$hookName": $expandedCommand');
+    printSafe('Executing hook "$hookName": $expandedCommand');
 
     final timeout = Duration(seconds: timeoutSeconds);
 
@@ -218,10 +219,10 @@ class HookService {
 
       // Display output
       if (result.stdout.isNotEmpty) {
-        print(result.stdout);
+        printSafe(result.stdout);
       }
       if (result.stderr.isNotEmpty) {
-        print(result.stderr);
+        printSafe(result.stderr);
       }
 
       // Check for failure
@@ -230,7 +231,7 @@ class HookService {
         throw HookExecutionException(hookName, expandedCommand, output);
       }
     } on TimeoutException catch (e) {
-      print('Hook "$hookName" timed out: $e');
+      printSafe('Hook "$hookName" timed out: $e');
       throw HookExecutionException(
         hookName,
         expandedCommand,

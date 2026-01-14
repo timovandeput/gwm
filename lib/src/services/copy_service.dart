@@ -5,6 +5,7 @@ import 'package:path/path.dart' as path;
 import '../infrastructure/file_system_adapter.dart';
 import '../infrastructure/platform_detector.dart';
 import '../models/config.dart';
+import '../cli_utils.dart';
 
 /// Service for copying files and directories to worktrees with Copy-on-Write optimization.
 ///
@@ -192,13 +193,13 @@ class CopyService {
   ///
   /// In production, this would integrate with the output formatter.
   void _logWarning(String message) {
-    print('Warning: $message');
+    printSafe('Warning: $message');
   }
 
   /// Logs an error message.
   ///
   /// In production, this would integrate with the output formatter.
   void _logError(String message) {
-    print('Error: $message');
+    printSafe('Error: $message');
   }
 }

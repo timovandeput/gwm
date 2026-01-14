@@ -1,6 +1,7 @@
 import 'package:args/args.dart';
 
 import '../models/exit_codes.dart';
+import '../cli_utils.dart';
 
 /// Base class for all GWM CLI commands.
 ///
@@ -32,7 +33,7 @@ abstract class BaseCommand {
   /// Subclasses can override this to provide custom error handling.
   /// By default, prints the error message and returns [ExitCode.generalError].
   ExitCode handleError(Object error) {
-    print('Error: $error');
+    printSafe('Error: $error');
     return ExitCode.generalError;
   }
 }

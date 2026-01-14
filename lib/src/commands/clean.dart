@@ -57,8 +57,8 @@ class CleanCommand extends BaseCommand {
       // Validate we're in a Git repository
       final isWorktree = await _gitClient.isWorktree();
       if (!isWorktree) {
-        print('Error: gwm clean can only be run from within a worktree.');
-        print('Use "gwm switch ." to go to the main repository.');
+        printSafe('Error: gwm clean can only be run from within a worktree.');
+        printSafe('Use "gwm switch ." to go to the main repository.');
         return ExitCode.invalidArguments;
       }
 
@@ -68,11 +68,11 @@ class CleanCommand extends BaseCommand {
       // Check for uncommitted changes
       final hasChanges = await _gitClient.hasUncommittedChanges(currentPath);
       if (hasChanges && !force) {
-        print('Uncommitted changes detected in worktree at: $currentPath');
+        printSafe('Uncommitted changes detected in worktree at: $currentPath');
         stdout.write('Continue with removal? (y/N): ');
         final response = stdin.readLineSync()?.toLowerCase().trim();
         if (response != 'y' && response != 'yes') {
-          print('Operation cancelled.');
+          printSafe('Operation cancelled.');
           return ExitCode.success;
         }
       }
@@ -82,7 +82,7 @@ class CleanCommand extends BaseCommand {
 
       // Execute pre_clean hooks (placeholder - hooks not yet implemented)
       if (config.hooks.preClean != null) {
-        print('Executing pre-clean hooks...');
+        printSafe('Executing pre-clean hooks...');
         // TODO: Implement hook execution service
         // await _hookService.executeHooks(config.hooks.preClean!, environment);
       }
@@ -91,12 +91,12 @@ class CleanCommand extends BaseCommand {
       final mainRepoPath = await _gitClient.getMainRepoPath();
 
       // Remove the worktree using Git
-      print('Removing worktree: $currentPath');
+      printSafe('Removing worktree: $currentPath');
       await _gitClient.removeWorktree(currentPath);
 
       // Execute post_clean hooks (placeholder - hooks not yet implemented)
       if (config.hooks.postClean != null) {
-        print('Executing post-clean hooks...');
+        printSafe('Executing post-clean hooks...');
         // TODO: Implement hook execution service
         // await _hookService.executeHooks(config.hooks.postClean!, environment);
       }
@@ -104,12 +104,12 @@ class CleanCommand extends BaseCommand {
       // Change to main repository directory
       // Note: In production, this would change the working directory
       // Directory.current = mainRepoPath;
-      print('Would return to main repository: $mainRepoPath');
-      print('Worktree successfully removed.');
+      printSafe('Would return to main repository: $mainRepoPath');
+      printSafe('Worktree successfully removed.');
 
       return ExitCode.success;
     } catch (e) {
-      print('Error: Failed to remove worktree: $e');
+      printSafe('Error: Failed to remove worktree: $e');
       return ExitCode.gitFailed;
     }
   }
