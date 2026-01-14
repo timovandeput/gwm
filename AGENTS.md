@@ -9,13 +9,20 @@ GWM (Git Worktree Manager) is a Dart CLI tool that simplifies Git worktree manag
 
 The project uses these Dart packages:
 - `args` (^2.7.0) - CLI argument parsing
-- `yaml` (^3.1.0) - YAML configuration support
-- `glob` (^2.1.0) - File pattern matching
+- `yaml` (^3.1.3) - YAML configuration file parsing
+- `glob` (^2.1.3) - File pattern matching for copy operations
+- `path` (^1.9.1) - Path manipulation
+- `process_runner` (^4.2.4) - Process execution with test fakes
 
 Add dependencies via:
 ```bash
-dart pub add args yaml glob 
+dart pub add args yaml glob path process_runner
 ```
+
+Dev dependencies:
+- `lints` (^6.0.0) - Dart linting rules
+- `mocktail` (^1.0.4) - Mocking library for tests
+- `test` (^1.25.6) - Testing framework
 
 ## Task tracking
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
@@ -48,7 +55,7 @@ bd sync               # Sync with git
 - **Run tests with coverage**: `dart test --coverage=coverage`
 - **Run tests in verbose mode**: `dart test -v`
 
-Note: Currently no test files exist. Create tests in `test/` directory following Dart test package conventions.
+Note: The project includes comprehensive test suites with unit tests for individual components and integration tests for end-to-end workflows. All tests follow Dart test package conventions and use mock objects to avoid external tool dependencies.
 
 ### Development Workflow
 1. Make changes to code
