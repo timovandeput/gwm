@@ -5,23 +5,29 @@ import 'package:gwt/src/commands/add.dart';
 import 'package:gwt/src/models/exit_codes.dart';
 import 'package:gwt/src/services/worktree_service.dart';
 import 'package:gwt/src/infrastructure/git_client.dart';
+import 'package:gwt/src/services/shell_integration.dart';
 
 // Mock classes
 class MockWorktreeService extends Mock implements WorktreeService {}
 
 class MockGitClient extends Mock implements GitClient {}
 
+class MockShellIntegration extends Mock implements ShellIntegration {}
+
 void main() {
   late MockWorktreeService mockWorktreeService;
   late MockGitClient mockGitClient;
+  late MockShellIntegration mockShellIntegration;
   late AddCommand addCommand;
 
   setUp(() {
     mockWorktreeService = MockWorktreeService();
     mockGitClient = MockGitClient();
+    mockShellIntegration = MockShellIntegration();
     addCommand = AddCommand(
       worktreeService: mockWorktreeService,
       gitClient: mockGitClient,
+      shellIntegration: mockShellIntegration,
     );
 
     // Register fallback values for mocks
@@ -58,11 +64,18 @@ void main() {
         () => mockWorktreeService.addWorktree(branch, createBranch: false),
       ).thenAnswer((_) async => ExitCode.success);
 
+      when(
+        () => mockWorktreeService.getWorktreePath(branch),
+      ).thenAnswer((_) async => '/worktree/path');
+
       final exitCode = await addCommand.execute(results);
 
       expect(exitCode, ExitCode.success);
       verify(
         () => mockWorktreeService.addWorktree(branch, createBranch: false),
+      ).called(1);
+      verify(
+        () => mockShellIntegration.outputWorktreeCreated('/worktree/path'),
       ).called(1);
     });
 
@@ -76,16 +89,23 @@ void main() {
           () => mockWorktreeService.addWorktree(branch, createBranch: true),
         ).thenAnswer((_) async => ExitCode.success);
 
+        when(
+          () => mockWorktreeService.getWorktreePath(branch),
+        ).thenAnswer((_) async => '/worktree/path');
+
         final exitCode = await addCommand.execute(results);
 
         expect(exitCode, ExitCode.success);
         verify(
           () => mockWorktreeService.addWorktree(branch, createBranch: true),
         ).called(1);
+        verify(
+          () => mockShellIntegration.outputWorktreeCreated('/worktree/path'),
+        ).called(1);
       },
     );
 
-    test('returns the exit code from worktreeService.addWorktree', () async {
+    test('returns exit code from worktreeService.addWorktree', () async {
       const branch = 'feature/test';
       final results = addCommand.parser.parse([branch]);
 
@@ -96,6 +116,7 @@ void main() {
       final exitCode = await addCommand.execute(results);
 
       expect(exitCode, ExitCode.gitFailed);
+      verifyNever(() => mockShellIntegration.outputWorktreeCreated(any()));
     });
   });
 }

@@ -25,7 +25,10 @@ enum ExitCode {
   configError(6),
 
   /// A Git command returned a non-zero exit status
-  gitFailed(7);
+  gitFailed(7),
+
+  /// Shell wrapper is missing or not properly configured
+  shellWrapperMissing(8);
 
   const ExitCode(this.value);
 

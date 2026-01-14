@@ -6,18 +6,33 @@ import '../services/worktree_service.dart';
 import '../infrastructure/git_client.dart';
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
+import '../services/shell_integration.dart';
+import '../models/config.dart';
+import '../utils/eval_validator.dart';
+import '../exceptions.dart';
 
 /// Command for adding a new Git worktree.
 ///
 /// Usage: gwt add `<branch>` [options]
 class AddCommand extends BaseCommand {
   final WorktreeService _worktreeService;
+  final ShellIntegration _shellIntegration;
 
-  AddCommand({WorktreeService? worktreeService, GitClient? gitClient})
-    : _worktreeService =
-          worktreeService ??
-          WorktreeService(gitClient ?? GitClientImpl(ProcessWrapperImpl()));
-
+  AddCommand({
+    WorktreeService? worktreeService,
+    GitClient? gitClient,
+    ShellIntegration? shellIntegration,
+    Config? config,
+    super.skipEvalCheck = false,
+  }) : _worktreeService =
+           worktreeService ??
+           WorktreeService(gitClient ?? GitClientImpl(ProcessWrapperImpl())),
+       _shellIntegration =
+           shellIntegration ??
+           ShellIntegration(
+             config?.shellIntegration ??
+                 ShellIntegrationConfig(enableEvalOutput: true),
+           );
   @override
   ArgParser get parser {
     return ArgParser()
@@ -55,11 +70,30 @@ class AddCommand extends BaseCommand {
     final branch = args[0];
     final createBranch = results.flag('create-branch');
 
-    // Use the worktree service to create the worktree
-    return await _worktreeService.addWorktree(
-      branch,
-      createBranch: createBranch,
-    );
+    try {
+      // Validate we're in eval wrapper
+      EvalValidator.validate(skipCheck: skipEvalCheck);
+
+      // Use the worktree service to create the worktree
+      final exitCode = await _worktreeService.addWorktree(
+        branch,
+        createBranch: createBranch,
+      );
+
+      // If worktree was created, navigate to it
+      if (exitCode == ExitCode.success) {
+        final worktreePath = await _worktreeService.getWorktreePath(branch);
+        _shellIntegration.outputWorktreeCreated(worktreePath);
+      }
+
+      return exitCode;
+    } on ShellWrapperMissingException catch (e) {
+      print(e.message);
+      return e.exitCode;
+    } catch (e) {
+      print('Error: Failed to create worktree: $e');
+      return ExitCode.gitFailed;
+    }
   }
 
   @override

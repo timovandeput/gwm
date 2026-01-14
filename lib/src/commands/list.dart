@@ -16,9 +16,12 @@ class ListCommand extends BaseCommand {
   final GitClient _gitClient;
   final OutputFormatter _formatter;
 
-  ListCommand({GitClient? gitClient, OutputFormatter? formatter})
-    : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
-      _formatter = formatter ?? OutputFormatter();
+  ListCommand({
+    GitClient? gitClient,
+    OutputFormatter? formatter,
+    super.skipEvalCheck = false,
+  }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
+       _formatter = formatter ?? OutputFormatter();
 
   @override
   ArgParser get parser {

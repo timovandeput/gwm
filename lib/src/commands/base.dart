@@ -7,6 +7,12 @@ import '../models/exit_codes.dart';
 /// Provides common functionality for argument parsing, validation,
 /// and error handling.
 abstract class BaseCommand {
+  /// Whether to skip shell wrapper validation check.
+  final bool skipEvalCheck;
+
+  /// Creates a base command with optional skipEvalCheck parameter.
+  const BaseCommand({this.skipEvalCheck = false});
+
   /// The argument parser for this command.
   ArgParser get parser;
 

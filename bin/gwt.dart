@@ -7,6 +7,7 @@ import 'package:gwt/src/commands/switch.dart';
 import 'package:gwt/src/commands/clean.dart';
 import 'package:gwt/src/commands/list.dart';
 import 'package:gwt/src/models/exit_codes.dart';
+import 'package:gwt/src/exceptions.dart';
 
 const String version = '0.0.1';
 
@@ -25,6 +26,11 @@ ArgParser buildParser() {
       help: 'Show additional command output.',
     )
     ..addFlag('version', negatable: false, help: 'Print the tool version.')
+    ..addFlag(
+      'no-eval-check',
+      negatable: false,
+      help: 'Skip shell wrapper validation check (not recommended).',
+    )
     ..addCommand('add', AddCommand().parser)
     ..addCommand('switch', SwitchCommand().parser)
     ..addCommand('clean', CleanCommand().parser)
@@ -74,18 +80,20 @@ Future<void> main(List<String> arguments) async {
     final commandResults = results.command!;
     late final BaseCommand command;
 
+    final skipEvalCheck = results.flag('no-eval-check');
+
     switch (commandName) {
       case 'add':
-        command = AddCommand();
+        command = AddCommand(skipEvalCheck: skipEvalCheck);
         break;
       case 'switch':
-        command = SwitchCommand();
+        command = SwitchCommand(skipEvalCheck: skipEvalCheck);
         break;
       case 'clean':
-        command = CleanCommand();
+        command = CleanCommand(skipEvalCheck: skipEvalCheck);
         break;
       case 'list':
-        command = ListCommand();
+        command = ListCommand(skipEvalCheck: skipEvalCheck);
         break;
       default:
         print('Error: Unknown command "$commandName".');
@@ -109,6 +117,9 @@ Future<void> main(List<String> arguments) async {
     print('');
     printUsage(argParser);
     exit(ExitCode.invalidArguments.value);
+  } on ShellWrapperMissingException catch (e) {
+    print(e.message);
+    exit(e.exitCode.value);
   } catch (e) {
     print('Unexpected error: $e');
     exit(ExitCode.generalError.value);

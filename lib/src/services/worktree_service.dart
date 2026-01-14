@@ -102,4 +102,12 @@ class WorktreeService {
 
     return PathUtils.normalize(worktreePath);
   }
+
+  /// Gets the path for a worktree with the given branch name.
+  ///
+  /// [branch] is the name of the branch.
+  /// Returns the resolved worktree path.
+  Future<String> getWorktreePath(String branch) async {
+    return await _resolveWorktreePath(branch);
+  }
 }

@@ -85,3 +85,9 @@ class GitException extends GwtException {
         'Git command failed: "$command ${arguments.join(' ')}"\n$output',
       );
 }
+
+/// Exception thrown when GWT is run without proper shell wrapper.
+class ShellWrapperMissingException extends GwtException {
+  const ShellWrapperMissingException(String message)
+    : super(ExitCode.shellWrapperMissing, message);
+}

@@ -9,6 +9,8 @@ import '../infrastructure/process_wrapper_impl.dart';
 import '../infrastructure/prompt_selector.dart';
 import '../services/shell_integration.dart';
 import '../models/config.dart';
+import '../utils/eval_validator.dart';
+import '../exceptions.dart';
 
 /// Command for switching to an existing Git worktree.
 ///
@@ -23,6 +25,7 @@ class SwitchCommand extends BaseCommand {
     PromptSelector? promptSelector,
     ShellIntegration? shellIntegration,
     Config? config,
+    super.skipEvalCheck = false,
   }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
        _promptSelector = promptSelector ?? PromptSelectorImpl(),
        _shellIntegration =
@@ -62,6 +65,9 @@ class SwitchCommand extends BaseCommand {
         return ExitCode.generalError;
       }
 
+      // Validate we're in eval wrapper
+      EvalValidator.validate(skipCheck: skipEvalCheck);
+
       final args = results.rest;
       final worktreeName = args.isNotEmpty ? args[0] : null;
 
@@ -82,6 +88,9 @@ class SwitchCommand extends BaseCommand {
       _shellIntegration.outputCdCommand(targetWorktree.path);
 
       return ExitCode.success;
+    } on ShellWrapperMissingException catch (e) {
+      print(e.message);
+      return e.exitCode;
     } catch (e) {
       print('Error: Failed to switch worktree: $e');
       return ExitCode.gitFailed;

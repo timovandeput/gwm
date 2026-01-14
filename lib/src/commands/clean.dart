@@ -16,9 +16,12 @@ class CleanCommand extends BaseCommand {
   final GitClient _gitClient;
   final ConfigService _configService;
 
-  CleanCommand({GitClient? gitClient, ConfigService? configService})
-    : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
-      _configService = configService ?? ConfigService();
+  CleanCommand({
+    GitClient? gitClient,
+    ConfigService? configService,
+    super.skipEvalCheck = false,
+  }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
+       _configService = configService ?? ConfigService();
 
   @override
   ArgParser get parser {
