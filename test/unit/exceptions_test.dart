@@ -77,7 +77,7 @@ void main() {
   });
 
   group('ConfigException', () {
-    const exception = ConfigException('/path/to/.gwt.json', 'invalid json');
+    const exception = ConfigException('/path/to/.gwm.json', 'invalid json');
 
     test('has correct exit code', () {
       expect(exception.exitCode, equals(ExitCode.configError));
@@ -86,12 +86,12 @@ void main() {
     test('has correct message', () {
       expect(
         exception.message,
-        equals('Configuration error in "/path/to/.gwt.json": invalid json'),
+        equals('Configuration error in "/path/to/.gwm.json": invalid json'),
       );
     });
 
     test('stores config details', () {
-      expect(exception.configPath, equals('/path/to/.gwt.json'));
+      expect(exception.configPath, equals('/path/to/.gwm.json'));
       expect(exception.reason, equals('invalid json'));
     });
   });

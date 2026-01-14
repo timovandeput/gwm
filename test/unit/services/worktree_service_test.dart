@@ -19,7 +19,7 @@ void main() {
     setUp(() {
       mockGitClient = MockGitClient();
       worktreeService = WorktreeService(mockGitClient);
-      tempDir = Directory.systemTemp.createTempSync('gwt_worktree_test_');
+      tempDir = Directory.systemTemp.createTempSync('gwm_worktree_test_');
 
       // Register fallback values for mocks
       registerFallbackValue('');

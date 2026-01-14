@@ -8,6 +8,7 @@ import '../infrastructure/git_client.dart';
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../services/config_service.dart';
+import '../cli_utils.dart';
 
 /// Command for cleaning up the current Git worktree.
 ///
@@ -42,11 +43,11 @@ class CleanCommand extends BaseCommand {
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
-      print('Usage: gwm clean [options]');
-      print('');
-      print('Delete the current worktree and return to the main repository.');
-      print('');
-      print(parser.usage);
+      printCommandUsage(
+        'clean [options]',
+        'Delete the current worktree and return to the main repository.',
+        parser,
+      );
       return ExitCode.success;
     }
 

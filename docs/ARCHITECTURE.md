@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-GWT (Git Worktree Manager) is a command-line tool built in Dart that simplifies Git worktree management. This document
+GWM (Git Worktree Manager) is a command-line tool built in Dart that simplifies Git worktree management. This document
 outlines the software architecture, component design, data flows, and testing strategy.
 
 ## 2. Technology Stack
@@ -78,9 +78,9 @@ graph TB
 ## 4. Directory Structure
 
 ```
-gwt/
+gwm/
 ├── bin/
-│   └── gwt.dart                  # Main entry point
+│   └── gwm.dart                  # Main entry point
 ├── lib/
 │   ├── src/
 │   │   ├── commands/             # Command handlers
@@ -111,7 +111,7 @@ gwt/
 │   │   │   ├── validation.dart
 │   │   │   └── output_formatter.dart
 │   │   └── exceptions.dart        # Custom exceptions
-│   └── gwt.dart                  # Library entry point
+│   └── gwm.dart                  # Library entry point
 ├── test/
 │   ├── unit/                     # Unit tests
 │   │   ├── commands/
@@ -213,9 +213,9 @@ The `ConfigService` manages configuration loading with the 3-tier hierarchy:
 ```mermaid
 graph LR
 subgraph "Configuration Hierarchy"
-G[Global Config<br/>~/.config/gwt/config.*]
-R[Repo Config<br/>.gwt.*]
-L[Local Config<br/>.gwt.local.*]
+G[Global Config<br/>~/.config/gwm/config.*]
+R[Repo Config<br/>.gwm.*]
+L[Local Config<br/>.gwm.local.*]
 M[Merged Config]
 end
 
@@ -336,8 +336,8 @@ sequenceDiagram
     participant Output
     User ->> Shell: gwm switch feature-auth
     Shell ->> GWM: Execute with shell wrapper
-    Note over Shell: gwt() { eval "$(command gwm $@")"; }
-    GWM->>GWT: Process command
+    Note over Shell: gwm() { eval "$(command gwm $@")"; }
+    GWM->>GWM: Process command
     GWM->>Output: Generate eval output
     Note over Output: cd ~/work/worktrees/project_feature-auth
     Output-->>Shell: Return shell command
@@ -502,7 +502,7 @@ All tests use test doubles and mocks to ensure:
 
 ```mermaid
 graph TD
-    subgraph Pyramid["GWT Test Pyramid"]
+    subgraph Pyramid["GWM Test Pyramid"]
         AT["Acceptance Tests<br/>10%<br/>User-facing behavior<br/>CLI interface"]
         UT["Unit Tests<br/>80%<br/>Service logic<br/>Model validation<br/>Utility functions"]
         IT["Integration Tests<br/>10%<br/>Full workflow scenarios<br/>End-to-end command execution"]
@@ -757,7 +757,7 @@ group('error conditions', () {
   });
 
   test('handles config parsing errors', () async {
-    mockFileSystem.addFile('/path/to/.gwt.json', '{ invalid json }');
+    mockFileSystem.addFile('/path/to/.gwm.json', '{ invalid json }');
 
     final result = await configService.loadConfig('/path/to/repo');
 

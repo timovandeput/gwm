@@ -4,14 +4,14 @@ This document provides instructions for installing and configuring GWM (Git Work
 
 ## Shell Integration
 
-GWT supports automatic directory switching through shell wrapper functions. These wrappers capture GWM's output and execute it in your shell.
+GWM supports automatic directory switching through shell wrapper functions. These wrappers capture GWM's output and execute it in your shell.
 
 ### Bash
 
 Add the following to your `~/.bashrc`:
 
 ```bash
-gwt() { eval "$(command gwm "$@")"; }
+gwm() { eval "$(command gwm "$@")"; }
 ```
 
 ### Zsh
@@ -19,7 +19,7 @@ gwt() { eval "$(command gwm "$@")"; }
 Add the following to your `~/.zshrc`:
 
 ```zsh
-gwt() { eval "$(command gwm "$@")" }
+gwm() { eval "$(command gwm "$@")" }
 ```
 
 ### Fish
@@ -27,7 +27,7 @@ gwt() { eval "$(command gwm "$@")" }
 Add the following to your `~/.config/fish/config.fish`:
 
 ```fish
-function gwt
+function gwm
     eval (command gwm $argv)
 end
 ```
@@ -52,14 +52,14 @@ def --env gwm [...args] {
 
 ## Tab Completion
 
-GWT provides tab completion for worktree names (in `list` and `switch` commands) and branch names (in `add` command).
+GMM provides tab completion for worktree names (in `list` and `switch` commands) and branch names (in `add` command).
 
 ### Bash
 
 Source the completion script in your `~/.bashrc`:
 
 ```bash
-source /path/to/gwt/docs/completion/bash/gwt-completion.bash
+source /path/to/gwm/docs/completion/bash/gwm-completion.bash
 ```
 
 ### Zsh
@@ -67,7 +67,7 @@ source /path/to/gwt/docs/completion/bash/gwt-completion.bash
 Either source the completion script or place it in your `$fpath`:
 
 ```zsh
-source /path/to/gwt/docs/completion/zsh/_gwt
+source /path/to/gwm/docs/completion/zsh/_gwm
 ```
 
 Or copy the file to a directory in your `$fpath` (e.g., `/usr/local/share/zsh/site-functions/`) and run `compinit`.
@@ -77,18 +77,18 @@ Or copy the file to a directory in your `$fpath` (e.g., `/usr/local/share/zsh/si
 Copy the completion file to your fish completions directory:
 
 ```fish
-cp /path/to/gwt/docs/completion/fish/gwt.fish ~/.config/fish/completions/
+cp /path/to/gwm/docs/completion/fish/gwm.fish ~/.config/fish/completions/
 ```
 
 Or to the system directory:
 
 ```fish
-sudo cp /path/to/gwt/docs/completion/fish/gwt.fish /usr/share/fish/vendor_completions.d/
+sudo cp /path/to/gwm/docs/completion/fish/gwm.fish /usr/share/fish/vendor_completions.d/
 ```
 
 ## Configuration
 
-GWT can be configured to disable shell integration if needed. Set the following in your configuration:
+GWM can be configured to disable shell integration if needed. Set the following in your configuration:
 
 ```json
 {

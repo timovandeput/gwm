@@ -250,9 +250,9 @@ class HookService {
   ) {
     return {
       ...Platform.environment,
-      'GWT_WORKTREE_PATH': worktreePath,
-      'GWT_ORIGIN_PATH': originPath,
-      'GWT_BRANCH': branch,
+      'GWM_WORKTREE_PATH': worktreePath,
+      'GWM_ORIGIN_PATH': originPath,
+      'GWM_BRANCH': branch,
     };
   }
 
@@ -262,16 +262,16 @@ class HookService {
   String _expandVariables(String command, Map<String, String> environment) {
     var expanded = command;
 
-    // Expand predefined GWT variables
+    // Expand predefined GWM variables
     expanded = expanded.replaceAll(
-      '\$GWT_WORKTREE_PATH',
-      environment['GWT_WORKTREE_PATH']!,
+      '\$GWM_WORKTREE_PATH',
+      environment['GWM_WORKTREE_PATH']!,
     );
     expanded = expanded.replaceAll(
-      '\$GWT_ORIGIN_PATH',
-      environment['GWT_ORIGIN_PATH']!,
+      '\$GWM_ORIGIN_PATH',
+      environment['GWM_ORIGIN_PATH']!,
     );
-    expanded = expanded.replaceAll('\$GWT_BRANCH', environment['GWT_BRANCH']!);
+    expanded = expanded.replaceAll('\$GWM_BRANCH', environment['GWM_BRANCH']!);
 
     // Expand other environment variables
     environment.forEach((key, value) {

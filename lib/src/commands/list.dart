@@ -8,6 +8,7 @@ import '../infrastructure/git_client.dart';
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../utils/output_formatter.dart';
+import '../cli_utils.dart';
 
 /// Command for listing Git worktrees.
 ///
@@ -43,11 +44,11 @@ class ListCommand extends BaseCommand {
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
-      print('Usage: gwm list [options]');
-      print('');
-      print('List all Git worktrees in the current repository.');
-      print('');
-      print(parser.usage);
+      printCommandUsage(
+        'list [options]',
+        'List all Git worktrees in the current repository.',
+        parser,
+      );
       return ExitCode.success;
     }
 

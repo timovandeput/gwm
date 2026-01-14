@@ -36,7 +36,7 @@ lib/src/models/config.dart
 lib/src/models/hook.dart
 lib/src/models/exit_codes.dart
 lib/src/exceptions.dart
-lib/gwt.dart
+lib/gwm.dart
 ```
 
 ### Acceptance Criteria
@@ -130,9 +130,9 @@ test/unit/services/config_service_test.dart
 
 ### Acceptance Criteria
 
-1. [ ] Loads global config from `~/.config/gwt/config.{json,yaml}`
-2. [ ] Loads repo config from `.gwt.{json,yaml}` in repository root
-3. [ ] Loads local config from `.gwt.local.{json,yaml}` in repository root
+1. [ ] Loads global config from `~/.config/gwm/config.{json,yaml}`
+2. [ ] Loads repo config from `.gwm.{json,yaml}` in repository root
+3. [ ] Loads local config from `.gwm.local.{json,yaml}` in repository root
 4. [ ] Merges configs with correct priority: local > repo > global
 5. [ ] Implements complete override: local field replaces repo field
 6. [ ] Implements prepend: `post_add_prepend` adds commands before repo list
@@ -175,7 +175,7 @@ Implement the CLI argument parsing framework and command routing system. This pr
 ### Files Created
 
 ```
-bin/gwt.dart
+bin/gwm.dart
 lib/src/commands/base.dart
 lib/src/commands/help.dart
 lib/src/commands/version.dart
@@ -508,7 +508,7 @@ automation and custom workflows.
 ### Deliverables
 
 - `HookService` implementation
-- Environment variable expansion ($GWT_WORKTREE_PATH, $GWT_ORIGIN_PATH, $GWT_BRANCH)
+- Environment variable expansion ($GWM_WORKTREE_PATH, $GWM_ORIGIN_PATH, $GWM_BRANCH)
 - Timeout handling with configurable global and per-hook timeouts
 - Sequential execution with immediate failure on error
 - Integration with all commands
@@ -569,9 +569,9 @@ seamless directory switching.
 lib/src/services/shell_integration.dart (enhanced)
 lib/src/infrastructure/prompt_selector.dart (enhanced with fzf)
 docs/INSTALLATION.md (shell wrapper instructions)
-docs/completion/bash/gwt-completion.bash
-docs/completion/zsh/_gwt
-docs/completion/fish/gwt.fish
+docs/completion/bash/gwm-completion.bash
+docs/completion/zsh/_gwm
+docs/completion/fish/gwm.fish
 test/unit/services/shell_integration_test.dart (enhanced)
 ```
 
@@ -679,10 +679,10 @@ docs/INSTALLATION.md
 docs/TROUBLESHOOTING.md
 docs/SHELL_INTEGRATION.md
 docs/EXAMPLES.md
-examples/basic/.gwt.json
-examples/advanced/.gwt.json
-examples/advanced/.gwt.local.json
-examples/minimal/.gwt.json
+examples/basic/.gwm.json
+examples/advanced/.gwm.json
+examples/advanced/.gwm.local.json
+examples/minimal/.gwm.json
 ```
 
 ### Acceptance Criteria

@@ -58,21 +58,21 @@ Then restart your shell or run: source ~/.config/fish/config.fish''';
       case Shell.powershell:
         return r'''
 Add to your PowerShell profile:
-    function gwm { Invoke-Expression (function gwm { Invoke-Expression (Invoke-Expression (& gwt gwm gwm $args) }
+    function gwm { Invoke-Expression (function gwm { Invoke-Expression (Invoke-Expression (& gwm gwm gwm $args) }
 To find your profile path, run: $PROFILE
 Then restart your shell or run: . $PROFILE''';
       case Shell.nushell:
         return r'''
 Add to ~/.config/nushell/config.nu:
     def --env gwm [...args] {
-        ^gwt ...$args | lines | each { |line| nu -c $line }
+        ^gwm ...$args | lines | each { |line| nu -c $line }
     }
 Then restart your shell or run: source ~/.config/nushell/config.nu''';
       case Shell.unknown:
         return r'''
 Ensure GWM is invoked with eval to enable automatic directory switching.
 For Unix-like shells, wrap GWM: eval "$(gwm "$@")"
-For PowerShell: Invoke-Expression (Invoke-Expression (& gwt gwm $args)''';
+For PowerShell: Invoke-Expression (Invoke-Expression (& gwm gwm $args)''';
     }
   }
 

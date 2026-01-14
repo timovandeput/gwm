@@ -58,7 +58,7 @@ void main() {
         final config = HooksConfig(
           timeout: 30,
           preAdd: Hook.fromList([
-            'echo "\$GWT_WORKTREE_PATH \$GWT_ORIGIN_PATH \$GWT_BRANCH"',
+            'echo "\$GWM_WORKTREE_PATH \$GWM_ORIGIN_PATH \$GWM_BRANCH"',
           ]),
         );
 
@@ -73,14 +73,14 @@ void main() {
       test('sets environment variables for hook execution', () async {
         fakeProcessWrapper.addResponse(
           'sh',
-          ['-c', 'env | grep GWT_ | sort'],
+          ['-c', 'env | grep GWM_ | sort'],
           stdout:
-              'GWT_BRANCH=test-branch\nGWT_ORIGIN_PATH=/test/origin\nGWT_WORKTREE_PATH=/test/worktree\n',
+              'GWM_BRANCH=test-branch\nGWM_ORIGIN_PATH=/test/origin\nGWM_WORKTREE_PATH=/test/worktree\n',
         );
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook.fromList(['env | grep GWT_ | sort']),
+          preAdd: Hook.fromList(['env | grep GWM_ | sort']),
         );
 
         await hookService.executePreAdd(

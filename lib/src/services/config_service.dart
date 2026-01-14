@@ -11,9 +11,9 @@ import '../utils/validation.dart';
 /// Service for loading and managing GWM configuration from multiple sources.
 ///
 /// Supports loading configuration from three tiers with proper merging:
-/// 1. Global config (~/.config/gwt/config.{json,yaml})
-/// 2. Repository config (.gwt.{json,yaml} in repo root)
-/// 3. Local config (.gwt.local.{json,yaml} in repo root)
+/// 1. Global config (~/.config/gwm/config.{json,yaml})
+/// 2. Repository config (.gwm.{json,yaml} in repo root)
+/// 3. Local config (.gwm.local.{json,yaml} in repo root)
 ///
 /// Configurations are merged with local > repo > global priority.
 class ConfigService {
@@ -35,12 +35,12 @@ class ConfigService {
     return _mergeConfigs(globalConfig, repoConfig, localConfig);
   }
 
-  /// Loads global configuration from ~/.config/gwt/config.{json,yaml}
+  /// Loads global configuration from ~/.config/gwm/config.{json,yaml}
   Future<Map<String, dynamic>?> _loadGlobalConfig() async {
     final homeDir = Platform.environment['HOME'];
     if (homeDir == null) return null;
 
-    final configDir = Directory('$homeDir/.config/gwt');
+    final configDir = Directory('$homeDir/.config/gwm');
     final jsonFile = File('${configDir.path}/config.json');
     final yamlFile = File('${configDir.path}/config.yaml');
 
@@ -53,10 +53,10 @@ class ConfigService {
     return null;
   }
 
-  /// Loads repository configuration from .gwt.{json,yaml} in repo root
+  /// Loads repository configuration from .gwm.{json,yaml} in repo root
   Future<Map<String, dynamic>?> _loadRepoConfig(String repoRoot) async {
-    final jsonFile = File('$repoRoot/.gwt.json');
-    final yamlFile = File('$repoRoot/.gwt.yaml');
+    final jsonFile = File('$repoRoot/.gwm.json');
+    final yamlFile = File('$repoRoot/.gwm.yaml');
 
     if (await jsonFile.exists()) {
       return _loadJsonFile(jsonFile.path);
@@ -67,10 +67,10 @@ class ConfigService {
     return null;
   }
 
-  /// Loads local configuration from .gwt.local.{json,yaml} in repo root
+  /// Loads local configuration from .gwm.local.{json,yaml} in repo root
   Future<Map<String, dynamic>?> _loadLocalConfig(String repoRoot) async {
-    final jsonFile = File('$repoRoot/.gwt.local.json');
-    final yamlFile = File('$repoRoot/.gwt.local.yaml');
+    final jsonFile = File('$repoRoot/.gwm.local.json');
+    final yamlFile = File('$repoRoot/.gwm.local.yaml');
 
     if (await jsonFile.exists()) {
       return _loadJsonFile(jsonFile.path);

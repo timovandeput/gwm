@@ -10,6 +10,7 @@ import '../services/shell_integration.dart';
 import '../models/config.dart';
 import '../utils/eval_validator.dart';
 import '../exceptions.dart';
+import '../cli_utils.dart';
 
 /// Command for adding a new Git worktree.
 ///
@@ -52,11 +53,11 @@ class AddCommand extends BaseCommand {
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
-      print('Usage: gwm add <branch> [options]');
-      print('');
-      print('Add a new Git worktree for the specified branch.');
-      print('');
-      print(parser.usage);
+      printCommandUsage(
+        'add <branch> [options]',
+        'Add a new Git worktree for the specified branch.',
+        parser,
+      );
       return ExitCode.success;
     }
 

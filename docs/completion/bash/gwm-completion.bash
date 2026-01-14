@@ -2,7 +2,7 @@
 
 # GWM (Git Worktree Manager) bash completion
 # Source this file in your ~/.bashrc:
-#   source /path/to/gwt-completion.bash
+#   source /path/to/gwm-completion.bash
 
 _gwm_complete_worktrees() {
     local cur prev

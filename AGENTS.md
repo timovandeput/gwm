@@ -1,7 +1,7 @@
 # AGENTS.md - Development Guidelines for GWM CLI Tool
 
 ## Project Overview
-GWT (Git Worktree Manager) is a Dart CLI tool that simplifies Git worktree management. It provides streamlined commands for creating, switching, and managing worktrees with automatic directory navigation, configurable hooks, and cross-platform support.
+GWM (Git Worktree Manager) is a Dart CLI tool that simplifies Git worktree management. It provides streamlined commands for creating, switching, and managing worktrees with automatic directory navigation, configurable hooks, and cross-platform support.
 
 **Architecture Reference**: See `docs/ARCHITECTURE.md` for complete system architecture, component diagrams, data flow, and testing strategy.
 
@@ -33,8 +33,8 @@ bd sync               # Sync with git
 ## Build, Lint, and Test Commands
 
 ### Build Commands
-- **Run the application**: `dart run bin/gwt.dart`
-- **Build executable**: `dart compile exe bin/gwt.dart -o gwt`
+- **Run the application**: `dart run bin/gwm.dart`
+- **Build executable**: `dart compile exe bin/gwm.dart -o gwm`
 
 ### Lint Commands
 - **Run static analysis**: `dart analyze`
@@ -55,7 +55,7 @@ Note: Currently no test files exist. Create tests in `test/` directory following
 2. Format: `dart format .`
 3. Lint: `dart analyze`
 4. Test: `dart test` (when tests exist)
-5. Run: `dart run bin/gwt.dart --help` to verify functionality
+5. Run: `dart run bin/gwm.dart --help` to verify functionality
 
 ## Code Style Guidelines
 
@@ -69,7 +69,7 @@ Note: Currently no test files exist. Create tests in `test/` directory following
 ### File Organization
 ```
 bin/                        # Executable entry points
-  gwt.dart                  # Main CLI application
+  gwm.dart                  # Main CLI application
 
 lib/
   src/
@@ -101,7 +101,7 @@ lib/
       validation.dart
       output_formatter.dart
     exceptions.dart          # Custom exceptions
-  gwt.dart                 # Library entry point
+  gwm.dart                 # Library entry point
 
 test/
   unit/                    # Unit tests for individual components
@@ -230,7 +230,7 @@ Config parseArguments(List<String> arguments) {
 
 ```dart
 const int defaultPort = 8080;
-const String appName = 'gwt';
+const String appName = 'gwm';
 const Duration timeout = Duration(seconds: 30);
 ```
 

@@ -13,8 +13,8 @@ void main() {
 
     setUp(() {
       configService = ConfigService();
-      tempDir = Directory.systemTemp.createTempSync('gwt_config_test_');
-      fakeHomeDir = Directory.systemTemp.createTempSync('gwt_fake_home_');
+      tempDir = Directory.systemTemp.createTempSync('gwm_config_test_');
+      fakeHomeDir = Directory.systemTemp.createTempSync('gwm_fake_home_');
     });
 
     tearDown(() {
@@ -22,7 +22,7 @@ void main() {
       fakeHomeDir.deleteSync(recursive: true);
       // Clean up any global config files created during tests
       final globalDir = Directory(
-        '${Platform.environment['HOME']}/.config/gwt',
+        '${Platform.environment['HOME']}/.config/gwm',
       );
       if (globalDir.existsSync()) {
         globalDir.deleteSync(recursive: true);
@@ -43,7 +43,7 @@ void main() {
 
       test('loads global JSON config', () async {
         final globalDir = Directory(
-          '${Platform.environment['HOME']}/.config/gwt',
+          '${Platform.environment['HOME']}/.config/gwm',
         );
         globalDir.createSync(recursive: true);
         addTearDown(() => globalDir.deleteSync(recursive: true));
@@ -76,7 +76,7 @@ void main() {
 
       test('loads global YAML config', () async {
         final globalDir = Directory(
-          '${Platform.environment['HOME']}/.config/gwt',
+          '${Platform.environment['HOME']}/.config/gwm',
         );
         globalDir.createSync(recursive: true);
         addTearDown(() => globalDir.deleteSync(recursive: true));
@@ -105,7 +105,7 @@ shellIntegration:
       });
 
       test('loads repo config', () async {
-        final repoConfig = File('${tempDir.path}/.gwt.json');
+        final repoConfig = File('${tempDir.path}/.gwm.json');
         repoConfig.writeAsStringSync('''
 {
   "version": "1.0",
@@ -121,7 +121,7 @@ shellIntegration:
       });
 
       test('loads local config with higher priority', () async {
-        final repoConfig = File('${tempDir.path}/.gwt.json');
+        final repoConfig = File('${tempDir.path}/.gwm.json');
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -130,7 +130,7 @@ shellIntegration:
 }
 ''');
 
-        final localConfig = File('${tempDir.path}/.gwt.local.json');
+        final localConfig = File('${tempDir.path}/.gwm.local.json');
         localConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -149,7 +149,7 @@ shellIntegration:
         () async {
           // Global config
           final globalDir = Directory(
-            '${Platform.environment['HOME']}/.config/gwt',
+            '${Platform.environment['HOME']}/.config/gwm',
           );
           globalDir.createSync(recursive: true);
           addTearDown(() => globalDir.deleteSync(recursive: true));
@@ -168,7 +168,7 @@ shellIntegration:
 ''');
 
           // Repo config
-          final repoConfig = File('${tempDir.path}/.gwt.json');
+          final repoConfig = File('${tempDir.path}/.gwm.json');
           repoConfig.writeAsStringSync('''
 {
   "copy": {
@@ -181,7 +181,7 @@ shellIntegration:
 ''');
 
           // Local config
-          final localConfig = File('${tempDir.path}/.gwt.local.json');
+          final localConfig = File('${tempDir.path}/.gwm.local.json');
           localConfig.writeAsStringSync('''
 {
   "copy": {
@@ -206,7 +206,7 @@ shellIntegration:
 
     group('hook merging', () {
       test('prepend commands to hook', () async {
-        final repoConfig = File('${tempDir.path}/.gwt.json');
+        final repoConfig = File('${tempDir.path}/.gwm.json');
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -215,7 +215,7 @@ shellIntegration:
 }
 ''');
 
-        final localConfig = File('${tempDir.path}/.gwt.local.json');
+        final localConfig = File('${tempDir.path}/.gwm.local.json');
         localConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -233,7 +233,7 @@ shellIntegration:
       });
 
       test('append commands to hook', () async {
-        final repoConfig = File('${tempDir.path}/.gwt.json');
+        final repoConfig = File('${tempDir.path}/.gwm.json');
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -242,7 +242,7 @@ shellIntegration:
 }
 ''');
 
-        final localConfig = File('${tempDir.path}/.gwt.local.json');
+        final localConfig = File('${tempDir.path}/.gwm.local.json');
         localConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -260,7 +260,7 @@ shellIntegration:
       });
 
       test('prepend and append together', () async {
-        final repoConfig = File('${tempDir.path}/.gwt.json');
+        final repoConfig = File('${tempDir.path}/.gwm.json');
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -269,7 +269,7 @@ shellIntegration:
 }
 ''');
 
-        final localConfig = File('${tempDir.path}/.gwt.local.json');
+        final localConfig = File('${tempDir.path}/.gwm.local.json');
         localConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -289,7 +289,7 @@ shellIntegration:
       });
 
       test('prepend/append work with object format hooks', () async {
-        final repoConfig = File('${tempDir.path}/.gwt.json');
+        final repoConfig = File('${tempDir.path}/.gwm.json');
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -301,7 +301,7 @@ shellIntegration:
 }
 ''');
 
-        final localConfig = File('${tempDir.path}/.gwt.local.json');
+        final localConfig = File('${tempDir.path}/.gwm.local.json');
         localConfig.writeAsStringSync('''
 {
   "hooks": {
@@ -324,7 +324,7 @@ shellIntegration:
 
     group('hook formats', () {
       test('supports array format hooks', () async {
-        final configFile = File('${tempDir.path}/.gwt.json');
+        final configFile = File('${tempDir.path}/.gwm.json');
         configFile.writeAsStringSync('''
 {
   "hooks": {
@@ -343,7 +343,7 @@ shellIntegration:
       });
 
       test('supports object format hooks', () async {
-        final configFile = File('${tempDir.path}/.gwt.json');
+        final configFile = File('${tempDir.path}/.gwm.json');
         configFile.writeAsStringSync('''
 {
   "hooks": {
@@ -364,7 +364,7 @@ shellIntegration:
 
     group('error handling', () {
       test('throws ConfigException for invalid JSON', () async {
-        final configFile = File('${tempDir.path}/.gwt.json');
+        final configFile = File('${tempDir.path}/.gwm.json');
         configFile.writeAsStringSync('{"invalid": json}');
 
         expect(
@@ -374,7 +374,7 @@ shellIntegration:
       });
 
       test('throws ConfigException for invalid YAML', () async {
-        final configFile = File('${tempDir.path}/.gwt.yaml');
+        final configFile = File('${tempDir.path}/.gwm.yaml');
         configFile.writeAsStringSync('invalid: yaml: content: [');
 
         expect(

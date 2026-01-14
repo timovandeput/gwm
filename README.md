@@ -1,6 +1,6 @@
 # GWM - Git Worktree Manager
 
-GWT (Git Worktree Manager) is a command-line tool that simplifies the management of Git worktrees, enabling parallel
+GWM (Git Worktree Manager) is a command-line tool that simplifies the management of Git worktrees, enabling parallel
 development sessions on the same Git repository. It's designed for both manual worktree workflows and AI-assisted
 development scenarios where multiple tool instances work in parallel on different features.
 
@@ -26,13 +26,13 @@ development scenarios where multiple tool instances work in parallel on differen
 
 1. 🔽 Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/gwt.git
-   cd gwt
+   git clone https://github.com/yourusername/gwm.git
+   cd gwm
    ```
 
 2. 🏗️ Build the executable:
    ```bash
-   dart compile exe bin/gwm.dart -o gwt
+   dart compile exe bin/gwm.dart -o gwm
    ```
 
 3. ➡️ Move the executable to your PATH:
@@ -41,7 +41,7 @@ development scenarios where multiple tool instances work in parallel on differen
    sudo mv gwm /usr/local/bin/
 
    # Windows
-   # Add gwt.exe to your PATH or move to a directory in PATH
+   # Add gwm.exe to your PATH or move to a directory in PATH
    ```
 
 ### Alternative: Running from Source
@@ -91,7 +91,7 @@ function gwm
 end
 
 # Tab completion (save to ~/.config/fish/completions/gwm.fish)
-complete -c gwm -a 'add switch clean list' -d 'GWT commands'
+complete -c gwm -a 'add switch clean list' -d 'GWM commands'
 ```
 
 ### PowerShell 💻
@@ -217,11 +217,11 @@ gwm list -j
 
 ## Configuration
 
-GWT supports configuration at three levels:
+GWM supports configuration at three levels:
 
 ### Global Configuration 🌍
 
-Location: `~/.config/gwt/config.json` (or `.yaml`)
+Location: `~/.config/gwm/config.json` (or `.yaml`)
 
 Applies to all repositories and contains default settings.
 
@@ -236,7 +236,7 @@ Applies to all repositories and contains default settings.
 
 ### Per-Repository Configuration 📁
 
-Location: `.gwt.json` (or `.yaml`) in repository root
+Location: `.gwm.json` (or `.yaml`) in repository root
 
 Repository-specific settings that can be committed to Git and shared with the team.
 
@@ -273,7 +273,7 @@ Repository-specific settings that can be committed to Git and shared with the te
 
 ### Per-Repository Local Configuration 🔒
 
-Location: `.gwt.local.json` (or `.yaml`) in repository root
+Location: `.gwm.local.json` (or `.yaml`) in repository root
 
 Local-only overrides that should be added to `.gitignore`.
 
@@ -332,12 +332,12 @@ Hooks are shell commands that run at specific points during worktree operations.
 
 | Hook          | When Executed                          | Environment Variables                  |
 |---------------|----------------------------------------|----------------------------------------|
-| `pre_add`     | Before creating worktree               | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `post_add`    | After creating worktree                | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `pre_switch`  | Before switching worktree              | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `post_switch` | After switching worktree               | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `pre_clean`   | Before deleting worktree               | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `post_clean`  | After deleting worktree (in main repo) | `GWT_ORIGIN_PATH`                      |
+| `pre_add`     | Before creating worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_add`    | After creating worktree                | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `pre_switch`  | Before switching worktree              | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_switch` | After switching worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `pre_clean`   | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_clean`  | After deleting worktree (in main repo) | `GWM_ORIGIN_PATH`                      |
 
 ```json
 {
@@ -372,13 +372,13 @@ Hooks are shell commands that run at specific points during worktree operations.
 
 ## Directory Structure 📂
 
-GWT creates worktrees in a shared directory structure:
+GWM creates worktrees in a shared directory structure:
 
 ```
 ~/work/
 ├── project/               # Main Git repository
-│   ├── .gwt.json          # Repository-specific configuration
-│   ├── .gwt.local.json    # Local-only configuration (gitignored)
+│   ├── .gwm.json          # Repository-specific configuration
+│   ├── .gwm.local.json    # Local-only configuration (gitignored)
 │   └── ...                # Repository files
 └── worktrees/             # Shared worktree directory
     ├── project_feature-auth/
@@ -465,7 +465,7 @@ gwm list -v
 dart run bin/gwm.dart
 
 # Build executable
-dart compile exe bin/gwm.dart -o gwt
+dart compile exe bin/gwm.dart -o gwm
 ```
 
 ### Lint Commands 🔍
@@ -521,11 +521,11 @@ Ensure shell wrapper is installed (see Shell Integration section above).
 
 ### Files not copied to worktree 📁
 
-Check `copy` configuration in `.gwt.json` and `.gwt.local.json` and verify file paths exist in main repository.
+Check `copy` configuration in `.gwm.json` and `.gwm.local.json` and verify file paths exist in main repository.
 
 ### Hook execution fails ❌
 
-GWT will display the error output from the failed command. Review the output to understand the failure, fix the issue,
+GWM will display the error output from the failed command. Review the output to understand the failure, fix the issue,
 and retry.
 
 ## Contributing 🤝
@@ -540,4 +540,4 @@ Contributions are welcome! Please see [AGENTS.md](AGENTS.md) for development gui
 
 - [📋 PRD](PRD.md) - Product Requirements Document
 - [👨‍💻 AGENTS.md](AGENTS.md) - Development Guidelines
-- [🔗 GitHub Repository](https://github.com/yourusername/gwt)
+- [🔗 GitHub Repository](https://github.com/yourusername/gwm)

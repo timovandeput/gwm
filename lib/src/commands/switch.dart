@@ -11,6 +11,7 @@ import '../services/shell_integration.dart';
 import '../models/config.dart';
 import '../utils/eval_validator.dart';
 import '../exceptions.dart';
+import '../cli_utils.dart';
 
 /// Command for switching to an existing Git worktree.
 ///
@@ -48,13 +49,11 @@ class SwitchCommand extends BaseCommand {
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
-      print('Usage: gwm switch [worktree-name]');
-      print('');
-      print('Switch to the specified worktree. If no worktree is specified,');
-      print('shows an interactive menu to select from available worktrees.');
-      print('Use "." to switch to the main workspace.');
-      print('');
-      print(parser.usage);
+      printCommandUsage(
+        'switch [worktree-name]',
+        'Switch to the specified worktree. If no worktree is specified,\nshows an interactive menu to select from available worktrees.\nUse "." to switch to the main workspace.',
+        parser,
+      );
       return ExitCode.success;
     }
 

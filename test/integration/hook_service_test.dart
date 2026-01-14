@@ -40,9 +40,9 @@ void main() {
           final config = HooksConfig(
             timeout: 30,
             preAdd: Hook.fromList([
-              'echo "Worktree: \$GWT_WORKTREE_PATH"',
-              'echo "Origin: \$GWT_ORIGIN_PATH"',
-              'echo "Branch: \$GWT_BRANCH"',
+              'echo "Worktree: \$GWM_WORKTREE_PATH"',
+              'echo "Origin: \$GWM_ORIGIN_PATH"',
+              'echo "Branch: \$GWM_BRANCH"',
             ]),
           );
 

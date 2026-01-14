@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-GWT (Git Worktree Manager) is a command-line tool that simplifies the management of Git worktrees, enabling parallel
+GWM (Git Worktree Manager) is a command-line tool that simplifies the management of Git worktrees, enabling parallel
 development sessions on the same Git repository. It is designed to support both manual worktree workflows and
 AI-assisted development scenarios where multiple tool instances work in parallel on different features.
 
@@ -14,7 +14,7 @@ becomes cumbersome without proper tooling.
 
 ### 1.2 Solution
 
-GWT provides a streamlined interface for:
+GWM provides a streamlined interface for:
 
 - Creating and managing worktrees with automatic directory navigation
 - Switching between worktrees seamlessly
@@ -187,19 +187,19 @@ gwm list -j
 
 #### 3.2.1 Configuration Files
 
-**Global Configuration**: `~/.config/gwt/config.json` (or `.yaml`)
+**Global Configuration**: `~/.config/gwm/config.json` (or `.yaml`)
 
 - Applies to all repositories
 - Contains default settings and shared hooks
 
-**Per-Repository Configuration**: `.gwt.json` (or `.yaml`) in repository root
+**Per-Repository Configuration**: `.gwm.json` (or `.yaml`) in repository root
 
 - Repository-specific overrides
 - Extends global configuration
 - Can be committed to Git and shared with the team
 - Used for team-wide settings and shared development workflows
 
-**Per-Repository Local Configuration**: `.gwt.local.json` (or `.yaml`) in repository root
+**Per-Repository Local Configuration**: `.gwm.local.json` (or `.yaml`) in repository root
 
 - Optional local-only overrides that are not committed to Git
 - Should be added to `.gitignore`
@@ -211,7 +211,7 @@ gwm list -j
 Local configuration can override, prepend to, or append to settings from the per-repository configuration:
 
 ```json
-// .gwt.json (shared, committed to Git)
+// .gwm.json (shared, committed to Git)
 {
   "version": "1.0",
   "copy": {
@@ -224,7 +224,7 @@ Local configuration can override, prepend to, or append to settings from the per
   }
 }
 
-// .gwt.local.json (local-only, gitignored)
+// .gwm.local.json (local-only, gitignored)
 {
   "copy": {
     "files": [".env.local", ".secrets"]  // Additional files to copy
@@ -235,7 +235,7 @@ Local configuration can override, prepend to, or append to settings from the per
   }
 }
 
-// Result when using .gwt.local.json:
+// Result when using .gwm.local.json:
 // copy.files = [".env", "*.env.*", ".env.local", ".secrets"]  // Merged
 // hooks.post_add = [
 //   "echo 'Local setup starting'",
@@ -253,13 +253,13 @@ Local configuration can override, prepend to, or append to settings from the per
 
 **Configuration Hierarchy** (highest to lowest priority):
 
-1. Per-repository local (`.gwt.local.json`) - with override strategies
-2. Per-repository (`.gwt.json`)
-3. Global (`~/.config/gwt/config.json`)
+1. Per-repository local (`.gwm.local.json`) - with override strategies
+2. Per-repository (`.gwm.json`)
+3. Global (`~/.config/gwm/config.json`)
 
 #### 3.2.2 Configuration Schema
 
-**Global Configuration** (`~/.config/gwt/config.json`):
+**Global Configuration** (`~/.config/gwm/config.json`):
 
 ```json
 {
@@ -270,7 +270,7 @@ Local configuration can override, prepend to, or append to settings from the per
 }
 ```
 
-**Per-Repository Configuration** (`.gwt.json` - shared, committed to Git):
+**Per-Repository Configuration** (`.gwm.json` - shared, committed to Git):
 
 ```json
 {
@@ -296,7 +296,7 @@ Local configuration can override, prepend to, or append to settings from the per
       "npm run build"
     ],
     "pre_switch": [
-      "echo 'Switching to $GWT_WORKTREE_PATH'"
+      "echo 'Switching to $GWM_WORKTREE_PATH'"
     ],
     "post_switch": [
       "npm run dev"
@@ -314,9 +314,9 @@ Local configuration can override, prepend to, or append to settings from the per
 }
 ```
 
-**Per-Repository Local Configuration** (`.gwt.local.json` - local-only, gitignored):
+**Per-Repository Local Configuration** (`.gwm.local.json` - local-only, gitignored):
 
-**Per-Repository Local Configuration** (`.gwt.local.json` - local-only, gitignored):
+**Per-Repository Local Configuration** (`.gwm.local.json` - local-only, gitignored):
 
 ```json
 {
@@ -348,8 +348,8 @@ Local configuration can override, prepend to, or append to settings from the per
       ".env",
       "*.env.*",
       "config/*.json",
-      ".env.local",      // From .gwt.local.json (appended)
-      ".secrets"         // From .gwt.local.json (appended)
+      ".env.local",      // From .gwm.local.json (appended)
+      ".secrets"         // From .gwm.local.json (appended)
     ],
     "directories": [
       "node_modules",
@@ -362,13 +362,13 @@ Local configuration can override, prepend to, or append to settings from the per
       "echo 'Creating worktree...'"
     ],
     "post_add": [
-      "echo 'Local setup starting'",  // From .gwt.local.json (prepended)
+      "echo 'Local setup starting'",  // From .gwm.local.json (prepended)
       "npm install",
       "npm run build",
-      "npm run dev"                    // From .gwt.local.json (appended)
+      "npm run dev"                    // From .gwm.local.json (appended)
     ],
     "pre_switch": [
-      "echo 'Switching to $GWT_WORKTREE_PATH'"
+      "echo 'Switching to $GWM_WORKTREE_PATH'"
     ],
     "post_switch": [
       "npm run dev"
@@ -388,7 +388,7 @@ Local configuration can override, prepend to, or append to settings from the per
 
 **YAML Alternative**:
 
-**Global Configuration** (`~/.config/gwt/config.yaml`):
+**Global Configuration** (`~/.config/gwm/config.yaml`):
 
 ```yaml
 version: "1.0"
@@ -396,7 +396,7 @@ hooks:
   timeout: 30
 ```
 
-**Per-Repository Configuration** (`.gwt.yaml` - shared, committed to Git):
+**Per-Repository Configuration** (`.gwm.yaml` - shared, committed to Git):
 
 ```yaml
 version: "1.0"
@@ -416,7 +416,7 @@ hooks:
     - "npm install"
     - "npm run build"
   pre_switch:
-    - "echo 'Switching to $GWT_WORKTREE_PATH'"
+    - "echo 'Switching to $GWM_WORKTREE_PATH'"
   post_switch:
     - "npm run dev"
   pre_clean:
@@ -427,7 +427,7 @@ shell_integration:
   enable_eval_output: true
 ```
 
-**Per-Repository Local Configuration** (`.gwt.local.yaml` - local-only, gitignored):
+**Per-Repository Local Configuration** (`.gwm.local.yaml` - local-only, gitignored):
 
 ```yaml
 version: "1.0"
@@ -462,7 +462,7 @@ The `copy` section in configuration specifies files and directories to copy from
 
 #### 3.3.2 Copy Optimization
 
-GWT automatically selects the best copy strategy based on the operating system and filesystem:
+GWM automatically selects the best copy strategy based on the operating system and filesystem:
 
 | Platform | Filesystem | Strategy                |
 |----------|------------|-------------------------|
@@ -481,24 +481,24 @@ GWT automatically selects the best copy strategy based on the operating system a
 
 | Hook          | When Executed                          | Environment Variables                  |
 |---------------|----------------------------------------|----------------------------------------|
-| `pre_add`     | Before creating worktree               | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `post_add`    | After creating worktree                | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `pre_switch`  | Before switching worktree              | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `post_switch` | After switching worktree               | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `pre_clean`   | Before deleting worktree               | `GWT_WORKTREE_PATH`, `GWT_ORIGIN_PATH` |
-| `post_clean`  | After deleting worktree (in main repo) | `GWT_ORIGIN_PATH`                      |
+| `pre_add`     | Before creating worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_add`    | After creating worktree                | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `pre_switch`  | Before switching worktree              | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_switch` | After switching worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `pre_clean`   | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_clean`  | After deleting worktree (in main repo) | `GWM_ORIGIN_PATH`                      |
 
 #### 3.4.2 Environment Variables
 
-- `GWT_WORKTREE_PATH`: Absolute path to the target worktree
-- `GWT_ORIGIN_PATH`: Absolute path to the main repository
-- `GWT_BRANCH`: Branch name being worked with
+- `GWM_WORKTREE_PATH`: Absolute path to the target worktree
+- `GWM_ORIGIN_PATH`: Absolute path to the main repository
+- `GWM_BRANCH`: Branch name being worked with
 
 #### 3.4.3 Hook Execution
 
 - Hooks run as shell commands (sh/bash on Unix, cmd/PowerShell on Windows)
 - Multiple hooks in an array execute sequentially
-- **GWT fails immediately if any external command invoked from a hook returns a non-zero exit status**
+- **GWM fails immediately if any external command invoked from a hook returns a non-zero exit status**
 - **Both standard output and error output from external commands are displayed to the user**
 - Hook execution stops on first failure
 - Failed hooks display error message and prevent the operation
@@ -553,7 +553,7 @@ When an external command fails (non-zero exit status):
     "post_add": [
       "npm install",
       "npm run db:migrate",
-      "echo 'Setup complete for $GWT_BRANCH'"
+      "echo 'Setup complete for $GWM_BRANCH'"
     ]
   }
 }
@@ -563,7 +563,7 @@ When an external command fails (non-zero exit status):
 
 #### 3.5.1 Automatic Directory Switching
 
-GWT uses `eval` output to enable automatic directory switching across all supported shells.
+GWM uses `eval` output to enable automatic directory switching across all supported shells.
 
 **Implementation**:
 
@@ -576,19 +576,19 @@ GWT uses `eval` output to enable automatic directory switching across all suppor
 **Bash** (`~/.bashrc`):
 
 ```bash
-gwt() { eval "$(command gwm "$@")"; }
+gwm() { eval "$(command gwm "$@")"; }
 ```
 
 **Zsh** (`~/.zshrc`):
 
 ```bash
-gwt() { eval "$(command gwm "$@")" }
+gwm() { eval "$(command gwm "$@")" }
 ```
 
 **Fish** (`~/.config/fish/config.fish`):
 
 ```fish
-function gwt
+function gwm
     eval (command gwm $argv)
 end
 ```
@@ -641,7 +641,7 @@ Auto-completion support for:
 ### 4.4 Error Handling
 
 - Clear, actionable error messages
-- **GWT fails immediately on any external command returning non-zero exit status**
+- **GWM fails immediately on any external command returning non-zero exit status**
   - This includes: Git commands, hook commands, and any other external tool invocations
 - **All external command output (both stdout and stderr) is displayed to the user**
   - This ensures users can diagnose failures and see error messages from invoked tools
@@ -655,7 +655,7 @@ Auto-completion support for:
 - Safe execution of hooks (no arbitrary code injection)
 - Clear prompts for destructive operations (clean, remove)
 - Support for `.gitignore`-like patterns for local config files
-- `.gwt.local.json` should be added to `.gitignore` to prevent committing local-only settings to the repository
+- `.gwm.local.json` should be added to `.gitignore` to prevent committing local-only settings to the repository
 
 ## 5. Technical Architecture
 
@@ -671,10 +671,10 @@ Auto-completion support for:
 ```
 ~/work/
 ├── project/               # Main Git repository
-│   ├── .gwt.json          # Repository-specific configuration (shared, committed)
-│   ├── .gwt.local.json    # Local-only configuration (gitignored)
-│   ├── .gitignore         # Should include .gwt.local.json
-│   │                       # Recommended content: .gwt.local.*
+│   ├── .gwm.json          # Repository-specific configuration (shared, committed)
+│   ├── .gwm.local.json    # Local-only configuration (gitignored)
+│   ├── .gitignore         # Should include .gwm.local.json
+│   │                       # Recommended content: .gwm.local.*
 │   └── ...                # Repository files
 └── worktrees/             # Shared worktree directory for all repos in ~/work/
     ├── project_feature-auth/
@@ -683,7 +683,7 @@ Auto-completion support for:
     ├── otherrepo_feature-xyz/
     └── ...
 
-~/.config/gwt/
+~/.config/gwm/
 └── config.json            # Global configuration
 ```
 
@@ -692,8 +692,8 @@ Auto-completion support for:
 - Multiple Git repositories in the same parent directory share the same `worktrees` directory
 - Worktree names are formatted as `<repo-name>_<branch-name>` to avoid conflicts
 - Worktrees are never created inside Git workspace directories
-- `.gwt.local.json` should be added to `.gitignore` to avoid committing local-only settings
-- Recommended `.gitignore` entry: `.gwt.local.*` to ignore both JSON and YAML local configs
+- `.gwm.local.json` should be added to `.gitignore` to avoid committing local-only settings
+- Recommended `.gitignore` entry: `.gwm.local.*` to ignore both JSON and YAML local configs
 
 ### 5.3 Git Command Integration
 
@@ -788,7 +788,7 @@ gwm list -v
 ### 6.4 Project Setup Workflow
 
 ```json
-// .gwt.json (shared, committed to Git)
+// .gwm.json (shared, committed to Git)
 {
   "version": "1.0",
   "copy": {
@@ -817,7 +817,7 @@ gwm list -v
 ```
 
 ```json
-// .gwt.local.json (local-only, gitignored)
+// .gwm.local.json (local-only, gitignored)
 {
   "version": "1.0",
   "hooks": {
@@ -839,11 +839,11 @@ gwm add feature/new-component
 # 1. Creates worktree in ~/work/worktrees/project_feature-new-component/
 # 2. Copies .env and node_modules from main repo
 # 3. Runs hooks in order:
-#    - "echo 'Starting local setup...'" (from .gwt.local.json)
-#    - "npm install" (from .gwt.json)
-#    - "npm run build" (from .gwt.json)
-#    - "npm run typecheck" (from .gwt.local.json)
-#    - "echo 'Local setup complete!'" (from .gwt.local.json)
+#    - "echo 'Starting local setup...'" (from .gwm.local.json)
+#    - "npm install" (from .gwm.json)
+#    - "npm run build" (from .gwm.json)
+#    - "npm run typecheck" (from .gwm.local.json)
+#    - "echo 'Local setup complete!'" (from .gwm.local.json)
 # 4. Switches to worktree directory
 
 # If any hook command fails (e.g., npm install):
@@ -946,7 +946,7 @@ The following decisions have been made for the implementation:
 
 ### 10.3 Example Configuration Files
 
-**Minimal Global Configuration** (`~/.config/gwt/config.json`):
+**Minimal Global Configuration** (`~/.config/gwm/config.json`):
 
 ```json
 {
@@ -957,7 +957,7 @@ The following decisions have been made for the implementation:
 }
 ```
 
-**Full Per-Repository Configuration** (`.gwt.json` - committed to Git):
+**Full Per-Repository Configuration** (`.gwm.json` - committed to Git):
 
 ```json
 {
@@ -999,7 +999,7 @@ The following decisions have been made for the implementation:
 }
 ```
 
-**Per-Repository Local Configuration** (`.gwt.local.json` - gitignored):
+**Per-Repository Local Configuration** (`.gwm.local.json` - gitignored):
 
 ```json
 {
@@ -1012,7 +1012,7 @@ The following decisions have been made for the implementation:
 }
 ```
 
-**Configuration with Per-Hook Timeout** (`.gwt.local.json`):
+**Configuration with Per-Hook Timeout** (`.gwm.local.json`):
 
 ```json
 {
@@ -1041,7 +1041,7 @@ The following decisions have been made for the implementation:
 
 **Issue**: Files not copied to worktree
 
-- **Solution**: Check `copy` configuration in `.gwt.json` and `.gwt.local.json` and verify file paths exist in main repository
+- **Solution**: Check `copy` configuration in `.gwm.json` and `.gwm.local.json` and verify file paths exist in main repository
 
 **Issue**: Hook execution fails with timeout
 
@@ -1073,11 +1073,11 @@ The following decisions have been made for the implementation:
 
 **Issue**: Local settings not taking effect
 
-- **Solution**: Ensure `.gwt.local.json` exists in the repository root and is not committed to Git (should be in `.gitignore`)
+- **Solution**: Ensure `.gwm.local.json` exists in the repository root and is not committed to Git (should be in `.gitignore`)
 
 **Issue**: Hooks running in wrong order
 
-- **Solution**: Check that you're using `_prepend` and `_append` suffixes correctly in `.gwt.local.json` to control hook execution order
+- **Solution**: Check that you're using `_prepend` and `_append` suffixes correctly in `.gwm.local.json` to control hook execution order
 
 **Issue**: Configuration format incompatible with current GWM version
 
