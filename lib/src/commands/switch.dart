@@ -51,7 +51,7 @@ class SwitchCommand extends BaseCommand {
     if (results.flag('help')) {
       printCommandUsage(
         'switch [worktree-name]',
-        'Switch to the specified worktree. If no worktree is specified,\nshows an interactive menu to select from available worktrees\n(requires --no-eval-check). Use "." to switch to the main workspace.',
+        'Switch to the specified worktree. If no worktree is specified,\nshows an interactive menu to select from available worktrees.\nUse "." to switch to the main workspace.',
         parser,
       );
       return ExitCode.success;
@@ -78,8 +78,7 @@ class SwitchCommand extends BaseCommand {
         printSafe(
           'Error: Interactive worktree selection is not available when using the shell wrapper.\n'
           'Available worktrees: $worktreeList\n'
-          'Please specify a worktree name: gwm switch <worktree-name>\n'
-          'Or use --no-eval-check for interactive mode (not recommended).',
+          'Please specify a worktree name: gwm switch <worktree-name>',
         );
         return ExitCode.invalidArguments;
       }
