@@ -117,9 +117,8 @@ class GitClientImpl implements GitClient {
       'rev-parse',
       '--show-toplevel',
     ]);
-    _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git rev-parse --show-toplevel');
+      throw Exception('Not in a Git repository');
     }
     return (result.stdout as String).trim();
   }
@@ -130,7 +129,6 @@ class GitClientImpl implements GitClient {
       'rev-parse',
       '--is-inside-work-tree',
     ]);
-    _printOutput(result);
     if (result.exitCode != 0) {
       return false; // Not in a git repository
     }
