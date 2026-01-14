@@ -6,23 +6,29 @@ import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/models/config.dart';
 import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/services/config_service.dart';
+import 'package:gwm/src/services/hook_service.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}
 
 class MockConfigService extends Mock implements ConfigService {}
 
+class MockHookService extends Mock implements HookService {}
+
 void main() {
   late MockGitClient mockGitClient;
   late MockConfigService mockConfigService;
+  late MockHookService mockHookService;
   late CleanCommand cleanCommand;
 
   setUp(() {
     mockGitClient = MockGitClient();
     mockConfigService = MockConfigService();
+    mockHookService = MockHookService();
     cleanCommand = CleanCommand(
       gitClient: mockGitClient,
       configService: mockConfigService,
+      hookService: mockHookService,
     );
 
     // Register fallback values for mocks
@@ -72,6 +78,9 @@ void main() {
         ),
       );
       when(
+        () => mockGitClient.getCurrentBranch(),
+      ).thenAnswer((_) async => 'test-branch');
+      when(
         () => mockGitClient.getMainRepoPath(),
       ).thenAnswer((_) async => '/path/to/main');
       when(
@@ -105,6 +114,9 @@ void main() {
           shellIntegration: ShellIntegrationConfig(enableEvalOutput: false),
         ),
       );
+      when(
+        () => mockGitClient.getCurrentBranch(),
+      ).thenAnswer((_) async => 'test-branch');
       when(
         () => mockGitClient.getMainRepoPath(),
       ).thenAnswer((_) async => '/path/to/main');

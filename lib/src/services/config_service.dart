@@ -293,6 +293,10 @@ class ConfigService {
   Hook? _parseHook(dynamic hookData) {
     if (hookData == null) return null;
 
+    if (hookData is String) {
+      return Hook.fromList([hookData]);
+    }
+
     if (hookData is List) {
       return Hook.fromList(List<String>.from(hookData));
     }

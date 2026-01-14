@@ -10,6 +10,8 @@ import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../infrastructure/prompt_selector.dart';
 import '../services/shell_integration.dart';
+import '../services/config_service.dart';
+import '../services/hook_service.dart';
 import '../models/config.dart';
 import '../utils/eval_validator.dart';
 import '../exceptions.dart';
@@ -21,16 +23,22 @@ import '../cli_utils.dart';
 class SwitchCommand extends BaseCommand {
   final GitClient _gitClient;
   final PromptSelector _promptSelector;
+  final ConfigService _configService;
+  final HookService _hookService;
   final ShellIntegration _shellIntegration;
 
   SwitchCommand({
     GitClient? gitClient,
     PromptSelector? promptSelector,
+    ConfigService? configService,
+    HookService? hookService,
     ShellIntegration? shellIntegration,
     Config? config,
     super.skipEvalCheck = false,
   }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
        _promptSelector = promptSelector ?? PromptSelectorImpl(),
+       _configService = configService ?? ConfigService(),
+       _hookService = hookService ?? HookService(ProcessWrapperImpl()),
        _shellIntegration =
            shellIntegration ??
            ShellIntegration(
@@ -102,8 +110,48 @@ class SwitchCommand extends BaseCommand {
         return ExitCode.generalError;
       }
 
+      // Load configuration for hooks
+      final repoRoot = await _getRepoRoot();
+      final config = repoRoot != null
+          ? await _configService.loadConfig(repoRoot: repoRoot)
+          : null;
+
+      // Execute pre-switch hooks
+      if (config?.hooks.preSwitch != null) {
+        final originPath = repoRoot ?? Directory.current.path;
+        final branch = targetWorktree.branch;
+        try {
+          await _hookService.executePreSwitch(
+            config!.hooks,
+            targetWorktree.path,
+            originPath,
+            branch,
+          );
+        } catch (e) {
+          printSafe('Error: Pre-switch hook failed: $e');
+          return ExitCode.hookFailed;
+        }
+      }
+
       // Output the cd command for shell integration
       _shellIntegration.outputCdCommand(targetWorktree.path);
+
+      // Execute post-switch hooks
+      if (config?.hooks.postSwitch != null) {
+        final originPath = repoRoot ?? Directory.current.path;
+        final branch = targetWorktree.branch;
+        try {
+          await _hookService.executePostSwitch(
+            config!.hooks,
+            targetWorktree.path,
+            originPath,
+            branch,
+          );
+        } catch (e) {
+          printSafe('Error: Post-switch hook failed: $e');
+          return ExitCode.hookFailed;
+        }
+      }
 
       return ExitCode.success;
     } on ShellWrapperMissingException catch (e) {
@@ -142,6 +190,18 @@ class SwitchCommand extends BaseCommand {
     // The command should work from main repo or existing worktrees
     // We don't restrict it further as the requirements don't specify
     return true;
+  }
+
+  /// Gets the repository root directory.
+  ///
+  /// Returns null if not in a git repo.
+  Future<String?> _getRepoRoot() async {
+    try {
+      return await _gitClient.getRepoRoot();
+    } catch (e) {
+      // If not in a git repo, return null
+      return null;
+    }
   }
 
   /// Resolves the target worktree based on the provided name or interactive selection.

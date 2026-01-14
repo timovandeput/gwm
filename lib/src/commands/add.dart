@@ -3,6 +3,7 @@ import 'package:args/args.dart';
 import 'base.dart';
 import '../models/exit_codes.dart';
 import '../services/worktree_service.dart';
+import '../services/config_service.dart';
 import '../infrastructure/git_client.dart';
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
@@ -17,10 +18,12 @@ import '../cli_utils.dart';
 /// Usage: gwm add `<branch>` [options]
 class AddCommand extends BaseCommand {
   final WorktreeService _worktreeService;
+  final ConfigService _configService;
   final ShellIntegration _shellIntegration;
 
   AddCommand({
     WorktreeService? worktreeService,
+    ConfigService? configService,
     GitClient? gitClient,
     ShellIntegration? shellIntegration,
     Config? config,
@@ -28,6 +31,7 @@ class AddCommand extends BaseCommand {
   }) : _worktreeService =
            worktreeService ??
            WorktreeService(gitClient ?? GitClientImpl(ProcessWrapperImpl())),
+       _configService = configService ?? ConfigService(),
        _shellIntegration =
            shellIntegration ??
            ShellIntegration(
@@ -75,10 +79,15 @@ class AddCommand extends BaseCommand {
       // Validate we're in eval wrapper
       EvalValidator.validate(skipCheck: skipEvalCheck);
 
+      // Load configuration for hooks and other settings
+      final repoRoot = await _getRepoRoot();
+      final config = await _configService.loadConfig(repoRoot: repoRoot);
+
       // Use the worktree service to create the worktree
       final exitCode = await _worktreeService.addWorktree(
         branch,
         createBranch: createBranch,
+        config: config,
       );
 
       // If worktree was created or already exists (and we're switching to it), navigate to it
@@ -101,6 +110,19 @@ class AddCommand extends BaseCommand {
     } catch (e) {
       printSafe('Error: Failed to create worktree: $e');
       return ExitCode.gitFailed;
+    }
+  }
+
+  /// Gets the repository root directory.
+  ///
+  /// Returns the current directory if not in a git repo (for error handling).
+  Future<String?> _getRepoRoot() async {
+    try {
+      final gitClient = GitClientImpl(ProcessWrapperImpl());
+      return await gitClient.getRepoRoot();
+    } catch (e) {
+      // If not in a git repo, return null - config will use global only
+      return null;
     }
   }
 

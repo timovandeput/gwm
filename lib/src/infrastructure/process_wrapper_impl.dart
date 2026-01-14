@@ -17,6 +17,7 @@ class ProcessWrapperImpl implements ProcessWrapper {
       command,
       arguments,
       workingDirectory: workingDirectory,
+      environment: Platform.environment,
     );
 
     final stdoutBuffer = StringBuffer();

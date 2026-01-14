@@ -4,11 +4,15 @@ import 'package:mocktail/mocktail.dart';
 import 'package:gwm/src/commands/add.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/services/worktree_service.dart';
+import 'package:gwm/src/services/config_service.dart';
 import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/services/shell_integration.dart';
+import 'package:gwm/src/models/config.dart';
 
 // Mock classes
 class MockWorktreeService extends Mock implements WorktreeService {}
+
+class MockConfigService extends Mock implements ConfigService {}
 
 class MockGitClient extends Mock implements GitClient {}
 
@@ -16,22 +20,33 @@ class MockShellIntegration extends Mock implements ShellIntegration {}
 
 void main() {
   late MockWorktreeService mockWorktreeService;
+  late MockConfigService mockConfigService;
   late MockGitClient mockGitClient;
   late MockShellIntegration mockShellIntegration;
   late AddCommand addCommand;
 
   setUp(() {
     mockWorktreeService = MockWorktreeService();
+    mockConfigService = MockConfigService();
     mockGitClient = MockGitClient();
     mockShellIntegration = MockShellIntegration();
     addCommand = AddCommand(
       worktreeService: mockWorktreeService,
+      configService: mockConfigService,
       gitClient: mockGitClient,
       shellIntegration: mockShellIntegration,
     );
 
     // Register fallback values for mocks
     registerFallbackValue('');
+    registerFallbackValue(
+      const Config(
+        version: '1.0',
+        copy: CopyConfig(files: [], directories: []),
+        hooks: HooksConfig(timeout: 30),
+        shellIntegration: ShellIntegrationConfig(enableEvalOutput: false),
+      ),
+    );
   });
 
   group('AddCommand', () {
@@ -61,7 +76,22 @@ void main() {
       final results = addCommand.parser.parse([branch]);
 
       when(
-        () => mockWorktreeService.addWorktree(branch, createBranch: false),
+        () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
+      ).thenAnswer(
+        (_) async => Config(
+          version: '1.0',
+          copy: CopyConfig(files: [], directories: []),
+          hooks: HooksConfig(timeout: 30),
+          shellIntegration: ShellIntegrationConfig(enableEvalOutput: false),
+        ),
+      );
+
+      when(
+        () => mockWorktreeService.addWorktree(
+          branch,
+          createBranch: false,
+          config: any(named: 'config'),
+        ),
       ).thenAnswer((_) async => ExitCode.success);
 
       when(
@@ -72,7 +102,11 @@ void main() {
 
       expect(exitCode, ExitCode.success);
       verify(
-        () => mockWorktreeService.addWorktree(branch, createBranch: false),
+        () => mockWorktreeService.addWorktree(
+          branch,
+          createBranch: false,
+          config: any(named: 'config'),
+        ),
       ).called(1);
       verify(
         () => mockShellIntegration.outputWorktreeCreated('/worktree/path'),
@@ -86,7 +120,22 @@ void main() {
         final results = addCommand.parser.parse(['-b', branch]);
 
         when(
-          () => mockWorktreeService.addWorktree(branch, createBranch: true),
+          () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
+        ).thenAnswer(
+          (_) async => Config(
+            version: '1.0',
+            copy: CopyConfig(files: [], directories: []),
+            hooks: HooksConfig(timeout: 30),
+            shellIntegration: ShellIntegrationConfig(enableEvalOutput: false),
+          ),
+        );
+
+        when(
+          () => mockWorktreeService.addWorktree(
+            branch,
+            createBranch: true,
+            config: any(named: 'config'),
+          ),
         ).thenAnswer((_) async => ExitCode.success);
 
         when(
@@ -97,7 +146,11 @@ void main() {
 
         expect(exitCode, ExitCode.success);
         verify(
-          () => mockWorktreeService.addWorktree(branch, createBranch: true),
+          () => mockWorktreeService.addWorktree(
+            branch,
+            createBranch: true,
+            config: any(named: 'config'),
+          ),
         ).called(1);
         verify(
           () => mockShellIntegration.outputWorktreeCreated('/worktree/path'),
@@ -110,7 +163,22 @@ void main() {
       final results = addCommand.parser.parse([branch]);
 
       when(
-        () => mockWorktreeService.addWorktree(branch, createBranch: false),
+        () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
+      ).thenAnswer(
+        (_) async => Config(
+          version: '1.0',
+          copy: CopyConfig(files: [], directories: []),
+          hooks: HooksConfig(timeout: 30),
+          shellIntegration: ShellIntegrationConfig(enableEvalOutput: false),
+        ),
+      );
+
+      when(
+        () => mockWorktreeService.addWorktree(
+          branch,
+          createBranch: false,
+          config: any(named: 'config'),
+        ),
       ).thenAnswer((_) async => ExitCode.gitFailed);
 
       final exitCode = await addCommand.execute(results);
@@ -126,7 +194,22 @@ void main() {
         final results = addCommand.parser.parse([branch]);
 
         when(
-          () => mockWorktreeService.addWorktree(branch, createBranch: false),
+          () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
+        ).thenAnswer(
+          (_) async => Config(
+            version: '1.0',
+            copy: CopyConfig(files: [], directories: []),
+            hooks: HooksConfig(timeout: 30),
+            shellIntegration: ShellIntegrationConfig(enableEvalOutput: false),
+          ),
+        );
+
+        when(
+          () => mockWorktreeService.addWorktree(
+            branch,
+            createBranch: false,
+            config: any(named: 'config'),
+          ),
         ).thenAnswer((_) async => ExitCode.worktreeExistsButSwitched);
 
         when(

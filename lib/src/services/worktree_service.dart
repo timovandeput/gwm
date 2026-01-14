@@ -2,6 +2,10 @@ import 'dart:io';
 
 import '../infrastructure/git_client.dart';
 import '../models/exit_codes.dart';
+import '../models/config.dart';
+import '../services/hook_service.dart';
+import '../infrastructure/process_wrapper.dart';
+import '../infrastructure/process_wrapper_impl.dart';
 import '../utils/path_utils.dart';
 import '../cli_utils.dart';
 
@@ -11,18 +15,26 @@ import '../cli_utils.dart';
 /// with proper path resolution and error handling.
 class WorktreeService {
   final GitClient _gitClient;
+  final HookService _hookService;
 
-  WorktreeService(this._gitClient);
+  WorktreeService(
+    this._gitClient, {
+    HookService? hookService,
+    ProcessWrapper? processWrapper,
+  }) : _hookService =
+           hookService ?? HookService(processWrapper ?? ProcessWrapperImpl());
 
   /// Adds a new worktree for the specified branch.
   ///
   /// [branch] is the name of the Git branch to create the worktree for.
   /// [createBranch] if true, creates the branch if it doesn't exist.
+  /// [config] contains the configuration including hooks to execute.
   ///
   /// Returns the exit code indicating success or the type of failure.
   Future<ExitCode> addWorktree(
     String branch, {
     bool createBranch = false,
+    Config? config,
   }) async {
     try {
       // Validate that we're running from the main repository
@@ -60,6 +72,22 @@ class WorktreeService {
         await parentDir.create(recursive: true);
       }
 
+      // Execute pre-add hooks
+      if (config?.hooks.preAdd != null) {
+        final originPath = await _gitClient.getRepoRoot();
+        try {
+          await _hookService.executePreAdd(
+            config!.hooks,
+            worktreePath,
+            originPath,
+            branch,
+          );
+        } catch (e) {
+          printSafe('Error: Pre-add hook failed: $e');
+          return ExitCode.hookFailed;
+        }
+      }
+
       // Create the worktree
       final actualPath = await _gitClient.createWorktree(
         worktreePath,
@@ -71,6 +99,22 @@ class WorktreeService {
       if (!await Directory(actualPath).exists()) {
         stderr.writeln('Error: Failed to create worktree at $actualPath');
         return ExitCode.gitFailed;
+      }
+
+      // Execute post-add hooks
+      if (config?.hooks.postAdd != null) {
+        final originPath = await _gitClient.getRepoRoot();
+        try {
+          await _hookService.executePostAdd(
+            config!.hooks,
+            actualPath,
+            originPath,
+            branch,
+          );
+        } catch (e) {
+          printSafe('Error: Post-add hook failed: $e');
+          return ExitCode.hookFailed;
+        }
       }
 
       printSafe(

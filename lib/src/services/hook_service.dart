@@ -32,6 +32,7 @@ class HookService {
       config.preAdd,
       'preAdd',
       config.timeout,
+      originPath, // Use origin path as working directory since worktree doesn't exist yet
       worktreePath,
       originPath,
       branch,
@@ -54,6 +55,7 @@ class HookService {
       config.postAdd,
       'postAdd',
       config.timeout,
+      worktreePath, // Worktree exists now
       worktreePath,
       originPath,
       branch,
@@ -77,6 +79,7 @@ class HookService {
       'preSwitch',
       config.timeout,
       worktreePath,
+      worktreePath,
       originPath,
       branch,
     );
@@ -98,6 +101,7 @@ class HookService {
       config.postSwitch,
       'postSwitch',
       config.timeout,
+      worktreePath,
       worktreePath,
       originPath,
       branch,
@@ -121,6 +125,7 @@ class HookService {
       'preClean',
       config.timeout,
       worktreePath,
+      worktreePath,
       originPath,
       branch,
     );
@@ -142,6 +147,7 @@ class HookService {
       config.postClean,
       'postClean',
       config.timeout,
+      originPath, // Use origin path since worktree may no longer exist
       worktreePath,
       originPath,
       branch,
@@ -153,11 +159,13 @@ class HookService {
   /// [hook] is the hook configuration to execute (may be null).
   /// [hookName] is the name of the hook for error reporting.
   /// [defaultTimeout] is the global timeout to use if hook has no timeout.
+  /// [workingDirectory] is the directory to execute the hook in.
   /// [worktreePath], [originPath], [branch] are environment variables.
   Future<void> _executeHook(
     Hook? hook,
     String hookName,
     int defaultTimeout,
+    String workingDirectory,
     String worktreePath,
     String originPath,
     String branch,
@@ -175,7 +183,7 @@ class HookService {
         hookName,
         timeout,
         environment,
-        worktreePath,
+        workingDirectory,
       );
     }
   }
@@ -196,14 +204,12 @@ class HookService {
   ) async {
     final expandedCommand = _expandVariables(command, environment);
 
-    printSafe('Executing hook "$hookName": $expandedCommand');
-
     final timeout = Duration(seconds: timeoutSeconds);
 
     try {
       final result = await _processWrapper
           .run(
-            'sh',
+            '/bin/sh',
             ['-c', expandedCommand],
             timeout: timeout,
             workingDirectory: workingDirectory,

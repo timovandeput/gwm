@@ -24,15 +24,15 @@ void main() {
       test(
         'executes multiple commands with environment variable expansion',
         () async {
-          fakeProcessWrapper.addResponse('sh', [
+          fakeProcessWrapper.addResponse('/bin/sh', [
             '-c',
             'echo "Worktree: /complex/worktree"',
           ], stdout: 'Worktree: /complex/worktree\n');
-          fakeProcessWrapper.addResponse('sh', [
+          fakeProcessWrapper.addResponse('/bin/sh', [
             '-c',
             'echo "Origin: /complex/origin"',
           ], stdout: 'Origin: /complex/origin\n');
-          fakeProcessWrapper.addResponse('sh', [
+          fakeProcessWrapper.addResponse('/bin/sh', [
             '-c',
             'echo "Branch: complex-branch"',
           ], stdout: 'Branch: complex-branch\n');
@@ -56,17 +56,17 @@ void main() {
       );
 
       test('stops execution on first command failure', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "success"',
         ], stdout: 'success\n');
         fakeProcessWrapper.addResponse(
-          'sh',
+          '/bin/sh',
           ['-c', 'exit 1'],
           exitCode: 1,
           stderr: 'command failed\n',
         );
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "should not execute"',
         ], stdout: 'should not execute\n');
@@ -91,7 +91,7 @@ void main() {
         );
 
         // Verify the third command's response is still available (wasn't consumed)
-        final result = await fakeProcessWrapper.run('sh', [
+        final result = await fakeProcessWrapper.run('/bin/sh', [
           '-c',
           'echo "should not execute"',
         ]);
@@ -99,7 +99,7 @@ void main() {
       });
 
       test('handles hook-specific timeout override', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "hook timeout test"',
         ], stdout: 'hook timeout test\n');
@@ -123,7 +123,7 @@ void main() {
 
     group('all hook phases', () {
       test('executePostAdd works', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "post-add integration test"',
         ], stdout: 'post-add integration test\n');
@@ -142,7 +142,7 @@ void main() {
       });
 
       test('executePreSwitch works', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "pre-switch integration test"',
         ], stdout: 'pre-switch integration test\n');
@@ -161,7 +161,7 @@ void main() {
       });
 
       test('executePostSwitch works', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "post-switch integration test"',
         ], stdout: 'post-switch integration test\n');
@@ -180,7 +180,7 @@ void main() {
       });
 
       test('executePreClean works', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "pre-clean integration test"',
         ], stdout: 'pre-clean integration test\n');
@@ -199,7 +199,7 @@ void main() {
       });
 
       test('executePostClean works', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "post-clean integration test"',
         ], stdout: 'post-clean integration test\n');

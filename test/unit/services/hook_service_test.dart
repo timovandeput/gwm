@@ -23,11 +23,11 @@ void main() {
 
     group('executePreAdd', () {
       test('executes preAdd hook commands sequentially', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "first command"',
         ], stdout: 'first command\n');
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "second command"',
         ], stdout: 'second command\n');
@@ -50,10 +50,11 @@ void main() {
       });
 
       test('expands environment variables in commands', () async {
-        fakeProcessWrapper.addResponse('sh', [
-          '-c',
-          'echo "/expanded/worktree /expanded/origin expanded-branch"',
-        ], stdout: '/expanded/worktree /expanded/origin expanded-branch\n');
+        fakeProcessWrapper.addResponse(
+          '/bin/sh',
+          ['-c', 'echo "/expanded/worktree /expanded/origin expanded-branch"'],
+          stdout: '/expanded/worktree /expanded/origin expanded-branch\n',
+        );
 
         final config = HooksConfig(
           timeout: 30,
@@ -72,7 +73,7 @@ void main() {
 
       test('sets environment variables for hook execution', () async {
         fakeProcessWrapper.addResponse(
-          'sh',
+          '/bin/sh',
           ['-c', 'env | grep GWM_ | sort'],
           stdout:
               'GWM_BRANCH=test-branch\nGWM_ORIGIN_PATH=/test/origin\nGWM_WORKTREE_PATH=/test/worktree\n',
@@ -92,7 +93,7 @@ void main() {
       });
 
       test('handles hook-specific timeout configuration', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "command with timeout"',
         ], stdout: 'command with timeout\n');
@@ -112,17 +113,17 @@ void main() {
       });
 
       test('fails immediately on first command failure', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "success"',
         ], stdout: 'success\n');
         fakeProcessWrapper.addResponse(
-          'sh',
+          '/bin/sh',
           ['-c', 'exit 1'],
           exitCode: 1,
           stderr: 'command failed\n',
         );
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "should not run"',
         ], stdout: 'should not run\n');
@@ -148,7 +149,7 @@ void main() {
 
         // Verify third command was never executed (its response should still be available)
         // If this completes without error, the third command wasn't executed
-        final result = await fakeProcessWrapper.run('sh', [
+        final result = await fakeProcessWrapper.run('/bin/sh', [
           '-c',
           'echo "should not run"',
         ]);
@@ -157,7 +158,7 @@ void main() {
 
       test('displays stdout and stderr output', () async {
         fakeProcessWrapper.addResponse(
-          'sh',
+          '/bin/sh',
           ['-c', 'echo "stdout message" && echo "stderr message" >&2'],
           stdout: 'stdout message\n',
           stderr: 'stderr message\n',
@@ -206,7 +207,7 @@ void main() {
 
     group('executePostAdd', () {
       test('executes postAdd hook commands', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "post-add command"',
         ], stdout: 'post-add command\n');
@@ -227,7 +228,7 @@ void main() {
 
     group('executePreSwitch', () {
       test('executes preSwitch hook commands', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "pre-switch command"',
         ], stdout: 'pre-switch command\n');
@@ -248,7 +249,7 @@ void main() {
 
     group('executePostSwitch', () {
       test('executes postSwitch hook commands', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "post-switch command"',
         ], stdout: 'post-switch command\n');
@@ -269,7 +270,7 @@ void main() {
 
     group('executePreClean', () {
       test('executes preClean hook commands', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "pre-clean command"',
         ], stdout: 'pre-clean command\n');
@@ -290,7 +291,7 @@ void main() {
 
     group('executePostClean', () {
       test('executes postClean hook commands', () async {
-        fakeProcessWrapper.addResponse('sh', [
+        fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "post-clean command"',
         ], stdout: 'post-clean command\n');
@@ -312,7 +313,7 @@ void main() {
     group('HookExecutionException', () {
       test('includes hook name, command, and output in exception', () async {
         fakeProcessWrapper.addResponse(
-          'sh',
+          '/bin/sh',
           ['-c', 'exit 1'],
           exitCode: 1,
           stderr: 'command failed with error\n',

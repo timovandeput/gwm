@@ -6,6 +6,7 @@ import '../infrastructure/git_client.dart';
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../services/config_service.dart';
+import '../services/hook_service.dart';
 import '../services/shell_integration.dart';
 import '../models/config.dart';
 import '../utils/eval_validator.dart';
@@ -18,16 +19,19 @@ import '../cli_utils.dart';
 class CleanCommand extends BaseCommand {
   final GitClient _gitClient;
   final ConfigService _configService;
+  final HookService _hookService;
   final ShellIntegration _shellIntegration;
 
   CleanCommand({
     GitClient? gitClient,
     ConfigService? configService,
+    HookService? hookService,
     ShellIntegration? shellIntegration,
     Config? config,
     super.skipEvalCheck = false,
   }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
        _configService = configService ?? ConfigService(),
+       _hookService = hookService ?? HookService(ProcessWrapperImpl()),
        _shellIntegration =
            shellIntegration ??
            ShellIntegration(
@@ -95,11 +99,22 @@ class CleanCommand extends BaseCommand {
         return ExitCode.invalidArguments;
       }
 
-      // Execute pre_clean hooks (placeholder - hooks not yet implemented)
+      // Get branch name for hooks
+      final branch = await _gitClient.getCurrentBranch();
+
+      // Execute pre-clean hooks
       if (config.hooks.preClean != null) {
-        printSafe('Executing pre-clean hooks...');
-        // TODO: Implement hook execution service
-        // await _hookService.executeHooks(config.hooks.preClean!, environment);
+        try {
+          await _hookService.executePreClean(
+            config.hooks,
+            repoRoot,
+            repoRoot, // origin path is the same as worktree path for clean
+            branch,
+          );
+        } catch (e) {
+          printSafe('Error: Pre-clean hook failed: $e');
+          return ExitCode.hookFailed;
+        }
       }
 
       // Get main repo path for navigation after cleanup
@@ -109,11 +124,19 @@ class CleanCommand extends BaseCommand {
       printSafe('Removing worktree: $repoRoot');
       await _gitClient.removeWorktree(repoRoot, force: force);
 
-      // Execute post_clean hooks (placeholder - hooks not yet implemented)
+      // Execute post-clean hooks
       if (config.hooks.postClean != null) {
-        printSafe('Executing post-clean hooks...');
-        // TODO: Implement hook execution service
-        // await _hookService.executeHooks(config.hooks.postClean!, environment);
+        try {
+          await _hookService.executePostClean(
+            config.hooks,
+            repoRoot,
+            repoRoot, // origin path
+            branch,
+          );
+        } catch (e) {
+          printSafe('Error: Post-clean hook failed: $e');
+          return ExitCode.hookFailed;
+        }
       }
 
       // Change to main repository directory

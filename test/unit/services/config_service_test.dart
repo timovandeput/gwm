@@ -360,6 +360,38 @@ shellIntegration:
         expect(config.hooks.postAdd?.commands, ['echo \'hello\'']);
         expect(config.hooks.postAdd?.timeout, 120);
       });
+
+      test('supports string format hooks', () async {
+        final configFile = File('${tempDir.path}/.gwm.json');
+        configFile.writeAsStringSync('''
+{
+  "hooks": {
+    "postAdd": "echo 'single command'"
+  }
+}
+''');
+
+        final config = await configService.loadConfig(repoRoot: tempDir.path);
+
+        expect(config.hooks.postAdd?.commands, ['echo \'single command\'']);
+        expect(config.hooks.postAdd?.timeout, isNull);
+      });
+
+      test('supports string format hooks in YAML', () async {
+        final configFile = File('${tempDir.path}/.gwm.yaml');
+        configFile.writeAsStringSync('''
+version: "1.0"
+hooks:
+  postAdd: "echo 'yaml single command'"
+''');
+
+        final config = await configService.loadConfig(repoRoot: tempDir.path);
+
+        expect(config.hooks.postAdd?.commands, [
+          'echo \'yaml single command\'',
+        ]);
+        expect(config.hooks.postAdd?.timeout, isNull);
+      });
     });
 
     group('error handling', () {

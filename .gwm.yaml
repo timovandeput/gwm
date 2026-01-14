@@ -6,24 +6,8 @@ copy:
 
 hooks:
   timeout: 30
-  preAdd:
-    commands:
-      - echo "🪝 preAdd"
-  postAdd:
-    commands:
-      - echo "🪝 postAdd"
-  preSwitch:
-    commands:
-      - echo "🪝 preSwitch"
-  postSwitch:
-    commands:
-      - echo "🪝 postSwitch"
-  preClean:
-    commands:
-      - echo "🪝 preClean"
-  postClean:
-    commands:
-      - echo "🪝 postClean"
+  preAdd: "echo 'Pre-add hook executed'"
+  postAdd: "echo 'Post-add hook executed'"
 
 shellIntegration:
   enableEvalOutput: false

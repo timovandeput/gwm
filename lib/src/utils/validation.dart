@@ -155,6 +155,11 @@ void validateConfigFile(Map<String, dynamic> config, String configPath) {
 void _validateHook(dynamic hook, String configPath, String fieldPath) {
   if (hook == null) return;
 
+  if (hook is String) {
+    // Single string command is valid
+    return;
+  }
+
   if (hook is List) {
     for (final cmd in hook) {
       if (cmd is! String) {
@@ -202,7 +207,10 @@ void _validateHook(dynamic hook, String configPath, String fieldPath) {
       }
     }
   } else {
-    throw ConfigException(configPath, '$fieldPath must be an array or object');
+    throw ConfigException(
+      configPath,
+      '$fieldPath must be a string, array, or object',
+    );
   }
 }
 
