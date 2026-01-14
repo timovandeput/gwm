@@ -173,8 +173,8 @@ gwm switch feature-auth
 # Switch to main Git workspace
 gwm switch .
 
-# Interactive selection
-gwm switch
+# Interactive selection (requires --no-eval-check)
+gwm switch --no-eval-check
 ```
 
 ### gwm clean 🧹

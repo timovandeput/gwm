@@ -107,32 +107,61 @@ void main() {
       verify(() => mockShellIntegration.outputCdCommand('/repo')).called(1);
     });
 
-    test('shows interactive selection when no argument provided', () async {
-      final worktrees = [
-        Worktree(
-          name: 'main',
-          branch: 'main',
-          path: '/repo',
-          isMain: true,
-          status: WorktreeStatus.clean,
-        ),
-      ];
+    test(
+      'shows interactive selection when no argument provided and eval check skipped',
+      () async {
+        final worktrees = [
+          Worktree(
+            name: 'main',
+            branch: 'main',
+            path: '/repo',
+            isMain: true,
+            status: WorktreeStatus.clean,
+          ),
+        ];
 
-      when(() => mockGitClient.getRepoRoot()).thenAnswer((_) async => '/repo');
-      when(
-        () => mockGitClient.listWorktrees(),
-      ).thenAnswer((_) async => worktrees);
-      when(
-        () => mockPromptSelector.selectWorktree(worktrees),
-      ).thenAnswer((_) async => worktrees[0]);
+        // Create command with eval check skipped
+        final commandWithSkipEval = SwitchCommand(
+          gitClient: mockGitClient,
+          promptSelector: mockPromptSelector,
+          shellIntegration: mockShellIntegration,
+          skipEvalCheck: true,
+        );
 
-      final results = switchCommand.parser.parse([]);
-      final exitCode = await switchCommand.execute(results);
+        when(
+          () => mockGitClient.getRepoRoot(),
+        ).thenAnswer((_) async => '/repo');
+        when(
+          () => mockGitClient.listWorktrees(),
+        ).thenAnswer((_) async => worktrees);
+        when(
+          () => mockPromptSelector.selectWorktree(worktrees),
+        ).thenAnswer((_) async => worktrees[0]);
 
-      expect(exitCode, ExitCode.success);
-      verify(() => mockPromptSelector.selectWorktree(worktrees)).called(1);
-      verify(() => mockShellIntegration.outputCdCommand('/repo')).called(1);
-    });
+        final results = commandWithSkipEval.parser.parse([]);
+        final exitCode = await commandWithSkipEval.execute(results);
+
+        expect(exitCode, ExitCode.success);
+        verify(() => mockPromptSelector.selectWorktree(worktrees)).called(1);
+        verify(() => mockShellIntegration.outputCdCommand('/repo')).called(1);
+      },
+    );
+
+    test(
+      'returns error when interactive selection requested but eval check not skipped',
+      () async {
+        when(
+          () => mockGitClient.getRepoRoot(),
+        ).thenAnswer((_) async => '/repo');
+
+        final results = switchCommand.parser.parse([]);
+        final exitCode = await switchCommand.execute(results);
+
+        expect(exitCode, ExitCode.invalidArguments);
+        verifyNever(() => mockPromptSelector.selectWorktree(any()));
+        verifyNever(() => mockShellIntegration.outputCdCommand(any()));
+      },
+    );
 
     test('returns error when specified worktree does not exist', () async {
       final worktrees = [
