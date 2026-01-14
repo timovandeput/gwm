@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:gwt/src/services/worktree_service.dart';
-import 'package:gwt/src/models/exit_codes.dart';
-import 'package:gwt/src/infrastructure/git_client.dart';
+import 'package:gwm/src/services/worktree_service.dart';
+import 'package:gwm/src/models/exit_codes.dart';
+import 'package:gwm/src/infrastructure/git_client.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}

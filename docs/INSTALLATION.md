@@ -1,17 +1,17 @@
-# GWT Installation and Setup
+# GWM Installation and Setup
 
-This document provides instructions for installing and configuring GWT (Git Worktree Manager) with shell integration and tab completion.
+This document provides instructions for installing and configuring GWM (Git Worktree Manager) with shell integration and tab completion.
 
 ## Shell Integration
 
-GWT supports automatic directory switching through shell wrapper functions. These wrappers capture GWT's output and execute it in your shell.
+GWT supports automatic directory switching through shell wrapper functions. These wrappers capture GWM's output and execute it in your shell.
 
 ### Bash
 
 Add the following to your `~/.bashrc`:
 
 ```bash
-gwt() { eval "$(command gwt "$@")"; }
+gwt() { eval "$(command gwm "$@")"; }
 ```
 
 ### Zsh
@@ -19,7 +19,7 @@ gwt() { eval "$(command gwt "$@")"; }
 Add the following to your `~/.zshrc`:
 
 ```zsh
-gwt() { eval "$(command gwt "$@")" }
+gwt() { eval "$(command gwm "$@")" }
 ```
 
 ### Fish
@@ -28,7 +28,7 @@ Add the following to your `~/.config/fish/config.fish`:
 
 ```fish
 function gwt
-    eval (command gwt $argv)
+    eval (command gwm $argv)
 end
 ```
 
@@ -37,7 +37,7 @@ end
 Add the following to your PowerShell profile (run `$PROFILE` to find the path):
 
 ```powershell
-function gwt { Invoke-Expression (& gwt $args) }
+function gwm { Invoke-Expression (& gwm $args) }
 ```
 
 ### Nushell
@@ -45,8 +45,8 @@ function gwt { Invoke-Expression (& gwt $args) }
 Add the following to your `~/.config/nushell/config.nu`:
 
 ```nu
-def --env gwt [...args] {
-    ^gwt ...$args | lines | each { |line| nu -c $line }
+def --env gwm [...args] {
+    ^gwm ...$args | lines | each { |line| nu -c $line }
 }
 ```
 
@@ -104,14 +104,14 @@ After setup, test the shell integration:
 
 ```bash
 # Create a worktree
-gwt add feature-test
+gwm add feature-test
 
 # You should automatically switch to the new worktree directory
 pwd  # Should show the worktree path
 
 # Test tab completion
-gwt switch <TAB>  # Should show available worktrees
-gwt add <TAB>     # Should show available branches
+gwm switch <TAB>  # Should show available worktrees
+gwm add <TAB>     # Should show available branches
 ```
 
 ## Troubleshooting

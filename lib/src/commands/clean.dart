@@ -11,7 +11,7 @@ import '../services/config_service.dart';
 
 /// Command for cleaning up the current Git worktree.
 ///
-/// Usage: gwt clean [options]
+/// Usage: gwm clean [options]
 class CleanCommand extends BaseCommand {
   final GitClient _gitClient;
   final ConfigService _configService;
@@ -42,7 +42,7 @@ class CleanCommand extends BaseCommand {
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
-      print('Usage: gwt clean [options]');
+      print('Usage: gwm clean [options]');
       print('');
       print('Delete the current worktree and return to the main repository.');
       print('');
@@ -56,8 +56,8 @@ class CleanCommand extends BaseCommand {
       // Validate we're in a Git repository
       final isWorktree = await _gitClient.isWorktree();
       if (!isWorktree) {
-        print('Error: gwt clean can only be run from within a worktree.');
-        print('Use "gwt switch ." to go to the main repository.');
+        print('Error: gwm clean can only be run from within a worktree.');
+        print('Use "gwm switch ." to go to the main repository.');
         return ExitCode.invalidArguments;
       }
 

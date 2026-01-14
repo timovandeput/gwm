@@ -1,11 +1,11 @@
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:gwt/src/commands/clean.dart';
-import 'package:gwt/src/models/exit_codes.dart';
-import 'package:gwt/src/models/config.dart';
-import 'package:gwt/src/infrastructure/git_client.dart';
-import 'package:gwt/src/services/config_service.dart';
+import 'package:gwm/src/commands/clean.dart';
+import 'package:gwm/src/models/exit_codes.dart';
+import 'package:gwm/src/models/config.dart';
+import 'package:gwm/src/infrastructure/git_client.dart';
+import 'package:gwm/src/services/config_service.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}

@@ -1,12 +1,12 @@
 import 'package:test/test.dart';
-import 'package:gwt/src/exceptions.dart';
-import 'package:gwt/src/models/exit_codes.dart';
+import 'package:gwm/src/exceptions.dart';
+import 'package:gwm/src/models/exit_codes.dart';
 
 void main() {
-  group('GwtException', () {
+  group('GwmException', () {
     test('is base class for all exceptions', () {
       final exception = WorktreeExistsException('test-worktree');
-      expect(exception, isA<GwtException>());
+      expect(exception, isA<GwmException>());
     });
   });
 

@@ -1,9 +1,9 @@
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:gwt/src/services/copy_service.dart';
-import 'package:gwt/src/models/config.dart';
-import 'package:gwt/src/infrastructure/file_system_adapter.dart';
+import 'package:gwm/src/services/copy_service.dart';
+import 'package:gwm/src/models/config.dart';
+import 'package:gwm/src/infrastructure/file_system_adapter.dart';
 
 // Mock classes
 class MockFileSystemAdapter extends Mock implements FileSystemAdapter {}

@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
-import 'package:gwt/src/models/config.dart';
-import 'package:gwt/src/services/shell_integration.dart';
+import 'package:gwm/src/models/config.dart';
+import 'package:gwm/src/services/shell_integration.dart';
 
 void main() {
   group('ShellIntegration', () {

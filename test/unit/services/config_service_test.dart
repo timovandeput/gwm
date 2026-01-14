@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:gwt/src/services/config_service.dart';
-import 'package:gwt/src/exceptions.dart';
+import 'package:gwm/src/services/config_service.dart';
+import 'package:gwm/src/exceptions.dart';
 
 void main() {
   group('ConfigService', () {

@@ -1,10 +1,10 @@
-#compdef gwt
+#compdef gwm
 
-# GWT (Git Worktree Manager) zsh completion
+# GWM (Git Worktree Manager) zsh completion
 # Source this file or place it in a directory in your $fpath (e.g., /usr/local/share/zsh/site-functions/)
 # Then run: compinit
 
-_gwt() {
+_gwm() {
     local -a commands worktrees branches
     commands=(
         'add:Add a new worktree'
@@ -21,7 +21,7 @@ _gwt() {
             ;;
         switch|list)
             # Complete worktree names for switch and list commands
-            worktrees=(${(@f)"$(gwt list 2>/dev/null | grep -v '^Found' | sed 's/^[[:space:]]*//' | cut -d' ' -f1)"})
+            worktrees=(${(@f)"$(gwm list 2>/dev/null | grep -v '^Found' | sed 's/^[[:space:]]*//' | cut -d' ' -f1)"})
             _describe -t worktrees 'worktree' worktrees
             ;;
         *)
@@ -31,4 +31,4 @@ _gwt() {
     esac
 }
 
-_gwt
+_gwm

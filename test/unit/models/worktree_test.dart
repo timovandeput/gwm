@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:gwt/src/models/worktree.dart';
+import 'package:gwm/src/models/worktree.dart';
 
 void main() {
   group('Worktree', () {

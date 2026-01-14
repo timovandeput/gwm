@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
-import 'package:gwt/src/utils/eval_validator.dart';
-import 'package:gwt/src/utils/shell_detector.dart';
+import 'package:gwm/src/utils/eval_validator.dart';
+import 'package:gwm/src/utils/shell_detector.dart';
 
 void main() {
   group('EvalValidator', () {

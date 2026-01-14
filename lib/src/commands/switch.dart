@@ -14,7 +14,7 @@ import '../exceptions.dart';
 
 /// Command for switching to an existing Git worktree.
 ///
-/// Usage: gwt switch [worktree-name]
+/// Usage: gwm switch [worktree-name]
 class SwitchCommand extends BaseCommand {
   final GitClient _gitClient;
   final PromptSelector _promptSelector;
@@ -48,7 +48,7 @@ class SwitchCommand extends BaseCommand {
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
-      print('Usage: gwt switch [worktree-name]');
+      print('Usage: gwm switch [worktree-name]');
       print('');
       print('Switch to the specified worktree. If no worktree is specified,');
       print('shows an interactive menu to select from available worktrees.');

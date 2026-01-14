@@ -1,5 +1,5 @@
-name: gwt
-description: A sample command-line application with basic argument parsing.
+name: gwm
+description: Git Worktree Manager - Streamlined Git worktree management
 version: 0.0.1
 # repository: https://github.com/my_org/my_repo
 

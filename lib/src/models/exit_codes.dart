@@ -1,4 +1,4 @@
-/// Exit codes used by the GWT CLI tool.
+/// Exit codes used by the GWM CLI tool.
 ///
 /// These codes follow standard CLI conventions and provide specific
 /// error information for different failure scenarios.

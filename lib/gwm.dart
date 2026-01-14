@@ -1,4 +1,4 @@
-/// GWT (Git Worktree Manager) - A CLI tool for streamlined Git worktree management.
+/// GWM (Git Worktree Manager) - A CLI tool for streamlined Git worktree management.
 ///
 /// This library provides the core domain models, exceptions, and utilities
 /// for managing Git worktrees with automatic directory navigation,

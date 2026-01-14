@@ -1,11 +1,11 @@
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:gwt/src/commands/add.dart';
-import 'package:gwt/src/models/exit_codes.dart';
-import 'package:gwt/src/services/worktree_service.dart';
-import 'package:gwt/src/infrastructure/git_client.dart';
-import 'package:gwt/src/services/shell_integration.dart';
+import 'package:gwm/src/commands/add.dart';
+import 'package:gwm/src/models/exit_codes.dart';
+import 'package:gwm/src/services/worktree_service.dart';
+import 'package:gwm/src/infrastructure/git_client.dart';
+import 'package:gwm/src/services/shell_integration.dart';
 
 // Mock classes
 class MockWorktreeService extends Mock implements WorktreeService {}

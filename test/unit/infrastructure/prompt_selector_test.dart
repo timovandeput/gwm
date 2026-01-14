@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:gwt/src/infrastructure/prompt_selector.dart';
+import 'package:gwm/src/infrastructure/prompt_selector.dart';
 
 void main() {
   group('PromptSelectorImpl', () {

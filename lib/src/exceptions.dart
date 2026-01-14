@@ -1,24 +1,24 @@
 import 'models/exit_codes.dart';
 
-/// Base exception class for all GWT-related errors.
+/// Base exception class for all GWM-related errors.
 ///
 /// Provides consistent error handling with exit codes and messages
 /// that can be displayed to users.
-abstract class GwtException implements Exception {
+abstract class GwmException implements Exception {
   /// The exit code associated with this exception
   final ExitCode exitCode;
 
   /// A human-readable error message
   final String message;
 
-  const GwtException(this.exitCode, this.message);
+  const GwmException(this.exitCode, this.message);
 
   @override
   String toString() => message;
 }
 
 /// Exception thrown when attempting to create a worktree that already exists.
-class WorktreeExistsException extends GwtException {
+class WorktreeExistsException extends GwmException {
   /// The name of the worktree that already exists
   final String worktreeName;
 
@@ -27,7 +27,7 @@ class WorktreeExistsException extends GwtException {
 }
 
 /// Exception thrown when a specified Git branch does not exist.
-class BranchNotFoundException extends GwtException {
+class BranchNotFoundException extends GwmException {
   /// The name of the branch that was not found
   final String branch;
 
@@ -36,7 +36,7 @@ class BranchNotFoundException extends GwtException {
 }
 
 /// Exception thrown when a hook command fails during execution.
-class HookExecutionException extends GwtException {
+class HookExecutionException extends GwmException {
   /// The name of the hook that failed
   final String hookName;
 
@@ -54,7 +54,7 @@ class HookExecutionException extends GwtException {
 }
 
 /// Exception thrown when configuration files are invalid or malformed.
-class ConfigException extends GwtException {
+class ConfigException extends GwmException {
   /// The path to the configuration file that caused the error
   final String configPath;
 
@@ -69,7 +69,7 @@ class ConfigException extends GwtException {
 }
 
 /// Exception thrown when a Git command fails.
-class GitException extends GwtException {
+class GitException extends GwmException {
   /// The Git command that failed
   final String command;
 
@@ -86,8 +86,8 @@ class GitException extends GwtException {
       );
 }
 
-/// Exception thrown when GWT is run without proper shell wrapper.
-class ShellWrapperMissingException extends GwtException {
+/// Exception thrown when GWM is run without proper shell wrapper.
+class ShellWrapperMissingException extends GwmException {
   const ShellWrapperMissingException(String message)
     : super(ExitCode.shellWrapperMissing, message);
 }

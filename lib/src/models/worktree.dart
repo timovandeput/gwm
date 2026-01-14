@@ -1,4 +1,4 @@
-/// Represents a Git worktree in the GWT system.
+/// Represents a Git worktree in the GWM system.
 ///
 /// A worktree can be either the main Git repository workspace or a linked
 /// worktree created with `git worktree add`.

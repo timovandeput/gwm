@@ -31,5 +31,5 @@ migrate_working_dir/
 /coverage/
 
 # Compiled executables
-/gwt
-/gwt.exe
+/gwm
+/gwm.exe

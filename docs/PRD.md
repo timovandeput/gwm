@@ -1,4 +1,4 @@
-# GWT - Git Worktree Manager PRD
+# GWM - Git Worktree Manager PRD
 
 ## 1. Overview
 
@@ -37,7 +37,7 @@ GWT provides a streamlined interface for:
 
 Create a new worktree with automatic directory navigation.
 
-**Usage**: `gwt add <branch-name> [options]`
+**Usage**: `gwm add <branch-name> [options]`
 
 **Behavior**:
 
@@ -62,15 +62,15 @@ Create a new worktree with automatic directory navigation.
 
 ```bash
 # Create worktree from existing branch
-gwt add feature/new-ui
+gwm add feature/new-ui
 # Uses existing "feature/new-ui" branch (fails if branch doesn't exist)
 
 # Create worktree with new branch
-gwt add -b feature/authentication
+gwm add -b feature/authentication
 # Creates new "feature/authentication" Git branch and worktree
 
 # Error case: worktree already exists
-gwt add feature/new-ui
+gwm add feature/new-ui
 # Error: Worktree 'myrepo_feature_new-ui' already exists
 ```
 
@@ -78,7 +78,7 @@ gwt add feature/new-ui
 
 Navigate to an existing worktree with interactive selection.
 
-**Usage**: `gwt switch [worktree-name]`
+**Usage**: `gwm switch [worktree-name]`
 
 **Behavior**:
 
@@ -92,13 +92,13 @@ Navigate to an existing worktree with interactive selection.
 
 ```bash
 # Switch to specific worktree
-gwt switch feature-auth
+gwm switch feature-auth
 
 # Switch to main Git workspace
-gwt switch .
+gwm switch .
 
 # Interactive selection
-gwt switch
+gwm switch
 # Select worktree:
 # 1. . (~/work/project) - main workspace
 # 2. feature-auth (~/work/worktrees/project_feature-auth)
@@ -110,7 +110,7 @@ gwt switch
 
 Delete current worktree and return to main repository.
 
-**Usage**: `gwt clean [options]`
+**Usage**: `gwm clean [options]`
 
 **Behavior**:
 
@@ -130,20 +130,20 @@ Delete current worktree and return to main repository.
 
 ```bash
 # Normal clean (prompts if uncommitted changes exist)
-gwt clean
+gwm clean
 # Uncommitted changes detected in 'feature-auth'
 # Continue? (y/N) y
 # Worktree removed successfully
 
 # Force clean (no prompts)
-gwt clean --force
+gwm clean --force
 ```
 
 #### 3.1.4 List Worktrees
 
 Display all available worktrees for the current repository.
 
-**Usage**: `gwt list [options]`
+**Usage**: `gwm list [options]`
 
 **Behavior**:
 
@@ -163,7 +163,7 @@ Display all available worktrees for the current repository.
 
 ```bash
 # Simple list
-gwt list
+gwm list
 # WORKTREE              BRANCH           PATH
 # * .                   main             ~/work/project
 #   feature-auth        feature/auth     ~/work/worktrees/project_feature-auth
@@ -171,7 +171,7 @@ gwt list
 #   api-v2              api-v2           ~/work/worktrees/project_api-v2
 
 # Detailed list
-gwt list -v
+gwm list -v
 # WORKTREE              BRANCH           STATUS          LAST MODIFIED
 # * .                   main             Modified        10 minutes ago
 #   feature-auth        feature/auth     Modified        5 minutes ago
@@ -179,7 +179,7 @@ gwt list -v
 #   api-v2              api-v2           Ahead (3)       1 day ago
 
 # JSON output
-gwt list -j
+gwm list -j
 {"worktrees":[{"name":".","branch":"main","path":"~/work/project","status":"modified","current":true},{"name":"feature-auth","branch":"feature/auth","path":"~/work/worktrees/project_feature-auth","status":"modified","current":false}]}
 ```
 
@@ -338,7 +338,7 @@ Local configuration can override, prepend to, or append to settings from the per
 }
 ```
 
-**Merged Result** (what GWT actually uses):
+**Merged Result** (what GWM actually uses):
 
 ```json
 {
@@ -509,9 +509,9 @@ GWT automatically selects the best copy strategy based on the operating system a
 
 When an external command fails (non-zero exit status):
 1. The command's error output is displayed
-2. GWT stops the current operation (add, switch, or clean)
+2. GWM stops the current operation (add, switch, or clean)
 3. An error message is shown indicating which hook failed
-4. GWT exits with a non-zero exit code (exit code 5 for hook failures)
+4. GWM exits with a non-zero exit code (exit code 5 for hook failures)
 
 **Hook Timeout Configuration**:
 
@@ -576,34 +576,34 @@ GWT uses `eval` output to enable automatic directory switching across all suppor
 **Bash** (`~/.bashrc`):
 
 ```bash
-gwt() { eval "$(command gwt "$@")"; }
+gwt() { eval "$(command gwm "$@")"; }
 ```
 
 **Zsh** (`~/.zshrc`):
 
 ```bash
-gwt() { eval "$(command gwt "$@")" }
+gwt() { eval "$(command gwm "$@")" }
 ```
 
 **Fish** (`~/.config/fish/config.fish`):
 
 ```fish
 function gwt
-    eval (command gwt $argv)
+    eval (command gwm $argv)
 end
 ```
 
 **PowerShell** (`$PROFILE`):
 
 ```powershell
-function gwt { Invoke-Expression (& gwt $args) }
+function gwm { Invoke-Expression (& gwm $args) }
 ```
 
 **Nushell** (`~/.config/nushell/config.nu`):
 
 ```nu
-def --env gwt [...args] {
-    ^gwt ...$args | lines | each { |line| nu -c $line }
+def --env gwm [...args] {
+    ^gwm ...$args | lines | each { |line| nu -c $line }
 }
 ```
 
@@ -628,7 +628,7 @@ Auto-completion support for:
 ### 4.2 Dependencies
 
 - Git 2.5+ (for worktree support)
-- Dart SDK (for running GWT)
+- Dart SDK (for running GWM)
 - Optional: fzf (for enhanced interactive selection)
 
 ### 4.3 Performance
@@ -709,10 +709,10 @@ All Git operations use command-line invocations:
 This ensures full compatibility with Git and proper handling of all edge cases.
 
 **Error Handling**:
-- GWT fails immediately if any Git command returns a non-zero exit status
+- GWM fails immediately if any Git command returns a non-zero exit status
 - All Git command output (both stdout and stderr) is displayed to the user
 - Git errors are propagated with clear context to help users understand what went wrong
-- GWT exits with exit code 7 for Git command failures
+- GWM exits with exit code 7 for Git command failures
 
 ### 5.4 Cross-Platform Considerations
 
@@ -727,16 +727,16 @@ This ensures full compatibility with Git and proper handling of all edge cases.
 
 ```bash
 # Start working on a new feature
-gwt add -b feature/new-ui
+gwm add -b feature/new-ui
 # Creates new "feature/new-ui" Git branch and worktree,
 # copies files, runs hooks, switches directory
 
 # Work on feature...
-# Directory is already switched by gwt add
+# Directory is already switched by gwm add
 # ... make changes ...
 
 # Clean up when done
-gwt clean
+gwm clean
 # Removes worktree, returns to main repo
 ```
 
@@ -744,45 +744,45 @@ gwt clean
 
 ```bash
 # Create multiple worktrees
-gwt add feature/auth
-gwt add feature/api
-gwt add bugfix/login
+gwm add feature/auth
+gwm add feature/api
+gwm add bugfix/login
 
 # Switch between worktrees
-gwt switch feature-auth  # or interactive: gwt switch
+gwm switch feature-auth  # or interactive: gwm switch
 
 # Switch back to main workspace
-gwt switch .
+gwm switch .
 
 # List all worktrees
-gwt list -v
+gwm list -v
 
 # Clean up completed features
-gwt switch feature-auth
-gwt clean
+gwm switch feature-auth
+gwm clean
 ```
 
 ### 6.3 AI-Assisted Development Workflow
 
 ```bash
 # Terminal 1: Work on authentication
-gwt add feature/auth
+gwm add feature/auth
 # AI agent works in this worktree...
 
 # Terminal 2: Work on API
-gwt switch feature-api
+gwm switch feature-api
 # Different AI agent works here...
 
 # Terminal 3: Work on bugfix
-gwt switch bugfix-login
+gwm switch bugfix-login
 # Third AI agent works here...
 
 # Terminal 4: Monitor or work on main branch
-gwt switch .
+gwm switch .
 # You're now in the main workspace
 
 # Monitor all worktrees from any terminal
-gwt list -v
+gwm list -v
 ```
 
 ### 6.4 Project Setup Workflow
@@ -834,7 +834,7 @@ gwt list -v
 
 ```bash
 # Create new worktree with automatic setup
-gwt add feature/new-component
+gwm add feature/new-component
 # Automatically:
 # 1. Creates worktree in ~/work/worktrees/project_feature-new-component/
 # 2. Copies .env and node_modules from main repo
@@ -847,7 +847,7 @@ gwt add feature/new-component
 # 4. Switches to worktree directory
 
 # If any hook command fails (e.g., npm install):
-# GWT will:
+# GWM will:
 # - Display the error output from npm
 # - Stop the operation
 # - Exit with code 5 (hook execution failed)
@@ -865,8 +865,8 @@ gwt add feature/new-component
 - Branch management (delete branch when removing worktree)
 - Configuration validation and schema enforcement
 - Hash verification for configuration files (security)
-- Interactive branch selection for `gwt add`
-- Configuration management commands (`gwt config get/set`)
+- Interactive branch selection for `gwm add`
+- Configuration management commands (`gwm config get/set`)
 
 ## 8. Success Metrics
 
@@ -899,7 +899,7 @@ The following decisions have been made for the implementation:
 **Decision**: Include version field and auto-migrate when possible
 
 - All configuration files include a `version` field
-- When configuration format changes, GWT automatically migrates old configurations when possible
+- When configuration format changes, GWM automatically migrates old configurations when possible
 - Migration warnings are displayed for manual configuration updates
 - Backward compatibility is maintained for at least one major version
 
@@ -917,13 +917,13 @@ The following decisions have been made for the implementation:
 
 | Command               | Description                                             |
 |-----------------------|---------------------------------------------------------|
-| `gwt add <branch>`    | Create worktree from existing branch                    |
-| `gwt add -b <branch>` | Create new Git branch and worktree                      |
-| `gwt switch [name]`   | Switch to worktree (use "." for main, interactive if no name) |
-| `gwt clean [--force]` | Delete current worktree and return to main repo         |
-| `gwt list [-v|-j]`    | List all worktrees (includes main workspace as ".")     |
-| `gwt --help`          | Show help message                                       |
-| `gwt --version`       | Show version information                                |
+| `gwm add <branch>`    | Create worktree from existing branch                    |
+| `gwm add -b <branch>` | Create new Git branch and worktree                      |
+| `gwm switch [name]`   | Switch to worktree (use "." for main, interactive if no name) |
+| `gwm clean [--force]` | Delete current worktree and return to main repo         |
+| `gwm list [-v|-j]`    | List all worktrees (includes main workspace as ".")     |
+| `gwm --help`          | Show help message                                       |
+| `gwm --version`       | Show version information                                |
 
 ### 10.2 Exit Codes
 
@@ -1033,7 +1033,7 @@ The following decisions have been made for the implementation:
 
 **Issue**: Worktree creation fails with "branch not found"
 
-- **Solution**: Use `-b` flag to create a new Git branch before creating the worktree (e.g., `gwt add -b feature/new-ui`), or ensure the branch exists locally
+- **Solution**: Use `-b` flag to create a new Git branch before creating the worktree (e.g., `gwm add -b feature/new-ui`), or ensure the branch exists locally
 
 **Issue**: Automatic directory switching doesn't work
 
@@ -1049,16 +1049,16 @@ The following decisions have been made for the implementation:
 
 **Issue**: Hook execution fails with non-zero exit status
 
-- **Solution**: GWT will display the error output from the failed command. Review the output to understand the failure, fix the issue, and retry. Example:
+- **Solution**: GWM will display the error output from the failed command. Review the output to understand the failure, fix the issue, and retry. Example:
   ```
-  gwt add feature/new-ui
+  gwm add feature/new-ui
   ✗ Hook 'post_add' failed: Command 'npm install' exited with status 1
   npm ERR! missing script: install
   ```
 
 **Issue**: Git command fails
 
-- **Solution**: GWT will display the full Git error output. Common issues:
+- **Solution**: GWM will display the full Git error output. Common issues:
   - Branch doesn't exist locally (use `-b` flag to create it)
   - Worktree already exists
   - Repository is in a corrupted state
@@ -1068,7 +1068,7 @@ The following decisions have been made for the implementation:
 
 - **Solution**: Review the error message to understand which hook failed and why. Manually complete or fix the failed steps, then either:
   - Use the partial worktree as-is (if the failure was non-critical)
-  - Run `gwt clean` from the partial worktree to remove it and retry
+  - Run `gwm clean` from the partial worktree to remove it and retry
   - Manually run the remaining hook commands
 
 **Issue**: Local settings not taking effect
@@ -1079,9 +1079,9 @@ The following decisions have been made for the implementation:
 
 - **Solution**: Check that you're using `_prepend` and `_append` suffixes correctly in `.gwt.local.json` to control hook execution order
 
-**Issue**: Configuration format incompatible with current GWT version
+**Issue**: Configuration format incompatible with current GWM version
 
-- **Solution**: GWT will attempt to auto-migrate configurations. If migration fails, update the configuration manually according to the current version's schema or downgrade GWT to a compatible version
+- **Solution**: GWM will attempt to auto-migrate configurations. If migration fails, update the configuration manually according to the current version's schema or downgrade GWM to a compatible version
 
 ---
 

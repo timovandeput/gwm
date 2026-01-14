@@ -1,6 +1,6 @@
 import 'package:mocktail/mocktail.dart';
 
-import 'package:gwt/src/infrastructure/git_client.dart';
+import 'package:gwm/src/infrastructure/git_client.dart';
 
 /// Mock implementation of [GitClient] for testing.
 ///

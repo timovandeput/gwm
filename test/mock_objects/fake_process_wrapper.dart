@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:gwt/src/infrastructure/process_wrapper.dart';
+import 'package:gwm/src/infrastructure/process_wrapper.dart';
 
 /// Fake implementation of [ProcessWrapper] for testing.
 ///

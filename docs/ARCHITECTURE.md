@@ -1,4 +1,4 @@
-# GWT Architecture Design Document
+# GWM Architecture Design Document
 
 ## 1. Overview
 
@@ -332,13 +332,13 @@ Shell integration uses eval-output for directory switching:
 sequenceDiagram
     participant User
     participant Shell
-    participant GWT
+    participant GWM
     participant Output
-    User ->> Shell: gwt switch feature-auth
-    Shell ->> GWT: Execute with shell wrapper
-    Note over Shell: gwt() { eval "$(command gwt $@")"; }
-    GWT->>GWT: Process command
-    GWT->>Output: Generate eval output
+    User ->> Shell: gwm switch feature-auth
+    Shell ->> GWM: Execute with shell wrapper
+    Note over Shell: gwt() { eval "$(command gwm $@")"; }
+    GWM->>GWT: Process command
+    GWM->>Output: Generate eval output
     Note over Output: cd ~/work/worktrees/project_feature-auth
     Output-->>Shell: Return shell command
     Shell->>Shell: eval output
@@ -422,7 +422,7 @@ graph LR
 
 ```mermaid
 classDiagram
-    class GwtException {
+    class GwmException {
         <<abstract>>
         +ExitCode exitCode
         +String message
@@ -453,11 +453,11 @@ classDiagram
         +String output
     }
 
-    GwtException <|-- WorktreeExistsException
-    GwtException <|-- BranchNotFoundException
-    GwtException <|-- HookExecutionException
-    GwtException <|-- ConfigException
-    GwtException <|-- GitException
+    GwmException <|-- WorktreeExistsException
+    GwmException <|-- BranchNotFoundException
+    GwmException <|-- HookExecutionException
+    GwmException <|-- ConfigException
+    GwmException <|-- GitException
 ```
 
 ### 7.3 Error Recovery Strategy
@@ -596,11 +596,11 @@ import 'package:test/test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 
-import 'package:gwt/src/models/worktree.dart';
-import 'package:gwt/src/models/exit_codes.dart';
-import 'package:gwt/src/services/worktree_service.dart';
-import 'package:gwt/src/infrastructure/git_client.dart';
-import 'package:gwt/src/infrastructure/file_system_adapter.dart';
+import 'package:gwm/src/models/worktree.dart';
+import 'package:gwm/src/models/exit_codes.dart';
+import 'package:gwm/src/services/worktree_service.dart';
+import 'package:gwm/src/infrastructure/git_client.dart';
+import 'package:gwm/src/infrastructure/file_system_adapter.dart';
 
 import 'worktree_service_test.mocks.dart';
 
@@ -821,9 +821,9 @@ Integration tests verify end-to-end workflows with all test doubles:
 
 import 'package:test/test.dart';
 
-import 'package:gwt/src/commands/add.dart';
-import 'package:gwt/src/infrastructure/git_client.dart';
-import 'package:gwt/mock_objects/fake_process_runner.dart';
+import 'package:gwm/src/commands/add.dart';
+import 'package:gwm/src/infrastructure/git_client.dart';
+import 'package:gwm/mock_objects/fake_process_runner.dart';
 
 void main() {
   group('Add Command Integration', () {

@@ -1,8 +1,8 @@
 import 'hook.dart';
 
-/// Configuration for the GWT CLI tool.
+/// Configuration for the GWM CLI tool.
 ///
-/// Contains all settings that control GWT behavior, loaded from
+/// Contains all settings that control GWM behavior, loaded from
 /// global, repository, and local configuration files.
 class Config {
   /// Configuration version for migration support

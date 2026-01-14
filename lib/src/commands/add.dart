@@ -13,7 +13,7 @@ import '../exceptions.dart';
 
 /// Command for adding a new Git worktree.
 ///
-/// Usage: gwt add `<branch>` [options]
+/// Usage: gwm add `<branch>` [options]
 class AddCommand extends BaseCommand {
   final WorktreeService _worktreeService;
   final ShellIntegration _shellIntegration;
@@ -52,7 +52,7 @@ class AddCommand extends BaseCommand {
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
-      print('Usage: gwt add <branch> [options]');
+      print('Usage: gwm add <branch> [options]');
       print('');
       print('Add a new Git worktree for the specified branch.');
       print('');
@@ -63,7 +63,7 @@ class AddCommand extends BaseCommand {
     final args = results.rest;
     if (args.isEmpty) {
       print('Error: Branch name is required.');
-      print('Usage: gwt add <branch> [options]');
+      print('Usage: gwm add <branch> [options]');
       return ExitCode.invalidArguments;
     }
 

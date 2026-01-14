@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:gwt/src/models/exit_codes.dart';
+import 'package:gwm/src/models/exit_codes.dart';
 
 void main() {
   group('ExitCode', () {

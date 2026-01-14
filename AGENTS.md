@@ -1,4 +1,4 @@
-# AGENTS.md - Development Guidelines for GWT CLI Tool
+# AGENTS.md - Development Guidelines for GWM CLI Tool
 
 ## Project Overview
 GWT (Git Worktree Manager) is a Dart CLI tool that simplifies Git worktree management. It provides streamlined commands for creating, switching, and managing worktrees with automatic directory navigation, configurable hooks, and cross-platform support.

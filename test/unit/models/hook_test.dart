@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:gwt/src/models/hook.dart';
+import 'package:gwm/src/models/hook.dart';
 
 void main() {
   group('Hook', () {

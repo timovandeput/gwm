@@ -8,7 +8,7 @@ import '../models/hook.dart';
 import '../exceptions.dart';
 import '../utils/validation.dart';
 
-/// Service for loading and managing GWT configuration from multiple sources.
+/// Service for loading and managing GWM configuration from multiple sources.
 ///
 /// Supports loading configuration from three tiers with proper merging:
 /// 1. Global config (~/.config/gwt/config.{json,yaml})

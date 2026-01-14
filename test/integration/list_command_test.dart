@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
-import 'package:gwt/src/commands/list.dart';
-import 'package:gwt/src/models/exit_codes.dart';
+import 'package:gwm/src/commands/list.dart';
+import 'package:gwm/src/models/exit_codes.dart';
 
 // Note: Integration tests require actual Git repositories and worktrees.
 // These tests are placeholders and would need proper setup in a real environment.

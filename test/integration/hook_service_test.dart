@@ -1,9 +1,9 @@
 import 'package:test/test.dart';
 
-import 'package:gwt/src/services/hook_service.dart';
-import 'package:gwt/src/models/config.dart';
-import 'package:gwt/src/models/hook.dart';
-import 'package:gwt/src/exceptions.dart';
+import 'package:gwm/src/services/hook_service.dart';
+import 'package:gwm/src/models/config.dart';
+import 'package:gwm/src/models/hook.dart';
+import 'package:gwm/src/exceptions.dart';
 import '../mock_objects/fake_process_wrapper.dart';
 
 void main() {

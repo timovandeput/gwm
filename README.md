@@ -1,4 +1,4 @@
-# GWT - Git Worktree Manager
+# GWM - Git Worktree Manager
 
 GWT (Git Worktree Manager) is a command-line tool that simplifies the management of Git worktrees, enabling parallel
 development sessions on the same Git repository. It's designed for both manual worktree workflows and AI-assisted
@@ -19,7 +19,7 @@ development scenarios where multiple tool instances work in parallel on differen
 ### Prerequisites
 
 - 📦 Git 2.5+ (for worktree support)
-- 🎯 Dart SDK (for building GWT)
+- 🎯 Dart SDK (for building GWM)
 - 🔍 Optional: [fzf](https://github.com/junegunn/fzf) for enhanced interactive selection
 
 ### Building the Executable
@@ -32,13 +32,13 @@ development scenarios where multiple tool instances work in parallel on differen
 
 2. 🏗️ Build the executable:
    ```bash
-   dart compile exe bin/gwt.dart -o gwt
+   dart compile exe bin/gwm.dart -o gwt
    ```
 
 3. ➡️ Move the executable to your PATH:
    ```bash
    # Linux/macOS
-   sudo mv gwt /usr/local/bin/
+   sudo mv gwm /usr/local/bin/
 
    # Windows
    # Add gwt.exe to your PATH or move to a directory in PATH
@@ -46,10 +46,10 @@ development scenarios where multiple tool instances work in parallel on differen
 
 ### Alternative: Running from Source
 
-If you prefer not to compile, you can run GWT directly using Dart:
+If you prefer not to compile, you can run GWM directly using Dart:
 
 ```bash
-dart run bin/gwt.dart --help
+dart run bin/gwm.dart --help
 ```
 
 ## Shell Integration
@@ -62,10 +62,10 @@ Add to `~/.bashrc`:
 
 ```bash
 # Wrapper for automatic directory switching
-gwt() { eval "$(command gwt "$@")"; }
+gwm() { eval "$(command gwm "$@")"; }
 
 # Tab completion (optional, if implemented)
-complete -F _gwt gwt
+complete -F _gwm gwm
 ```
 
 ### Zsh 🦓
@@ -74,10 +74,10 @@ Add to `~/.zshrc`:
 
 ```bash
 # Wrapper for automatic directory switching
-gwt() { eval "$(command gwt "$@")" }
+gwm() { eval "$(command gwm "$@")" }
 
 # Tab completion (optional, if implemented)
-compdef _gwt gwt
+compdef _gwm gwm
 ```
 
 ### Fish 🐠
@@ -86,12 +86,12 @@ Add to `~/.config/fish/config.fish`:
 
 ```fish
 # Wrapper for automatic directory switching
-function gwt
-    eval (command gwt $argv)
+function gwm
+    eval (command gwm $argv)
 end
 
-# Tab completion (save to ~/.config/fish/completions/gwt.fish)
-complete -c gwt -a 'add switch clean list' -d 'GWT commands'
+# Tab completion (save to ~/.config/fish/completions/gwm.fish)
+complete -c gwm -a 'add switch clean list' -d 'GWT commands'
 ```
 
 ### PowerShell 💻
@@ -100,7 +100,7 @@ Add to your PowerShell profile (`$PROFILE`):
 
 ```powershell
 # Wrapper for automatic directory switching
-function gwt { Invoke-Expression (& gwt $args) }
+function gwm { Invoke-Expression (& gwm $args) }
 ```
 
 ### Nushell 🦀
@@ -109,8 +109,8 @@ Add to `~/.config/nushell/config.nu`:
 
 ```nu
 # Wrapper for automatic directory switching
-def --env gwt [...args] {
-    ^gwt ...$args | lines | each { |line| nu -c $line }
+def --env gwm [...args] {
+    ^gwm ...$args | lines | each { |line| nu -c $line }
 }
 ```
 
@@ -128,33 +128,33 @@ source ~/.config/fish/config.fish
 
 ```bash
 # Create a worktree with a new branch 🌳
-gwt add -b feature/new-ui
+gwm add -b feature/new-ui
 
 # Switch to an existing worktree (interactive) 🔄
-gwt switch
+gwm switch
 
 # List all worktrees 📋
-gwt list -v
+gwm list -v
 
 # Clean up current worktree and return to main repo 🧹
-gwt clean
+gwm clean
 ```
 
 ## Usage
 
-### gwt add ➕
+### gwm add ➕
 
 Create a new worktree with automatic directory navigation.
 
 ```bash
 # Create worktree from existing branch
-gwt add feature/new-ui
+gwm add feature/new-ui
 
 # Create worktree with new branch
-gwt add -b feature/authentication
+gwm add -b feature/authentication
 
 # Create worktree with new branch (long form)
-gwt add --branch feature/authentication
+gwm add --branch feature/authentication
 ```
 
 **Options:**
@@ -162,31 +162,31 @@ gwt add --branch feature/authentication
 - `-b, --branch`: Create a new Git branch instead of using an existing one
 - `-h, --help`: Show help message
 
-### gwt switch 🔄
+### gwm switch 🔄
 
 Navigate to an existing worktree or main repository.
 
 ```bash
 # Switch to specific worktree
-gwt switch feature-auth
+gwm switch feature-auth
 
 # Switch to main Git workspace
-gwt switch .
+gwm switch .
 
 # Interactive selection
-gwt switch
+gwm switch
 ```
 
-### gwt clean 🧹
+### gwm clean 🧹
 
 Delete current worktree and return to main repository.
 
 ```bash
 # Normal clean (prompts if uncommitted changes exist)
-gwt clean
+gwm clean
 
 # Force clean (no prompts)
-gwt clean --force
+gwm clean --force
 ```
 
 **Options:**
@@ -194,19 +194,19 @@ gwt clean --force
 - `-f, --force`: Bypass safety checks and delete immediately
 - `-h, --help`: Show help message
 
-### gwt list 📋
+### gwm list 📋
 
 Display all available worktrees for current repository.
 
 ```bash
 # Simple list
-gwt list
+gwm list
 
 # Detailed list
-gwt list -v
+gwm list -v
 
 # JSON output for scripting
-gwt list -j
+gwm list -j
 ```
 
 **Options:**
@@ -399,48 +399,48 @@ GWT creates worktrees in a shared directory structure:
 
 ```bash
 # Create worktree with new branch 🌳
-gwt add -b feature/new-ui
+gwm add -b feature/new-ui
 
 # Work on feature...
-# Directory is already switched by gwt add
+# Directory is already switched by gwm add
 
 # Clean up when done 🧹
-gwt clean
+gwm clean
 ```
 
 ### Multi-Feature Workflow 🔀
 
 ```bash
 # Create multiple worktrees 🌳
-gwt add feature/auth
-gwt add feature/api
-gwt add bugfix/login
+gwm add feature/auth
+gwm add feature/api
+gwm add bugfix/login
 
 # Switch between worktrees 🔄
-gwt switch feature-auth
+gwm switch feature-auth
 
 # Switch back to main workspace 🏠
-gwt switch .
+gwm switch .
 
 # List all worktrees 📋
-gwt list -v
+gwm list -v
 ```
 
 ### AI-Assisted Development 🤖
 
 ```bash
 # Terminal 1: Work on authentication 🤖
-gwt add feature/auth
+gwm add feature/auth
 
 # Terminal 2: Work on API 🤖
-gwt switch feature-api
+gwm switch feature-api
 
 # Terminal 3: Work on bugfix 🤖
-gwt switch bugfix-login
+gwm switch bugfix-login
 
 # Terminal 4: Monitor from main workspace 👁
-gwt switch .
-gwt list -v
+gwm switch .
+gwm list -v
 ```
 
 ## Exit Codes 📊
@@ -462,10 +462,10 @@ gwt list -v
 
 ```bash
 # Run application
-dart run bin/gwt.dart
+dart run bin/gwm.dart
 
 # Build executable
-dart compile exe bin/gwt.dart -o gwt
+dart compile exe bin/gwm.dart -o gwt
 ```
 
 ### Lint Commands 🔍
@@ -503,7 +503,7 @@ dart test --coverage=coverage
 2. 🎨 Format: `dart format .`
 3. 🔍 Lint: `dart analyze`
 4. 🧪 Test: `dart test`
-5. ▶️ Run: `dart run bin/gwt.dart --help` to verify functionality
+5. ▶️ Run: `dart run bin/gwm.dart --help` to verify functionality
 
 ## Troubleshooting 🔧
 
@@ -512,7 +512,7 @@ dart test --coverage=coverage
 Use `-b` flag to create a new Git branch before creating the worktree:
 
 ```bash
-gwt add -b feature/new-ui
+gwm add -b feature/new-ui
 ```
 
 ### Automatic directory switching doesn't work ⚠️

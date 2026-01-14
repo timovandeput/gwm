@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
-import 'package:gwt/src/infrastructure/git_client.dart';
-import 'package:gwt/src/infrastructure/git_client_impl.dart';
+import 'package:gwm/src/infrastructure/git_client.dart';
+import 'package:gwm/src/infrastructure/git_client_impl.dart';
 import '../../mock_objects/fake_process_wrapper.dart';
 
 void main() {

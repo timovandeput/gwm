@@ -1,8 +1,8 @@
-# GWT Implementation Plan
+# GWM Implementation Plan
 
 ## Overview
 
-This document outlines the incremental implementation plan for GWT (Git Worktree Manager). Each increment delivers an
+This document outlines the incremental implementation plan for GWM (Git Worktree Manager). Each increment delivers an
 end-to-end feature or addresses a critical technical constraint, with clear acceptance criteria.
 
 ## Implementation Philosophy
@@ -25,7 +25,7 @@ features.
 
 - Complete directory structure as specified in ARCHITECTURE.md
 - Domain models: `Worktree`, `Config`, `Hook`, `ExitCodes`
-- Exception hierarchy: `GwtException` and all subclasses
+- Exception hierarchy: `GwmException` and all subclasses
 - Basic library entry point
 
 ### Files Created
@@ -185,12 +185,12 @@ test/unit/commands/version_test.dart
 
 ### Acceptance Criteria
 
-1. [ ] `gwt --help` displays help message for all commands
-2. [ ] `gwt --version` displays version information
-3. [ ] `gwt add --help` shows help for add command with all options
-4. [ ] `gwt switch --help` shows help for switch command
-5. [ ] `gwt clean --help` shows help for clean command with force flag
-6. [ ] `gwt list --help` shows help for list command with verbose/json flags
+1. [ ] `gwm --help` displays help message for all commands
+2. [ ] `gwm --version` displays version information
+3. [ ] `gwm add --help` shows help for add command with all options
+4. [ ] `gwm switch --help` shows help for switch command
+5. [ ] `gwm clean --help` shows help for clean command with force flag
+6. [ ] `gwm list --help` shows help for list command with verbose/json flags
 7. [ ] Invalid commands display error message and exit with code 2
 8. [ ] Missing required arguments display error and exit with code 2
 9. [ ] Command parser matches PRD specification exactly
@@ -274,9 +274,9 @@ test/integration/list_command_test.dart
 
 ### Acceptance Criteria
 
-1. [ ] `gwt list` displays table with worktree, branch, path columns
-2. [ ] `gwt list -v` displays table with status and last modified
-3. [ ] `gwt list -j` outputs JSON format
+1. [ ] `gwm list` displays table with worktree, branch, path columns
+2. [ ] `gwm list -v` displays table with status and last modified
+3. [ ] `gwm list -j` outputs JSON format
 4. [ ] Main workspace always included as "."
 5. [ ] Current worktree marked with "*" in table output
 6. [ ] Lists only worktrees for current repository
@@ -324,8 +324,8 @@ test/integration/add_command_test.dart
 
 ### Acceptance Criteria
 
-1. [ ] `gwt add feature/auth` creates worktree from existing branch
-2. [ ] `gwt add -b feature/auth` creates new branch then worktree
+1. [ ] `gwm add feature/auth` creates worktree from existing branch
+2. [ ] `gwm add -b feature/auth` creates new branch then worktree
 3. [ ] Creates worktree in `<parent-dir>/worktrees/<repo-name>_<branch-name>/`
 4. [ ] Fails with exit code 3 if worktree already exists
 5. [ ] Fails with exit code 4 if branch doesn't exist (without -b flag)
@@ -376,9 +376,9 @@ test/integration/switch_command_test.dart
 
 ### Acceptance Criteria
 
-1. [ ] `gwt switch feature-auth` switches to specific worktree
-2. [ ] `gwt switch .` switches to main Git workspace
-3. [ ] `gwt switch` shows interactive selection menu
+1. [ ] `gwm switch feature-auth` switches to specific worktree
+2. [ ] `gwm switch .` switches to main Git workspace
+3. [ ] `gwm switch` shows interactive selection menu
 4. [ ] Interactive menu includes main workspace as "."
 5. [ ] Fails with exit code 3 if worktree doesn't exist
 6. [ ] Only works from main repo or existing worktree
@@ -425,9 +425,9 @@ test/integration/clean_command_test.dart
 
 ### Acceptance Criteria
 
-1. [ ] `gwt clean` deletes current worktree and returns to main repo
+1. [ ] `gwm clean` deletes current worktree and returns to main repo
 2. [ ] Prompts for confirmation if uncommitted changes exist
-3. [ ] `gwt clean --force` deletes without prompts
+3. [ ] `gwm clean --force` deletes without prompts
 4. [ ] Fails with exit code 2 if run from main workspace (not a worktree)
 5. [ ] Uses Git to remove worktree (proper cleanup)
 6. [ ] Returns to main repository directory after deletion
@@ -525,7 +525,7 @@ test/integration/hook_service_test.dart
 
 1. [ ] Executes hooks sequentially in order
 2. [ ] Expands environment variables in hook commands
-3. [ ] Sets GWT_WORKTREE_PATH, GWT_ORIGIN_PATH, GWT_BRANCH for hooks
+3. [ ] Sets GWM_WORKTREE_PATH, GWM_ORIGIN_PATH, GWM_BRANCH for hooks
 4. [ ] Displays all hook output (stdout + stderr) to user
 5. [ ] Fails immediately on first hook failure (exit code 5)
 6. [ ] Displays error output from failed hook command
@@ -603,7 +603,7 @@ test/unit/services/shell_integration_test.dart (enhanced)
 
 ### Description
 
-Integrate all services together and ensure complete feature parity with PRD. This delivers the fully functional GWT
+Integrate all services together and ensure complete feature parity with PRD. This delivers the fully functional GWM
 tool.
 
 ### Deliverables
@@ -626,10 +626,10 @@ test/integration/ (comprehensive integration tests)
 
 ### Acceptance Criteria
 
-1. [ ] `gwt add` supports: existing branches, new branches (-b), hooks, file copying
-2. [ ] `gwt switch` supports: direct switch, interactive selection, hooks, shell integration
-3. [ ] `gwt clean` supports: normal mode, force mode, hooks, uncommitted changes detection
-4. [ ] `gwt list` supports: simple, verbose, JSON output, current worktree marker
+1. [ ] `gwm add` supports: existing branches, new branches (-b), hooks, file copying
+2. [ ] `gwm switch` supports: direct switch, interactive selection, hooks, shell integration
+3. [ ] `gwm clean` supports: normal mode, force mode, hooks, uncommitted changes detection
+4. [ ] `gwm list` supports: simple, verbose, JSON output, current worktree marker
 5. [ ] Configuration hierarchy works correctly (global + repo + local with override strategies)
 6. [ ] All hooks execute in correct order (pre/post for add/switch/clean)
 7. [ ] All exit codes match PRD specification

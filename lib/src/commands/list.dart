@@ -11,7 +11,7 @@ import '../utils/output_formatter.dart';
 
 /// Command for listing Git worktrees.
 ///
-/// Usage: gwt list [options]
+/// Usage: gwm list [options]
 class ListCommand extends BaseCommand {
   final GitClient _gitClient;
   final OutputFormatter _formatter;
@@ -43,7 +43,7 @@ class ListCommand extends BaseCommand {
   @override
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
-      print('Usage: gwt list [options]');
+      print('Usage: gwm list [options]');
       print('');
       print('List all Git worktrees in the current repository.');
       print('');

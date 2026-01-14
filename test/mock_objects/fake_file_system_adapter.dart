@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:glob/glob.dart';
 
-import 'package:gwt/src/infrastructure/file_system_adapter.dart';
+import 'package:gwm/src/infrastructure/file_system_adapter.dart';
 
 /// Fake implementation of [FileSystemAdapter] for testing.
 ///

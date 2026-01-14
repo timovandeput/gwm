@@ -1,13 +1,14 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:gwt/src/commands/add.dart';
-import 'package:gwt/src/commands/base.dart';
-import 'package:gwt/src/commands/switch.dart';
-import 'package:gwt/src/commands/clean.dart';
-import 'package:gwt/src/commands/list.dart';
-import 'package:gwt/src/models/exit_codes.dart';
-import 'package:gwt/src/exceptions.dart';
+import 'package:gwm/src/commands/add.dart';
+import 'package:gwm/src/commands/base.dart';
+import 'package:gwm/src/commands/switch.dart';
+import 'package:gwm/src/commands/clean.dart';
+import 'package:gwm/src/commands/list.dart';
+import 'package:gwm/src/models/exit_codes.dart';
+import 'package:gwm/src/exceptions.dart';
+import 'package:gwm/src/cli_utils.dart';
 
 const String version = '0.0.1';
 
@@ -37,21 +38,6 @@ ArgParser buildParser() {
     ..addCommand('list', ListCommand().parser);
 }
 
-void printUsage(ArgParser argParser) {
-  print('GWT (Git Worktree Manager) - Streamlined Git worktree management');
-  print('');
-  print('Usage: gwt <command> [arguments]');
-  print('');
-  print('Available commands:');
-  print('  add     Add a new worktree');
-  print('  switch  Switch to an existing worktree');
-  print('  clean   Delete current worktree and return to main repo');
-  print('  list    List all worktrees');
-  print('');
-  print('Global options:');
-  print(argParser.usage);
-}
-
 Future<void> main(List<String> arguments) async {
   final ArgParser argParser = buildParser();
 
@@ -64,15 +50,15 @@ Future<void> main(List<String> arguments) async {
       return;
     }
     if (results.flag('version')) {
-      print('gwt version: $version');
+      printSafe('gwm version: $version');
       return;
     }
 
     // Handle subcommands
     final commandName = results.command?.name;
     if (commandName == null) {
-      print('Error: No command specified.');
-      print('');
+      printSafe('Error: No command specified.');
+      printSafe('');
       printUsage(argParser);
       exit(ExitCode.invalidArguments.value);
     }
@@ -113,15 +99,15 @@ Future<void> main(List<String> arguments) async {
     exit(exitCode.value);
   } on FormatException catch (e) {
     // Print usage information if an invalid argument was provided.
-    print(e.message);
-    print('');
+    printSafe(e.message);
+    printSafe('');
     printUsage(argParser);
     exit(ExitCode.invalidArguments.value);
   } on ShellWrapperMissingException catch (e) {
-    print(e.message);
+    printSafe(e.message);
     exit(e.exitCode.value);
   } catch (e) {
-    print('Unexpected error: $e');
+    printSafe('Unexpected error: $e');
     exit(ExitCode.generalError.value);
   }
 }

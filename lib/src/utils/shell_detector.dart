@@ -41,38 +41,38 @@ class ShellDetector {
       case Shell.bash:
         return r'''
 Add to ~/.bashrc:
-    gwt() { eval "$(command gwt "$@")"; }
+    gwm() { eval "$(command gwm "$@")"; }
 Then restart your shell or run: source ~/.bashrc''';
       case Shell.zsh:
         return r'''
 Add to ~/.zshrc:
-    gwt() { eval "$(command gwt "$@")" }
+    gwm() { eval "$(command gwm "$@")" }
 Then restart your shell or run: source ~/.zshrc''';
       case Shell.fish:
         return r'''
 Add to ~/.config/fish/config.fish:
-    function gwt
-        eval (command gwt $argv)
+    function gwm
+        eval (command gwm $argv)
     end
 Then restart your shell or run: source ~/.config/fish/config.fish''';
       case Shell.powershell:
         return r'''
 Add to your PowerShell profile:
-    function gwt { Invoke-Expression (& gwt $args) }
+    function gwm { Invoke-Expression (function gwm { Invoke-Expression (Invoke-Expression (& gwt gwm gwm $args) }
 To find your profile path, run: $PROFILE
 Then restart your shell or run: . $PROFILE''';
       case Shell.nushell:
         return r'''
 Add to ~/.config/nushell/config.nu:
-    def --env gwt [...args] {
+    def --env gwm [...args] {
         ^gwt ...$args | lines | each { |line| nu -c $line }
     }
 Then restart your shell or run: source ~/.config/nushell/config.nu''';
       case Shell.unknown:
         return r'''
-Ensure GWT is invoked with eval to enable automatic directory switching.
-For Unix-like shells, wrap GWT: eval "$(gwt "$@")"
-For PowerShell: Invoke-Expression (& gwt $args)''';
+Ensure GWM is invoked with eval to enable automatic directory switching.
+For Unix-like shells, wrap GWM: eval "$(gwm "$@")"
+For PowerShell: Invoke-Expression (Invoke-Expression (& gwt gwm $args)''';
     }
   }
 

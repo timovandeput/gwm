@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# GWT (Git Worktree Manager) bash completion
+# GWM (Git Worktree Manager) bash completion
 # Source this file in your ~/.bashrc:
 #   source /path/to/gwt-completion.bash
 
-_gwt_complete_worktrees() {
+_gwm_complete_worktrees() {
     local cur prev
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
@@ -13,7 +13,7 @@ _gwt_complete_worktrees() {
         switch|list)
             # Complete worktree names for switch and list commands
             local worktrees
-            worktrees=$(gwt list 2>/dev/null | grep -v '^Found' | sed 's/^[[:space:]]*//' | cut -d' ' -f1)
+            worktrees=$(gwm list 2>/dev/null | grep -v '^Found' | sed 's/^[[:space:]]*//' | cut -d' ' -f1)
             COMPREPLY=( $(compgen -W "${worktrees}" -- "${cur}") )
             ;;
         add)
@@ -30,4 +30,4 @@ _gwt_complete_worktrees() {
 }
 
 # Register completion function
-complete -F _gwt_complete_worktrees gwt
+complete -F _gwm_complete_worktrees gwm

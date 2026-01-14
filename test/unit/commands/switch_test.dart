@@ -1,12 +1,12 @@
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:gwt/src/commands/switch.dart';
-import 'package:gwt/src/models/exit_codes.dart';
-import 'package:gwt/src/models/worktree.dart';
-import 'package:gwt/src/infrastructure/git_client.dart';
-import 'package:gwt/src/infrastructure/prompt_selector.dart';
-import 'package:gwt/src/services/shell_integration.dart';
+import 'package:gwm/src/commands/switch.dart';
+import 'package:gwm/src/models/exit_codes.dart';
+import 'package:gwm/src/models/worktree.dart';
+import 'package:gwm/src/infrastructure/git_client.dart';
+import 'package:gwm/src/infrastructure/prompt_selector.dart';
+import 'package:gwm/src/services/shell_integration.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}

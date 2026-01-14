@@ -2,7 +2,7 @@ import 'package:args/args.dart';
 
 import '../models/exit_codes.dart';
 
-/// Base class for all GWT CLI commands.
+/// Base class for all GWM CLI commands.
 ///
 /// Provides common functionality for argument parsing, validation,
 /// and error handling.
