@@ -1,0 +1,29 @@
+version: "1.0"
+
+copy:
+  files: []
+  directories: []
+
+hooks:
+  timeout: 30
+  preAdd:
+    commands:
+      - echo "🪝 preAdd"
+  postAdd:
+    commands:
+      - echo "🪝 postAdd"
+  preSwitch:
+    commands:
+      - echo "🪝 preSwitch"
+  postSwitch:
+    commands:
+      - echo "🪝 postSwitch"
+  preClean:
+    commands:
+      - echo "🪝 preClean"
+  postClean:
+    commands:
+      - echo "🪝 postClean"
+
+shellIntegration:
+  enableEvalOutput: false

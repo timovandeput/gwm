@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:args/args.dart';
 
 import 'base.dart';

@@ -73,7 +73,6 @@ void main() {
         );
       });
     });
-    });
 
     group('listWorktrees', () {
       test('parses worktree list successfully', () async {
