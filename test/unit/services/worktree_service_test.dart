@@ -77,7 +77,7 @@ void main() {
       });
 
       test(
-        'returns worktreeExists when worktree directory already exists',
+        'returns worktreeExistsButSwitched when worktree directory already exists',
         () async {
           // Arrange
           const branch = 'existing-worktree';
@@ -99,7 +99,7 @@ void main() {
           final result = await worktreeService.addWorktree(branch);
 
           // Assert
-          expect(result, ExitCode.worktreeExists);
+          expect(result, ExitCode.worktreeExistsButSwitched);
           verifyNever(
             () => mockGitClient.createWorktree(
               any(),

@@ -81,10 +81,17 @@ class AddCommand extends BaseCommand {
         createBranch: createBranch,
       );
 
-      // If worktree was created, navigate to it
-      if (exitCode == ExitCode.success) {
+      // If worktree was created or already exists (and we're switching to it), navigate to it
+      if (exitCode == ExitCode.success ||
+          exitCode == ExitCode.worktreeExistsButSwitched) {
         final worktreePath = await _worktreeService.getWorktreePath(branch);
-        _shellIntegration.outputWorktreeCreated(worktreePath);
+        if (exitCode == ExitCode.success) {
+          _shellIntegration.outputWorktreeCreated(worktreePath);
+        } else {
+          // Worktree already exists, output switch message
+          _shellIntegration.outputCdCommand(worktreePath);
+          printSafe('Switched to existing worktree: $worktreePath');
+        }
       }
 
       return exitCode;

@@ -28,7 +28,10 @@ enum ExitCode {
   gitFailed(7),
 
   /// Shell wrapper is missing or not properly configured
-  shellWrapperMissing(8);
+  shellWrapperMissing(8),
+
+  /// Worktree already exists but successfully switched to it
+  worktreeExistsButSwitched(9);
 
   const ExitCode(this.value);
 

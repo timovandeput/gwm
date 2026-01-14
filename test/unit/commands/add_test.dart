@@ -118,5 +118,29 @@ void main() {
       expect(exitCode, ExitCode.gitFailed);
       verifyNever(() => mockShellIntegration.outputWorktreeCreated(any()));
     });
+
+    test(
+      'switches to existing worktree when worktree already exists',
+      () async {
+        const branch = 'existing-feature';
+        final results = addCommand.parser.parse([branch]);
+
+        when(
+          () => mockWorktreeService.addWorktree(branch, createBranch: false),
+        ).thenAnswer((_) async => ExitCode.worktreeExistsButSwitched);
+
+        when(
+          () => mockWorktreeService.getWorktreePath(branch),
+        ).thenAnswer((_) async => '/existing/worktree/path');
+
+        final exitCode = await addCommand.execute(results);
+
+        expect(exitCode, ExitCode.worktreeExistsButSwitched);
+        verify(
+          () => mockShellIntegration.outputCdCommand('/existing/worktree/path'),
+        ).called(1);
+        verifyNever(() => mockShellIntegration.outputWorktreeCreated(any()));
+      },
+    );
   });
 }

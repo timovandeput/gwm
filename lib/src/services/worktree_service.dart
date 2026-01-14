@@ -43,8 +43,10 @@ class WorktreeService {
 
       // Check if worktree already exists
       if (await worktreeDir.exists()) {
-        printSafe('Error: Worktree already exists at $worktreePath');
-        return ExitCode.worktreeExists;
+        printSafe(
+          'Warning: Worktree already exists at $worktreePath, switching to it',
+        );
+        return ExitCode.worktreeExistsButSwitched;
       }
 
       // If createBranch is true and branch doesn't exist, create it along with worktree
