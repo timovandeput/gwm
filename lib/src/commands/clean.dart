@@ -8,6 +8,10 @@ import '../infrastructure/git_client.dart';
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../services/config_service.dart';
+import '../services/shell_integration.dart';
+import '../models/config.dart';
+import '../utils/eval_validator.dart';
+import '../exceptions.dart';
 import '../cli_utils.dart';
 
 /// Command for cleaning up the current Git worktree.
@@ -16,13 +20,22 @@ import '../cli_utils.dart';
 class CleanCommand extends BaseCommand {
   final GitClient _gitClient;
   final ConfigService _configService;
+  final ShellIntegration _shellIntegration;
 
   CleanCommand({
     GitClient? gitClient,
     ConfigService? configService,
+    ShellIntegration? shellIntegration,
+    Config? config,
     super.skipEvalCheck = false,
   }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
-       _configService = configService ?? ConfigService();
+       _configService = configService ?? ConfigService(),
+       _shellIntegration =
+           shellIntegration ??
+           ShellIntegration(
+             config?.shellIntegration ??
+                 ShellIntegrationConfig(enableEvalOutput: true),
+           );
 
   @override
   ArgParser get parser {
@@ -54,6 +67,8 @@ class CleanCommand extends BaseCommand {
     final force = results.flag('force');
 
     try {
+      // Validate we're in eval wrapper
+      EvalValidator.validate(skipCheck: skipEvalCheck);
       // Validate we're in a Git repository
       final isWorktree = await _gitClient.isWorktree();
       if (!isWorktree) {
@@ -102,12 +117,13 @@ class CleanCommand extends BaseCommand {
       }
 
       // Change to main repository directory
-      // Note: In production, this would change the working directory
-      // Directory.current = mainRepoPath;
-      printSafe('Would return to main repository: $mainRepoPath');
+      _shellIntegration.outputCdCommand(mainRepoPath);
       printSafe('Worktree successfully removed.');
 
       return ExitCode.success;
+    } on ShellWrapperMissingException catch (e) {
+      printSafe(e.message);
+      return e.exitCode;
     } catch (e) {
       printSafe('Error: Failed to remove worktree: $e');
       return ExitCode.gitFailed;

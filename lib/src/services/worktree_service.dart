@@ -3,6 +3,7 @@ import 'dart:io';
 import '../infrastructure/git_client.dart';
 import '../models/exit_codes.dart';
 import '../utils/path_utils.dart';
+import '../cli_utils.dart';
 
 /// Service for managing Git worktrees.
 ///
@@ -26,15 +27,13 @@ class WorktreeService {
     try {
       // Validate that we're running from the main repository
       if (await _gitClient.isWorktree()) {
-        stderr.writeln(
-          'Error: Must run from main Git repository, not a worktree',
-        );
+        printSafe('Error: Must run from main Git repository, not a worktree');
         return ExitCode.generalError;
       }
 
       // Check if branch exists (unless createBranch is true)
       if (!createBranch && !await _gitClient.branchExists(branch)) {
-        stderr.writeln('Error: Branch "$branch" does not exist');
+        printSafe('Error: Branch "$branch" does not exist');
         return ExitCode.branchNotFound;
       }
 
@@ -44,7 +43,7 @@ class WorktreeService {
 
       // Check if worktree already exists
       if (await worktreeDir.exists()) {
-        stderr.writeln('Error: Worktree already exists at $worktreePath');
+        printSafe('Error: Worktree already exists at $worktreePath');
         return ExitCode.worktreeExists;
       }
 
@@ -72,12 +71,12 @@ class WorktreeService {
         return ExitCode.gitFailed;
       }
 
-      stdout.writeln(
+      printSafe(
         'Successfully created worktree for branch "$branch" at $actualPath',
       );
       return ExitCode.success;
     } catch (e) {
-      stderr.writeln('Error: Failed to create worktree: $e');
+      printSafe('Error: Failed to create worktree: $e');
       return ExitCode.gitFailed;
     }
   }
