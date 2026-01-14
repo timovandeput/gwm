@@ -82,13 +82,27 @@ class CleanCommand extends BaseCommand {
         return ExitCode.invalidArguments;
       }
 
-      final currentPath = Directory.current.path;
       final repoRoot = await _gitClient.getRepoRoot();
 
+      // Load configuration for hooks
+      final config = await _configService.loadConfig(repoRoot: repoRoot);
+
       // Check for uncommitted changes
-      final hasChanges = await _gitClient.hasUncommittedChanges(currentPath);
+      final hasChanges = await _gitClient.hasUncommittedChanges(repoRoot);
       if (hasChanges && !force) {
-        printSafe('Uncommitted changes detected in worktree at: $currentPath');
+        printSafe('Uncommitted changes detected in worktree at: $repoRoot');
+
+        // Check if we're in an interactive terminal
+        if (!stdin.hasTerminal) {
+          printSafe(
+            'Error: Cannot prompt for confirmation in non-interactive mode.',
+          );
+          printSafe(
+            'Use --force to skip confirmation and proceed with removal.',
+          );
+          return ExitCode.invalidArguments;
+        }
+
         stdout.write('Continue with removal? (y/N): ');
         final response = stdin.readLineSync()?.toLowerCase().trim();
         if (response != 'y' && response != 'yes') {
@@ -96,9 +110,6 @@ class CleanCommand extends BaseCommand {
           return ExitCode.success;
         }
       }
-
-      // Load configuration for hooks
-      final config = await _configService.loadConfig(repoRoot: repoRoot);
 
       // Execute pre_clean hooks (placeholder - hooks not yet implemented)
       if (config.hooks.preClean != null) {
@@ -111,8 +122,8 @@ class CleanCommand extends BaseCommand {
       final mainRepoPath = await _gitClient.getMainRepoPath();
 
       // Remove the worktree using Git
-      printSafe('Removing worktree: $currentPath');
-      await _gitClient.removeWorktree(currentPath);
+      printSafe('Removing worktree: $repoRoot');
+      await _gitClient.removeWorktree(repoRoot);
 
       // Execute post_clean hooks (placeholder - hooks not yet implemented)
       if (config.hooks.postClean != null) {
