@@ -113,6 +113,31 @@ void main() {
       verify(() => mockGitClient.removeWorktree(any())).called(1);
     });
 
+    test('fails when uncommitted changes exist without force flag', () async {
+      when(() => mockGitClient.isWorktree()).thenAnswer((_) async => true);
+      when(
+        () => mockGitClient.getRepoRoot(),
+      ).thenAnswer((_) async => '/path/to/repo');
+      when(
+        () => mockGitClient.hasUncommittedChanges(any()),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
+      ).thenAnswer(
+        (_) async => Config(
+          version: '1.0',
+          copy: CopyConfig(files: [], directories: []),
+          hooks: HooksConfig(timeout: 30),
+          shellIntegration: ShellIntegrationConfig(enableEvalOutput: false),
+        ),
+      );
+
+      final results = cleanCommand.parser.parse([]);
+      final exitCode = await cleanCommand.execute(results);
+
+      expect(exitCode, ExitCode.invalidArguments);
+    });
+
     test('handles Git command failures', () async {
       when(() => mockGitClient.isWorktree()).thenAnswer((_) async => true);
       when(() => mockGitClient.getRepoRoot()).thenThrow(Exception('Git error'));

@@ -43,7 +43,7 @@ class CleanCommand extends BaseCommand {
       ..addFlag(
         'force',
         abbr: 'f',
-        help: 'Force removal without confirmation prompts.',
+        help: 'Force removal when uncommitted changes exist.',
       )
       ..addFlag(
         'help',
@@ -90,25 +90,11 @@ class CleanCommand extends BaseCommand {
       // Check for uncommitted changes
       final hasChanges = await _gitClient.hasUncommittedChanges(repoRoot);
       if (hasChanges && !force) {
-        printSafe('Uncommitted changes detected in worktree at: $repoRoot');
-
-        // Check if we're in an interactive terminal
-        if (!stdin.hasTerminal) {
-          printSafe(
-            'Error: Cannot prompt for confirmation in non-interactive mode.',
-          );
-          printSafe(
-            'Use --force to skip confirmation and proceed with removal.',
-          );
-          return ExitCode.invalidArguments;
-        }
-
-        stdout.write('Continue with removal? (y/N): ');
-        final response = stdin.readLineSync()?.toLowerCase().trim();
-        if (response != 'y' && response != 'yes') {
-          printSafe('Operation cancelled.');
-          return ExitCode.success;
-        }
+        printSafe(
+          'Error: Uncommitted changes detected in worktree at: $repoRoot',
+        );
+        printSafe('Use --force to skip confirmation and proceed with removal.');
+        return ExitCode.invalidArguments;
       }
 
       // Execute pre_clean hooks (placeholder - hooks not yet implemented)
