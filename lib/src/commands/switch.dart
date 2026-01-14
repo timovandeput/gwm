@@ -81,11 +81,12 @@ class SwitchCommand extends BaseCommand {
         final availableWorktrees = worktrees.where(
           (w) => w.path != currentPath,
         );
-        final worktreeList = availableWorktrees.map((w) => w.name).join(', ');
+        final message = availableWorktrees.isEmpty
+            ? 'No worktrees available to switch to.'
+            : 'Available worktrees: ${availableWorktrees.map((w) => w.name).join(', ')}\nPlease specify a worktree name: gwm switch <worktree-name>';
         printSafe(
           'Error: Interactive worktree selection is not available when using the shell wrapper.\n'
-          'Available worktrees: $worktreeList\n'
-          'Please specify a worktree name: gwm switch <worktree-name>',
+          '$message',
         );
         return ExitCode.invalidArguments;
       }

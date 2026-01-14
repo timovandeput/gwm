@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -240,6 +242,33 @@ void main() {
       final results = switchCommand.parser.parse(['worktree-name']);
       final exitCode = switchCommand.validate(results);
       expect(exitCode, ExitCode.success);
+    });
+
+    test('returns error when no worktrees available to switch to', () async {
+      final currentPath = Directory.current.path;
+      final worktrees = [
+        Worktree(
+          name: 'main',
+          branch: 'main',
+          path: currentPath,
+          isMain: true,
+          status: WorktreeStatus.clean,
+        ),
+      ];
+
+      when(
+        () => mockGitClient.getRepoRoot(),
+      ).thenAnswer((_) async => currentPath);
+      when(
+        () => mockGitClient.listWorktrees(),
+      ).thenAnswer((_) async => worktrees);
+
+      final results = switchCommand.parser.parse([]);
+      final exitCode = await switchCommand.execute(results);
+
+      expect(exitCode, ExitCode.invalidArguments);
+      verifyNever(() => mockPromptSelector.selectWorktree(any()));
+      verifyNever(() => mockShellIntegration.outputCdCommand(any()));
     });
   });
 }
