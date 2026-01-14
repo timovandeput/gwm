@@ -121,21 +121,19 @@ class GitClientImpl implements GitClient {
 
   @override
   Future<bool> isWorktree() async {
-    final result = await _processWrapper.run('git', [
-      'rev-parse',
-      '--is-inside-work-tree',
-    ]);
-    if (result.exitCode != 0) {
+    try {
+      // Get the worktree root directory
+      final repoRoot = await getRepoRoot();
+      // Check if .git in the worktree root is a file (worktree) or directory (main repo)
+      final gitFile = File('$repoRoot/.git');
+      if (await gitFile.exists()) {
+        final stat = await gitFile.stat();
+        return stat.type == FileSystemEntityType.file;
+      }
+      return false;
+    } catch (e) {
       return false; // Not in a git repository
     }
-    // Check if .git is a file (worktree) or directory (main repo)
-    final gitDir = File('.git');
-    if (await gitDir.exists()) {
-      return await gitDir.stat().then(
-        (stat) => stat.type == FileSystemEntityType.file,
-      );
-    }
-    return false;
   }
 
   @override

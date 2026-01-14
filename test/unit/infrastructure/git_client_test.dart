@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:test/test.dart';
+import 'package:path/path.dart' as path;
 
 import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/infrastructure/git_client_impl.dart';
@@ -368,6 +369,99 @@ HEAD abc123def456
         // Note: This test would need file system mocking to fully test
         // the worktree case. For now, we test the git command part.
         // The actual file reading logic is tested in integration tests.
+      });
+    });
+
+    group('isWorktree', () {
+      late Directory tempDir;
+      late Directory worktreeDir;
+      late Directory subDir;
+
+      setUp(() async {
+        tempDir = await Directory.systemTemp.createTemp('gwm_test');
+        worktreeDir = Directory(path.join(tempDir.path, 'worktree'));
+        await worktreeDir.create();
+        subDir = Directory(path.join(worktreeDir.path, 'subdir'));
+        await subDir.create();
+      });
+
+      tearDown(() async {
+        if (await tempDir.exists()) {
+          await tempDir.delete(recursive: true);
+        }
+      });
+
+      test('returns false when not in git repository', () async {
+        fakeProcessWrapper.addResponse(
+          'git',
+          ['rev-parse', '--show-toplevel'],
+          exitCode: 128, // Not in git repo
+          stderr: 'fatal: not a git repository',
+        );
+
+        final isWorktree = await gitClient.isWorktree();
+
+        expect(isWorktree, isFalse);
+      });
+
+      test('returns false when in main repository', () async {
+        // Mock being in main repo
+        fakeProcessWrapper.addResponse('git', [
+          'rev-parse',
+          '--show-toplevel',
+        ], stdout: '${tempDir.path}\n');
+
+        // Create .git directory (main repo)
+        final gitDir = Directory(path.join(tempDir.path, '.git'));
+        await gitDir.create();
+
+        final isWorktree = await gitClient.isWorktree();
+
+        expect(isWorktree, isFalse);
+      });
+
+      test('returns true when in worktree root', () async {
+        // Mock being in worktree
+        fakeProcessWrapper.addResponse('git', [
+          'rev-parse',
+          '--show-toplevel',
+        ], stdout: '${worktreeDir.path}\n');
+
+        // Create .git file (worktree)
+        final gitFile = File(path.join(worktreeDir.path, '.git'));
+        await gitFile.writeAsString(
+          'gitdir: /path/to/main/.git/worktrees/feature',
+        );
+
+        final isWorktree = await gitClient.isWorktree();
+
+        expect(isWorktree, isTrue);
+      });
+
+      test('returns true when in worktree subdirectory', () async {
+        // Mock being in worktree subdirectory
+        fakeProcessWrapper.addResponse('git', [
+          'rev-parse',
+          '--show-toplevel',
+        ], stdout: '${worktreeDir.path}\n');
+
+        // Create .git file in worktree root (worktree)
+        final gitFile = File(path.join(worktreeDir.path, '.git'));
+        await gitFile.writeAsString(
+          'gitdir: /path/to/main/.git/worktrees/feature',
+        );
+
+        // Change to subdirectory for this test
+        final originalDir = Directory.current;
+        try {
+          Directory.current = subDir;
+
+          final isWorktree = await gitClient.isWorktree();
+
+          expect(isWorktree, isTrue);
+        } finally {
+          Directory.current = originalDir;
+        }
       });
     });
   });
