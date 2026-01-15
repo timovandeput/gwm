@@ -22,7 +22,7 @@ cp gwm.bash ~/.local/share/bash-completion/completions/gwm
 
 ### Zsh
 
-**Option 1: Add to fpath**
+**Option 1: Add to fpath (recommended)**
 ```bash
 # Create completions directory if it doesn't exist
 mkdir -p ~/.zsh/completions
@@ -35,6 +35,15 @@ fpath=(~/.zsh/completions $fpath)
 
 # Reload completions
 autoload -Uz compinit && compinit
+```
+
+**Option 2: Source directly (for testing)**
+```bash
+# In any ZSH shell
+source path/to/gwm.zsh
+
+# Now test completions
+gwm <Tab>
 ```
 
 **Option 2: Use a completion manager like zplug**
