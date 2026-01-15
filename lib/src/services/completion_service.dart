@@ -105,7 +105,15 @@ class CompletionService {
         }
         break;
       case 'delete':
-        // No positional arguments to complete
+        if (position == 0) {
+          // Completing worktree name for delete command
+          // Exclude the main workspace since it cannot be deleted
+          return filterCandidates(
+            (await getWorktreeCompletions())
+                .where((name) => name != '.')
+                .toList(),
+          );
+        }
         break;
       case 'list':
         // No positional arguments to complete

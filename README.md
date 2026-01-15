@@ -138,6 +138,9 @@ gwm list -v
 
 # Delete current worktree and return to main repo 🧹
 gwm delete
+
+# Delete a specific worktree from main workspace 🗑️
+gwm delete feature-branch
 ```
 
 ## Usage
@@ -178,14 +181,19 @@ gwm switch .
 
 ### gwm delete 🧹
 
-Delete current worktree and return to main repository.
+Delete the specified worktree, or the current worktree if no name is provided.
+Can only delete worktrees from the main workspace. Cannot delete the main workspace.
 
 ```bash
-# Normal delete (prompts if uncommitted changes exist)
+# Delete current worktree (prompts if uncommitted changes exist)
 gwm delete
+
+# Delete named worktree from main workspace
+gwm delete feature-branch
 
 # Force delete (no prompts)
 gwm delete --force
+gwm delete feature-branch --force
 ```
 
 **Options:**
