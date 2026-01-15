@@ -1,4 +1,5 @@
 import '../models/config.dart';
+import 'completion_service.dart';
 
 /// Service for shell integration functionality.
 ///
@@ -9,8 +10,11 @@ class ShellIntegration {
   /// Configuration for shell integration features.
   final ShellIntegrationConfig config;
 
+  /// Completion service for tab completion support.
+  final CompletionService? completionService;
+
   /// Creates a new shell integration service with the given configuration.
-  const ShellIntegration(this.config);
+  const ShellIntegration(this.config, {this.completionService});
 
   /// Outputs a command to change to the specified directory path.
   ///
@@ -67,5 +71,24 @@ class ShellIntegration {
   void outputError(String message) {
     // Always output errors regardless of eval output setting
     print('echo "Error: $message" >&2');
+  }
+
+  /// Gets completion candidates for shell completion scripts.
+  ///
+  /// This method is used by completion scripts to get dynamic completion data.
+  /// Returns a list of completion candidates for the given command and context.
+  Future<List<String>> getCompletionCandidates({
+    String? command,
+    String partial = '',
+    int position = 0,
+  }) async {
+    if (completionService == null) {
+      return [];
+    }
+    return completionService!.getCompletions(
+      command: command,
+      partial: partial,
+      position: position,
+    );
   }
 }

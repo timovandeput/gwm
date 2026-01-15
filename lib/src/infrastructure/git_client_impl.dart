@@ -223,6 +223,26 @@ class GitClientImpl implements GitClient {
     throw Exception('Unable to determine main repository path');
   }
 
+  @override
+  Future<List<String>> listBranches() async {
+    final result = await _processWrapper.run('git', [
+      'branch',
+      '--format=%(refname:short)',
+    ]);
+    _printOutput(result);
+    if (result.exitCode != 0) {
+      throw Exception(
+        'Git command failed: git branch --format=%(refname:short)',
+      );
+    }
+    final output = result.stdout as String;
+    return output
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList();
+  }
+
   void _printOutput(ProcessResult result) {
     if (result.stderr.isNotEmpty) {
       printSafe(result.stderr);

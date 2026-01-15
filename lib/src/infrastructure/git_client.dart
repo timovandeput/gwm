@@ -44,4 +44,7 @@ abstract class GitClient {
 
   /// Gets the path to the main Git repository (common .git directory).
   Future<String> getMainRepoPath();
+
+  /// Lists all available Git branches.
+  Future<List<String>> listBranches();
 }

@@ -18,10 +18,59 @@ import 'package:gwm/src/services/config_service.dart';
 import 'package:gwm/src/services/hook_service.dart';
 import 'package:gwm/src/services/copy_service.dart';
 import 'package:gwm/src/services/shell_integration.dart';
+import 'package:gwm/src/services/completion_service.dart';
 import 'package:gwm/src/utils/output_formatter.dart';
 import 'package:gwm/src/models/config.dart';
 
 const String version = '0.0.1';
+
+/// Handles tab completion requests.
+///
+/// Completion requests are made by shell completion scripts with special arguments.
+/// The format is: gwm --complete `command` `partial` `position`
+///
+/// Returns ExitCode.success on completion, or an error code if completion fails.
+Future<ExitCode> handleCompletion(
+  List<String> arguments,
+  CompletionService completionService,
+) async {
+  // Arguments should be: [--complete, command?, partial?, position?]
+  // Skip the --complete flag
+  final completionArgs = arguments.skip(1).toList();
+
+  String? command;
+  String partial = '';
+  int position = 0;
+
+  if (completionArgs.isNotEmpty) {
+    command = completionArgs[0];
+  }
+  if (completionArgs.length > 1) {
+    partial = completionArgs[1];
+  }
+  if (completionArgs.length > 2) {
+    position = int.tryParse(completionArgs[2]) ?? 0;
+  }
+
+  try {
+    final completions = await completionService.getCompletions(
+      command: command,
+      partial: partial,
+      position: position,
+    );
+
+    // Output completions one per line
+    for (final completion in completions) {
+      printSafe(completion);
+    }
+
+    return ExitCode.success;
+  } catch (e) {
+    // On completion errors, output nothing and exit successfully
+    // This prevents completion from breaking the shell
+    return ExitCode.success;
+  }
+}
 
 ArgParser buildParser() {
   // Create dummy commands just for their parsers
@@ -61,6 +110,12 @@ ArgParser buildParser() {
       'no-eval-check',
       negatable: false,
       help: 'Skip shell wrapper validation check (not recommended).',
+    )
+    ..addFlag(
+      'complete',
+      negatable: false,
+      help:
+          'Generate tab completion candidates (used by shell completion scripts).',
     )
     ..addCommand(
       'add',
@@ -108,8 +163,10 @@ Future<void> main(List<String> arguments) async {
   final configService = ConfigService();
   final hookService = HookService(processWrapper);
   final copyService = CopyService(fileSystemAdapter);
+  final completionService = CompletionService(gitClient);
   final shellIntegration = ShellIntegration(
     ShellIntegrationConfig(enableEvalOutput: true),
+    completionService: completionService,
   );
 
   // Create worktree service with its dependencies
@@ -119,6 +176,12 @@ Future<void> main(List<String> arguments) async {
 
   try {
     final ArgResults results = argParser.parse(arguments);
+
+    // Handle completion flag
+    if (results.flag('complete')) {
+      final exitCode = await handleCompletion(arguments, completionService);
+      exit(exitCode.value);
+    }
 
     // Handle global flags
     if (results.flag('help')) {
