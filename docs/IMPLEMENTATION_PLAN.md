@@ -569,9 +569,9 @@ seamless directory switching.
 lib/src/services/shell_integration.dart (enhanced)
 lib/src/infrastructure/prompt_selector.dart (enhanced with fzf)
 docs/INSTALLATION.md (shell wrapper instructions)
-docs/completion/bash/gwm-completion.bash
-docs/completion/zsh/_gwm
-docs/completion/fish/gwm.fish
+docs/completion/gwm.bash
+docs/completion/gwm.zsh
+docs/completion/gwm.fish
 test/unit/services/shell_integration_test.dart (enhanced)
 ```
 

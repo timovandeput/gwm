@@ -59,7 +59,7 @@ GMM provides tab completion for worktree names (in `list` and `switch` commands)
 Source the completion script in your `~/.bashrc`:
 
 ```bash
-source /path/to/gwm/docs/completion/bash/gwm-completion.bash
+source /path/to/gwm/docs/completion/gwm.bash
 ```
 
 ### Zsh
@@ -67,23 +67,23 @@ source /path/to/gwm/docs/completion/bash/gwm-completion.bash
 Either source the completion script or place it in your `$fpath`:
 
 ```zsh
-source /path/to/gwm/docs/completion/zsh/_gwm
+source /path/to/gwm/docs/completion/gwm.zsh
 ```
 
-Or copy the file to a directory in your `$fpath` (e.g., `/usr/local/share/zsh/site-functions/`) and run `compinit`.
+Or copy the file to a directory in your `$fpath` (e.g., `/usr/local/share/zsh/site-functions/_gwm`) and run `compinit`.
 
 ### Fish
 
 Copy the completion file to your fish completions directory:
 
 ```fish
-cp /path/to/gwm/docs/completion/fish/gwm.fish ~/.config/fish/completions/
+cp /path/to/gwm/docs/completion/gwm.fish ~/.config/fish/completions/
 ```
 
 Or to the system directory:
 
 ```fish
-sudo cp /path/to/gwm/docs/completion/fish/gwm.fish /usr/share/fish/vendor_completions.d/
+sudo cp /path/to/gwm/docs/completion/gwm.fish /usr/share/fish/vendor_completions.d/
 ```
 
 ## Configuration
