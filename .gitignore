@@ -33,3 +33,4 @@ migrate_working_dir/
 # Compiled executables
 /gwm
 /gwm.exe
+.gwm.*
