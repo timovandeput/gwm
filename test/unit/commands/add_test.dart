@@ -5,8 +5,8 @@ import 'package:gwm/src/commands/add.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/services/worktree_service.dart';
 import 'package:gwm/src/services/config_service.dart';
-import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/services/shell_integration.dart';
+import 'package:gwm/src/services/hook_service.dart';
 import 'package:gwm/src/models/config.dart';
 
 // Mock classes
@@ -14,26 +14,28 @@ class MockWorktreeService extends Mock implements WorktreeService {}
 
 class MockConfigService extends Mock implements ConfigService {}
 
-class MockGitClient extends Mock implements GitClient {}
-
 class MockShellIntegration extends Mock implements ShellIntegration {}
+
+class MockHookService extends Mock implements HookService {}
 
 void main() {
   late MockWorktreeService mockWorktreeService;
   late MockConfigService mockConfigService;
-
   late MockShellIntegration mockShellIntegration;
+  late MockHookService mockHookService;
   late AddCommand addCommand;
 
   setUp(() {
     mockWorktreeService = MockWorktreeService();
     mockConfigService = MockConfigService();
-
     mockShellIntegration = MockShellIntegration();
+    mockHookService = MockHookService();
+
     addCommand = AddCommand(
       mockWorktreeService,
       mockConfigService,
       mockShellIntegration,
+      mockHookService,
     );
 
     // Register fallback values for mocks

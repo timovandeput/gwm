@@ -123,6 +123,7 @@ ArgParser buildParser() {
         dummyWorktreeService,
         dummyConfigService,
         dummyShellIntegration,
+        dummyHookService,
       ).parser,
     )
     ..addCommand(
@@ -213,6 +214,7 @@ Future<void> main(List<String> arguments) async {
           worktreeService,
           configService,
           shellIntegration,
+          hookService,
           skipEvalCheck: skipEvalCheck,
         );
         break;

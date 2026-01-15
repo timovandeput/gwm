@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
 
 import 'base.dart';
 import '../models/exit_codes.dart';
 import '../services/worktree_service.dart';
 import '../services/config_service.dart';
+import '../services/hook_service.dart';
 
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
@@ -19,11 +22,13 @@ class AddCommand extends BaseCommand {
   final WorktreeService _worktreeService;
   final ConfigService _configService;
   final ShellIntegration _shellIntegration;
+  final HookService _hookService;
 
   AddCommand(
     this._worktreeService,
     this._configService,
-    this._shellIntegration, {
+    this._shellIntegration,
+    this._hookService, {
     super.skipEvalCheck = false,
   });
   @override
@@ -82,11 +87,44 @@ class AddCommand extends BaseCommand {
       if (exitCode == ExitCode.success ||
           exitCode == ExitCode.worktreeExistsButSwitched) {
         final worktreePath = await _worktreeService.getWorktreePath(branch);
+        final originPath = await _getRepoRoot() ?? Directory.current.path;
+
         if (exitCode == ExitCode.success) {
           _shellIntegration.outputWorktreeCreated(worktreePath);
         } else {
-          // Worktree already exists, output switch message
+          // Worktree already exists, execute switch hooks and output switch message
+          // Execute pre-switch hooks
+          if (config.hooks.preSwitch != null) {
+            try {
+              await _hookService.executePreSwitch(
+                config.hooks,
+                worktreePath,
+                originPath,
+                branch,
+              );
+            } catch (e) {
+              printSafe('Error: Pre-switch hook failed: $e');
+              return ExitCode.hookFailed;
+            }
+          }
+
           _shellIntegration.outputCdCommand(worktreePath);
+
+          // Execute post-switch hooks
+          if (config.hooks.postSwitch != null) {
+            try {
+              await _hookService.executePostSwitch(
+                config.hooks,
+                worktreePath,
+                originPath,
+                branch,
+              );
+            } catch (e) {
+              printSafe('Error: Post-switch hook failed: $e');
+              return ExitCode.hookFailed;
+            }
+          }
+
           printSafe('Switched to existing worktree: $worktreePath');
         }
       }
