@@ -40,7 +40,7 @@ class OutputFormatter {
     final modifiedWidth = verbose ? 19 : 0; // "YYYY-MM-DD HH:MM:SS" format
 
     // Header
-    final headerName = 'Worktree'.padRight(nameWidth);
+    final headerName = 'Worktree'.padRight(nameWidth + 1);
     final headerBranch = 'Branch'.padRight(branchWidth);
     final headerPath = 'Path';
     final headerStatus = verbose ? 'Status'.padRight(statusWidth) : '';
@@ -53,10 +53,10 @@ class OutputFormatter {
     );
     buffer.writeln(
       '-' *
-          (nameWidth +
+          ((nameWidth + 1) +
               branchWidth +
               pathWidth +
-              (verbose ? statusWidth + modifiedWidth + 9 : 4)),
+              (verbose ? statusWidth + modifiedWidth + 9 : 6)),
     );
 
     // Rows
