@@ -141,7 +141,20 @@ class CompletionService {
         break;
       case 'delete':
         if (position == 0) {
-          // Completing worktree name for delete command
+          // Check if we're in a worktree - if so, no completion suggestions
+          // because delete from worktree only works without arguments (deletes current)
+          // or with arguments from main workspace only
+          try {
+            final isInWorktree = await _gitClient.isWorktree();
+            if (isInWorktree) {
+              return [];
+            }
+          } catch (e) {
+            // If we can't determine location, err on the side of caution
+            return [];
+          }
+
+          // Completing worktree name for delete command from main workspace
           // Exclude the main workspace since it cannot be deleted, and exclude current worktree
           return filterCandidates(
             (await getWorktreeCompletionsExcludingCurrent())

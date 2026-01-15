@@ -194,6 +194,9 @@ void main() {
         () => mockGitClient.getMainRepoPath(),
       ).thenAnswer((_) => Future.value('/path/to/main'));
       when(
+        () => mockGitClient.hasUncommittedChanges(any()),
+      ).thenAnswer((_) async => false);
+      when(
         () => mockGitClient.removeWorktree(any(), force: false),
       ).thenAnswer((_) async {});
 

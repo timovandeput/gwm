@@ -26,7 +26,7 @@ development scenarios where multiple tool instances work in parallel on differen
 
 1. 🔽 Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/gwm.git
+   git clone https://github.com/timovandeput/gwm.git
    cd gwm
    ```
 
@@ -38,19 +38,12 @@ development scenarios where multiple tool instances work in parallel on differen
 3. ➡️ Move the executable to your PATH:
    ```bash
    # Linux/macOS
+   chmod +x gwm
    sudo mv gwm /usr/local/bin/
 
    # Windows
    # Add gwm.exe to your PATH or move to a directory in PATH
    ```
-
-### Alternative: Running from Source
-
-If you prefer not to compile, you can run GWM directly using Dart:
-
-```bash
-dart run bin/gwm.dart --help
-```
 
 ## Shell Integration
 
@@ -76,7 +69,7 @@ Add to `~/.zshrc`:
 # Wrapper for automatic directory switching
 gwm() { eval "$(command gwm "$@")" }
 
-# Tab completion (optional, if implemented)
+# Tab completion (optional)
 compdef _gwm gwm
 ```
 
