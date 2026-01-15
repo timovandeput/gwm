@@ -41,7 +41,7 @@ void printUsage(
     'Available commands:',
     '  add     Add a new worktree',
     '  switch  Switch to an existing worktree',
-    '  delete   Delete current worktree and return to main repo',
+    '  delete  Delete current worktree and return to main repo',
     '  list    List all worktrees',
     '',
     'Global options:',
