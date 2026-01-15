@@ -1,12 +1,10 @@
 name: gwm
 description: Git Worktree Manager - Streamlined Git worktree management
-version: 0.0.1
-# repository: https://github.com/my_org/my_repo
+version: 0.1.0
 
 environment:
   sdk: ^3.10.4
 
-# Add regular dependencies here.
 dependencies:
   args: ^2.7.0
   glob: ^2.1.3
