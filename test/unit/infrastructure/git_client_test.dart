@@ -86,6 +86,7 @@ worktree /feature/path
 HEAD def456ghi789
 branch refs/heads/feature/branch
 ''';
+        fakeProcessWrapper.addResponse('git', ['worktree', 'prune']);
         fakeProcessWrapper.addResponse('git', [
           'worktree',
           'list',
@@ -110,6 +111,7 @@ branch refs/heads/feature/branch
 worktree /detached/path
 HEAD abc123def456
 ''';
+        fakeProcessWrapper.addResponse('git', ['worktree', 'prune']);
         fakeProcessWrapper.addResponse('git', [
           'worktree',
           'list',
@@ -124,6 +126,7 @@ HEAD abc123def456
       });
 
       test('throws exception on git failure', () async {
+        fakeProcessWrapper.addResponse('git', ['worktree', 'prune']);
         fakeProcessWrapper.addResponse(
           'git',
           ['worktree', 'list', '--porcelain'],
@@ -141,6 +144,33 @@ HEAD abc123def456
             ),
           ),
         );
+      });
+
+      test('continues with list when prune fails', () async {
+        const output = '''
+worktree /main/path
+HEAD abc123def456
+branch refs/heads/main
+''';
+        fakeProcessWrapper.addResponse(
+          'git',
+          ['worktree', 'prune'],
+          exitCode: 1,
+          stderr: 'prune failed',
+        );
+        fakeProcessWrapper.addResponse('git', [
+          'worktree',
+          'list',
+          '--porcelain',
+        ], stdout: output);
+
+        final worktrees = await gitClient.listWorktrees();
+
+        expect(worktrees, hasLength(1));
+        expect(worktrees[0].name, 'main');
+        expect(worktrees[0].branch, 'main');
+        expect(worktrees[0].path, '/main/path');
+        expect(worktrees[0].isMain, isTrue);
       });
     });
 

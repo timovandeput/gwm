@@ -34,6 +34,13 @@ class GitClientImpl implements GitClient {
 
   @override
   Future<List<Worktree>> listWorktrees() async {
+    // Prune stale worktree entries first
+    final pruneResult = await _processWrapper.run('git', ['worktree', 'prune']);
+    _printOutput(pruneResult);
+    if (pruneResult.exitCode != 0) {
+      // Prune failure is not fatal, continue with listing
+    }
+
     final result = await _processWrapper.run('git', [
       'worktree',
       'list',

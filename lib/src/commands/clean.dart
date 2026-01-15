@@ -118,7 +118,7 @@ class CleanCommand extends BaseCommand {
           await _hookService.executePostClean(
             config.hooks,
             repoRoot,
-            repoRoot, // origin path
+            mainRepoPath, // origin path
             branch,
           );
         } catch (e) {
