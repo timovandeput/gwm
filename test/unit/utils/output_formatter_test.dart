@@ -364,6 +364,61 @@ void main() {
         // Should have padded empty string for last modified column (19 spaces)
         expect(lines[2], endsWith('|                    '));
       });
+
+      test('verbose table has correct column structure and content', () {
+        final worktrees = [
+          Worktree(
+            name: 'test',
+            branch: 'test',
+            path: '/test/path',
+            isMain: true,
+            status: WorktreeStatus.clean,
+            lastModified: DateTime(2023, 1, 1, 12, 0, 0),
+          ),
+          Worktree(
+            name: 'feature',
+            branch: 'feature/branch',
+            path: '/feature/path',
+            isMain: false,
+            status: WorktreeStatus.modified,
+            lastModified: null,
+          ),
+        ];
+
+        final result = formatter.formatTable(
+          worktrees,
+          '/other/path',
+          verbose: true,
+        );
+        final lines = result.split('\n');
+
+        // Verify header contains all expected columns
+        expect(lines[0], contains('Worktree'));
+        expect(lines[0], contains('| Branch'));
+        expect(lines[0], contains('| Path'));
+        expect(lines[0], contains('| Status'));
+        expect(lines[0], contains('| Last Modified'));
+
+        // Verify rows have 4 separators (5 columns)
+        for (var i = 2; i < lines.length - 1; i++) {
+          final line = lines[i];
+          final separatorCount = '|'.allMatches(line).length;
+          expect(separatorCount, 4); // 4 separators for 5 columns
+        }
+
+        // Verify content appears in correct order in rows
+        expect(lines[2], contains(' test'));
+        expect(lines[2], contains('| test'));
+        expect(lines[2], contains('| /test/path'));
+        expect(lines[2], contains('| clean'));
+        expect(lines[2], contains('2023-01-01 12:00:00'));
+
+        expect(lines[3], contains(' feature'));
+        expect(lines[3], contains('| feature/branch'));
+        expect(lines[3], contains('| /feature/path'));
+        expect(lines[3], contains('| modified'));
+        expect(lines[3], contains('| ')); // empty last modified
+      });
     });
   });
 }

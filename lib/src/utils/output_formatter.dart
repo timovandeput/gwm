@@ -42,7 +42,7 @@ class OutputFormatter {
     // Header
     final headerName = 'Worktree'.padRight(nameWidth + 1);
     final headerBranch = 'Branch'.padRight(branchWidth);
-    final headerPath = 'Path';
+    final headerPath = 'Path'.padRight(pathWidth);
     final headerStatus = verbose ? 'Status'.padRight(statusWidth) : '';
     final headerModified = verbose
         ? 'Last Modified'.padRight(modifiedWidth)
@@ -64,7 +64,7 @@ class OutputFormatter {
       final marker = worktree.path == currentPath ? '*' : ' ';
       final name = worktree.name.padRight(nameWidth);
       final branch = worktree.branch.padRight(branchWidth);
-      final path = worktree.path;
+      final path = worktree.path.padRight(pathWidth);
       final status = verbose ? worktree.status.name.padRight(statusWidth) : '';
       final modified = verbose
           ? _formatDateTime(worktree.lastModified).padRight(modifiedWidth)
