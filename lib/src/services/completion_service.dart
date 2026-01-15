@@ -110,7 +110,7 @@ class CompletionService {
   ///
   /// If [command] is null, returns global flags. Otherwise, returns flags for the specified command.
   List<String> getFlagCompletions([String? command]) {
-    final options = command == null
+    final options = (command == null || command.isEmpty)
         ? _argParser.options
         : _argParser.commands[command]?.options;
     if (options == null) return [];
@@ -144,9 +144,11 @@ class CompletionService {
 
     if (command == null || command.isEmpty) {
       // Completing subcommands or global flags
-      return filterCandidates(
-        getCommandCompletions() + getFlagCompletions(null),
-      );
+      if (partial.startsWith('-')) {
+        return filterCandidates(getFlagCompletions(null));
+      } else {
+        return filterCandidates(getCommandCompletions());
+      }
     }
 
     // For commands, try to complete positional args first, then flags
