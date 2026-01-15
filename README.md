@@ -47,15 +47,18 @@ development scenarios where multiple tool instances work in parallel on differen
 
 ## Shell Integration
 
-For automatic directory switching and tab completion, add the following wrapper functions to your shell configuration. Tab completion is built-in and works automatically once the wrapper is set up.
+For automatic directory switching and tab completion, add the following wrapper functions to your shell configuration.
 
 ### Bash 🐚
 
 Add to `~/.bashrc`:
 
 ```bash
-# Wrapper for automatic directory switching and tab completion
+# Wrapper for automatic directory switching
 gwm() { eval "$(command gwm "$@")"; }
+
+# Tab completion
+source /path/to/gwm/docs/completion/gwm.bash
 ```
 
 ### Zsh 🦓
@@ -63,8 +66,11 @@ gwm() { eval "$(command gwm "$@")"; }
 Add to `~/.zshrc`:
 
 ```bash
-# Wrapper for automatic directory switching and tab completion
+# Wrapper for automatic directory switching
 gwm() { eval "$(command gwm "$@")" }
+
+# Tab completion
+source /path/to/gwm/docs/completion/gwm.zsh
 ```
 
 ### Fish 🐠
@@ -72,10 +78,13 @@ gwm() { eval "$(command gwm "$@")" }
 Add to `~/.config/fish/config.fish`:
 
 ```fish
-# Wrapper for automatic directory switching and tab completion
+# Wrapper for automatic directory switching
 function gwm
     eval (command gwm $argv)
 end
+
+# Tab completion
+cp /path/to/gwm/docs/completion/gwm.fish ~/.config/fish/completions/gwm.fish
 ```
 
 ### PowerShell 💻

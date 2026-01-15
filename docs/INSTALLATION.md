@@ -52,7 +52,7 @@ def --env gwm [...args] {
 
 ## Tab Completion
 
-GWM provides intelligent tab completion for commands, flags, worktree names, and branch names. Completion is built into the Dart binary and works automatically once you've set up the shell wrapper function (see Shell Integration above).
+GWM provides intelligent tab completion for commands, flags, worktree names, and branch names. The completion system is built into the Dart binary and uses shell completion scripts for integration.
 
 The completion system dynamically provides:
 - **Commands**: `add`, `switch`, `delete`, `list`
@@ -60,7 +60,37 @@ The completion system dynamically provides:
 - **Worktree names**: For `gwm switch <TAB>` and `gwm delete <TAB>` (excludes current worktree and main workspace where appropriate)
 - **Command flags**: Appropriate flags for each command (e.g., `--force` for delete, `--verbose` for list)
 
-No additional setup is required beyond the shell wrapper - completion works out of the box!
+### Bash
+
+Source the completion script in your `~/.bashrc`:
+
+```bash
+source /path/to/gwm/docs/completion/gwm.bash
+```
+
+### Zsh
+
+Either source the completion script or place it in your `$fpath`:
+
+```zsh
+source /path/to/gwm/docs/completion/gwm.zsh
+```
+
+Or copy the file to a directory in your `$fpath` (e.g., `/usr/local/share/zsh/site-functions/_gwm`) and run `compinit`.
+
+### Fish
+
+Copy the completion file to your fish completions directory:
+
+```fish
+cp /path/to/gwm/docs/completion/gwm.fish ~/.config/fish/completions/
+```
+
+Or to the system directory:
+
+```fish
+sudo cp /path/to/gwm/docs/completion/gwm.fish /usr/share/fish/vendor_completions.d/
+```
 
 ## Configuration
 
