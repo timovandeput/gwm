@@ -57,8 +57,14 @@ Add to `~/.bashrc`:
 # Wrapper for automatic directory switching
 gwm() { eval "$(command gwm "$@")"; }
 
-# Tab completion
+# Tab completion - Option 1: Source in your shell profile
 source /path/to/gwm/docs/completion/gwm.bash
+
+# Or Option 2: Install system-wide
+# sudo cp gwm.bash /usr/local/share/bash-completion/completions/gwm
+# # or for local user:
+# mkdir -p ~/.local/share/bash-completion/completions
+# cp gwm.bash ~/.local/share/bash-completion/completions/gwm
 ```
 
 ### Zsh 🦓
@@ -69,8 +75,17 @@ Add to `~/.zshrc`:
 # Wrapper for automatic directory switching
 gwm() { eval "$(command gwm "$@")" }
 
-# Tab completion
-source /path/to/gwm/docs/completion/gwm.zsh
+# Tab completion - Create completions directory if it doesn't exist
+mkdir -p ~/.zsh/completions
+
+# Copy the completion script
+cp gwm.zsh ~/.zsh/completions/_gwm
+
+# Add to your fpath
+fpath=(~/.zsh/completions $fpath)
+
+# Reload completions
+autoload -Uz compinit && compinit
 ```
 
 ### Fish 🐠
