@@ -100,6 +100,127 @@ void main() {
       });
     });
 
+    group('getWorktreeCompletionsExcludingCurrent', () {
+      test(
+        'returns worktree names excluding current worktree when in main workspace',
+        () async {
+          final mockWorktrees = [
+            Worktree(
+              name: 'feature-branch',
+              branch: 'feature/branch',
+              path: '/path/to/feature',
+              isMain: false,
+              status: WorktreeStatus.clean,
+            ),
+            Worktree(
+              name: 'bugfix',
+              branch: 'bugfix/login',
+              path: '/path/to/bugfix',
+              isMain: false,
+              status: WorktreeStatus.clean,
+            ),
+          ];
+
+          when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
+          when(
+            () => mockGitClient.listWorktrees(),
+          ).thenAnswer((_) async => mockWorktrees);
+
+          final completions = await completionService
+              .getWorktreeCompletionsExcludingCurrent();
+
+          expect(completions, ['feature-branch', 'bugfix']);
+          verify(() => mockGitClient.isWorktree()).called(1);
+          verify(() => mockGitClient.listWorktrees()).called(1);
+          verifyNever(() => mockGitClient.getCurrentBranch());
+        },
+      );
+
+      test(
+        'returns worktree names excluding current worktree when in a worktree',
+        () async {
+          final mockWorktrees = [
+            Worktree(
+              name: 'feature-branch',
+              branch: 'feature/branch',
+              path: '/path/to/feature',
+              isMain: false,
+              status: WorktreeStatus.clean,
+            ),
+            Worktree(
+              name: 'bugfix',
+              branch: 'bugfix',
+              path: '/path/to/bugfix',
+              isMain: false,
+              status: WorktreeStatus.clean,
+            ),
+          ];
+
+          when(() => mockGitClient.isWorktree()).thenAnswer((_) async => true);
+          when(
+            () => mockGitClient.getCurrentBranch(),
+          ).thenAnswer((_) async => 'bugfix');
+          when(
+            () => mockGitClient.listWorktrees(),
+          ).thenAnswer((_) async => mockWorktrees);
+
+          final completions = await completionService
+              .getWorktreeCompletionsExcludingCurrent();
+
+          expect(completions, ['.', 'feature-branch']);
+          verify(() => mockGitClient.isWorktree()).called(1);
+          verify(() => mockGitClient.getCurrentBranch()).called(1);
+          verify(() => mockGitClient.listWorktrees()).called(1);
+        },
+      );
+
+      test(
+        'returns only dot when all worktrees are current worktree',
+        () async {
+          final mockWorktrees = [
+            Worktree(
+              name: 'feature-branch',
+              branch: 'feature-branch',
+              path: '/path/to/feature',
+              isMain: false,
+              status: WorktreeStatus.clean,
+            ),
+          ];
+
+          when(() => mockGitClient.isWorktree()).thenAnswer((_) async => true);
+          when(
+            () => mockGitClient.getCurrentBranch(),
+          ).thenAnswer((_) async => 'feature-branch');
+          when(
+            () => mockGitClient.listWorktrees(),
+          ).thenAnswer((_) async => mockWorktrees);
+
+          final completions = await completionService
+              .getWorktreeCompletionsExcludingCurrent();
+
+          expect(completions, ['.']);
+          verify(() => mockGitClient.isWorktree()).called(1);
+          verify(() => mockGitClient.getCurrentBranch()).called(1);
+          verify(() => mockGitClient.listWorktrees()).called(1);
+        },
+      );
+
+      test('handles errors gracefully', () async {
+        when(
+          () => mockGitClient.isWorktree(),
+        ).thenThrow(Exception('Git error'));
+        when(() => mockGitClient.listWorktrees()).thenAnswer((_) async => []);
+
+        final completions = await completionService
+            .getWorktreeCompletionsExcludingCurrent();
+
+        expect(completions, []);
+        verify(() => mockGitClient.isWorktree()).called(1);
+        verify(() => mockGitClient.listWorktrees()).called(1);
+        verifyNever(() => mockGitClient.getCurrentBranch());
+      });
+    });
+
     group('getBranchCompletions', () {
       test('returns branch names when successful', () async {
         final mockBranches = [
@@ -255,6 +376,9 @@ void main() {
             ),
           ];
           when(
+            () => mockGitClient.isWorktree(),
+          ).thenAnswer((_) async => false); // In main workspace
+          when(
             () => mockGitClient.listWorktrees(),
           ).thenAnswer((_) async => mockWorktrees);
 
@@ -263,8 +387,10 @@ void main() {
             position: 0,
           );
 
-          expect(completions, ['.', 'feature-branch']);
+          expect(completions, ['feature-branch']);
+          verify(() => mockGitClient.isWorktree()).called(1);
           verify(() => mockGitClient.listWorktrees()).called(1);
+          verifyNever(() => mockGitClient.getCurrentBranch());
         },
       );
 
@@ -288,6 +414,9 @@ void main() {
             ),
           ];
           when(
+            () => mockGitClient.isWorktree(),
+          ).thenAnswer((_) async => false); // In main workspace
+          when(
             () => mockGitClient.listWorktrees(),
           ).thenAnswer((_) async => mockWorktrees);
 
@@ -298,7 +427,9 @@ void main() {
           );
 
           expect(completions, ['feature-branch']);
+          verify(() => mockGitClient.isWorktree()).called(1);
           verify(() => mockGitClient.listWorktrees()).called(1);
+          verifyNever(() => mockGitClient.getCurrentBranch());
         },
       );
 
@@ -324,18 +455,41 @@ void main() {
           );
 
           expect(completions, isEmpty);
+          verifyNever(() => mockGitClient.isWorktree());
           verifyNever(() => mockGitClient.listWorktrees());
         },
       );
 
-      test('returns empty list for delete command', () async {
-        final completions = await completionService.getCompletions(
-          command: 'delete',
-          position: 0,
-        );
+      test(
+        'returns worktree completions for delete command at position 0',
+        () async {
+          final mockWorktrees = [
+            Worktree(
+              name: 'feature-branch',
+              branch: 'feature/branch',
+              path: '/path/to/feature',
+              isMain: false,
+              status: WorktreeStatus.clean,
+            ),
+          ];
+          when(
+            () => mockGitClient.isWorktree(),
+          ).thenAnswer((_) async => false); // In main workspace
+          when(
+            () => mockGitClient.listWorktrees(),
+          ).thenAnswer((_) async => mockWorktrees);
 
-        expect(completions, isEmpty);
-      });
+          final completions = await completionService.getCompletions(
+            command: 'delete',
+            position: 0,
+          );
+
+          expect(completions, ['feature-branch']);
+          verify(() => mockGitClient.isWorktree()).called(1);
+          verify(() => mockGitClient.listWorktrees()).called(1);
+          verifyNever(() => mockGitClient.getCurrentBranch());
+        },
+      );
 
       test('returns empty list for list command', () async {
         final completions = await completionService.getCompletions(
@@ -371,16 +525,19 @@ void main() {
 
       test('handles errors in worktree completion gracefully', () async {
         when(
-          () => mockGitClient.listWorktrees(),
+          () => mockGitClient.isWorktree(),
         ).thenThrow(Exception('Git error'));
+        when(() => mockGitClient.listWorktrees()).thenAnswer((_) async => []);
 
         final completions = await completionService.getCompletions(
           command: 'switch',
           position: 0,
         );
 
-        expect(completions, ['.']);
+        expect(completions, []);
+        verify(() => mockGitClient.isWorktree()).called(1);
         verify(() => mockGitClient.listWorktrees()).called(1);
+        verifyNever(() => mockGitClient.getCurrentBranch());
       });
     });
   });

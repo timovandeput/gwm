@@ -29,6 +29,39 @@ class CompletionService {
     }
   }
 
+  /// Gets completion candidates for worktree names, excluding the current worktree.
+  ///
+  /// Used for commands like `gwm switch` and `gwm delete` where you shouldn't
+  /// be able to switch to or delete the worktree you're currently in.
+  Future<List<String>> getWorktreeCompletionsExcludingCurrent() async {
+    final allWorktrees = await getWorktreeCompletions();
+    final currentWorktree = await _getCurrentWorktreeName();
+
+    // When in main workspace (currentWorktree == '.'), exclude '.' since you can't switch to main from main
+    // When in a worktree, exclude the current worktree name since you can't switch to yourself
+    return allWorktrees.where((name) => name != currentWorktree).toList();
+  }
+
+  /// Gets the name of the current worktree.
+  ///
+  /// Returns "." for the main workspace, or the worktree name if in a worktree.
+  Future<String> _getCurrentWorktreeName() async {
+    try {
+      final isWorktree = await _gitClient.isWorktree();
+      if (isWorktree) {
+        final branch = await _gitClient.getCurrentBranch();
+        // Extract worktree name from branch (same logic as in GitClientImpl)
+        return branch.split('/').last;
+      } else {
+        // In main workspace
+        return '.';
+      }
+    } catch (e) {
+      // If we can't determine current worktree, assume main workspace
+      return '.';
+    }
+  }
+
   /// Gets completion candidates for Git branch names.
   ///
   /// Used for commands like `gwm add` where a branch name is expected.
@@ -101,15 +134,17 @@ class CompletionService {
       case 'switch':
         if (position == 0) {
           // Completing worktree name for switch command
-          return filterCandidates(await getWorktreeCompletions());
+          return filterCandidates(
+            await getWorktreeCompletionsExcludingCurrent(),
+          );
         }
         break;
       case 'delete':
         if (position == 0) {
           // Completing worktree name for delete command
-          // Exclude the main workspace since it cannot be deleted
+          // Exclude the main workspace since it cannot be deleted, and exclude current worktree
           return filterCandidates(
-            (await getWorktreeCompletions())
+            (await getWorktreeCompletionsExcludingCurrent())
                 .where((name) => name != '.')
                 .toList(),
           );
