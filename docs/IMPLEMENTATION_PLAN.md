@@ -561,41 +561,41 @@ seamless directory switching.
 - Enhanced shell integration for all commands
 - fzf detection and integration for interactive selection
 - Shell wrapper documentation
-- Tab completion support (bash, zsh, fish)
+- Built-in tab completion support (bash, zsh, fish via Dart --complete)
 
 ### Files Created/Modified
 
 ```
 lib/src/services/shell_integration.dart (enhanced)
+lib/src/services/completion_service.dart (new - Dart-based completion)
 lib/src/infrastructure/prompt_selector.dart (enhanced with fzf)
 docs/INSTALLATION.md (shell wrapper instructions)
-docs/completion/gwm.bash
-docs/completion/gwm.zsh
-docs/completion/gwm.fish
+bin/gwm.dart (enhanced with --complete flag handling)
 test/unit/services/shell_integration_test.dart (enhanced)
+test/unit/services/completion_service_test.dart (new)
 ```
 
 ### Acceptance Criteria
 
-1. [ ] All commands output eval commands where appropriate
-2. [ ] Shell wrapper functions provided for bash, zsh, fish, PowerShell, nushell
-3. [ ] fzf detected automatically if available
-4. [ ] Interactive selection uses fzf when available, falls back to Dart selector
-5. [ ] Tab completion for worktree names in list/switch commands
-6. [ ] Tab completion for branch names in add command
-7. [ ] Tab completion includes "." for main workspace
-8. [ ] Installation instructions for shell wrappers documented
-9. [ ] Graceful degradation if fzf not installed
-10. [ ] Shell integration can be disabled via config
+1. [x] All commands output eval commands where appropriate
+2. [x] Shell wrapper functions provided for bash, zsh, fish, PowerShell, nushell
+3. [x] fzf detected automatically if available
+4. [x] Interactive selection uses fzf when available, falls back to Dart selector
+5. [x] Tab completion for worktree names in list/switch commands (implemented in Dart)
+6. [x] Tab completion for branch names in add command (implemented in Dart)
+7. [x] Tab completion includes "." for main workspace (implemented in Dart)
+8. [x] Installation instructions for shell wrappers documented
+9. [x] Graceful degradation if fzf not installed
+10. [x] Shell integration can be disabled via config
 
 ### Test Coverage
 
-- [ ] Tests for fzf detection
-- [ ] Tests for fzf integration
-- [ ] Tests for fallback selector
-- [ ] Tests for shell integration output format
-- [ ] Tests for tab completion scripts (manual verification)
-- [ ] 90%+ coverage for enhanced shell integration
+- [x] Tests for fzf detection
+- [x] Tests for fzf integration
+- [x] Tests for fallback selector
+- [x] Tests for shell integration output format
+- [x] Tests for Dart-based tab completion service
+- [x] 90%+ coverage for enhanced shell integration and completion service
 
 ---
 

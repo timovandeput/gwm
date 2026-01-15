@@ -164,25 +164,27 @@ Future<void> main(List<String> arguments) async {
   final configService = ConfigService();
   final hookService = HookService(processWrapper);
   final copyService = CopyService(fileSystemAdapter);
-  final completionService = CompletionService(gitClient);
-  final shellIntegration = ShellIntegration(
-    ShellIntegrationConfig(enableEvalOutput: true),
-    completionService: completionService,
-  );
 
   // Create worktree service with its dependencies
   final worktreeService = WorktreeService(gitClient, hookService, copyService);
 
   final ArgParser argParser = buildParser();
 
+  // Handle completion before parsing to avoid invalid option errors
+  if (arguments.contains('--complete')) {
+    final completionService = CompletionService(gitClient, argParser);
+    final exitCode = await handleCompletion(arguments, completionService);
+    exit(exitCode.value);
+  }
+
+  final completionService = CompletionService(gitClient, argParser);
+  final shellIntegration = ShellIntegration(
+    ShellIntegrationConfig(enableEvalOutput: true),
+    completionService: completionService,
+  );
+
   try {
     final ArgResults results = argParser.parse(arguments);
-
-    // Handle completion flag
-    if (results.flag('complete')) {
-      final exitCode = await handleCompletion(arguments, completionService);
-      exit(exitCode.value);
-    }
 
     // Handle global flags
     if (results.flag('help')) {

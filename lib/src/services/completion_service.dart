@@ -1,3 +1,5 @@
+import 'package:args/args.dart';
+
 import '../infrastructure/git_client.dart';
 
 /// Service for handling tab completion of GWM commands.
@@ -6,9 +8,10 @@ import '../infrastructure/git_client.dart';
 /// and configuration options based on the current context.
 class CompletionService {
   final GitClient _gitClient;
+  final ArgParser _argParser;
 
-  /// Creates a new completion service with the given Git client.
-  const CompletionService(this._gitClient);
+  /// Creates a new completion service with the given Git client and argument parser.
+  const CompletionService(this._gitClient, this._argParser);
 
   /// Gets completion candidates for worktree names.
   ///
@@ -103,11 +106,26 @@ class CompletionService {
     return ['add', 'switch', 'delete', 'list'];
   }
 
+  /// Gets completion candidates for flags/options.
+  ///
+  /// If [command] is null, returns global flags. Otherwise, returns flags for the specified command.
+  List<String> getFlagCompletions([String? command]) {
+    final options = command == null
+        ? _argParser.options
+        : _argParser.commands[command]?.options;
+    if (options == null) return [];
+
+    return options.values
+        .where((option) => option.isFlag)
+        .map((flag) => '--${flag.name}')
+        .toList();
+  }
+
   /// Gets completion candidates for a specific command and partial input.
   ///
   /// [command] is the subcommand being completed (e.g., 'add', 'switch')
   /// [partial] is the partial input being completed
-  /// [position] indicates which argument position we're completing
+  /// [position] indicates which argument position we're completing (0-based)
   Future<List<String>> getCompletions({
     String? command,
     String partial = '',
@@ -119,55 +137,66 @@ class CompletionService {
       return candidates.where((c) => c.startsWith(partial)).toList();
     }
 
-    if (command == null) {
-      // Completing subcommands
-      return filterCandidates(getCommandCompletions());
+    // If partial starts with '-', complete flags
+    if (partial.startsWith('-')) {
+      return filterCandidates(getFlagCompletions(command));
     }
+
+    if (command == null || command.isEmpty) {
+      // Completing subcommands or global flags
+      return filterCandidates(
+        getCommandCompletions() + getFlagCompletions(null),
+      );
+    }
+
+    // For commands, try to complete positional args first, then flags
+    final positionalCompletions = await _getPositionalCompletions(
+      command,
+      position,
+    );
+    if (positionalCompletions.isNotEmpty) {
+      return filterCandidates(positionalCompletions);
+    }
+
+    // If no positional completions, complete flags
+    return filterCandidates(getFlagCompletions(command));
+  }
+
+  /// Gets positional argument completions for a command at the given position.
+  Future<List<String>> _getPositionalCompletions(
+    String command,
+    int position,
+  ) async {
+    if (position != 0) return []; // Only position 0 has positional args for now
 
     switch (command) {
       case 'add':
-        if (position == 0) {
-          // Completing branch name for add command
-          return filterCandidates(await getBranchCompletions());
-        }
-        break;
+        return await getBranchCompletions();
       case 'switch':
-        if (position == 0) {
-          // Completing worktree name for switch command
-          return filterCandidates(
-            await getWorktreeCompletionsExcludingCurrent(),
-          );
-        }
-        break;
+        return await getWorktreeCompletionsExcludingCurrent();
       case 'delete':
-        if (position == 0) {
-          // Check if we're in a worktree - if so, no completion suggestions
-          // because delete from worktree only works without arguments (deletes current)
-          // or with arguments from main workspace only
-          try {
-            final isInWorktree = await _gitClient.isWorktree();
-            if (isInWorktree) {
-              return [];
-            }
-          } catch (e) {
-            // If we can't determine location, err on the side of caution
+        // Check if we're in a worktree - if so, no completion suggestions
+        // because delete from worktree only works without arguments (deletes current)
+        // or with arguments from main workspace only
+        try {
+          final isInWorktree = await _gitClient.isWorktree();
+          if (isInWorktree) {
             return [];
           }
-
-          // Completing worktree name for delete command from main workspace
-          // Exclude the main workspace since it cannot be deleted, and exclude current worktree
-          return filterCandidates(
-            (await getWorktreeCompletionsExcludingCurrent())
-                .where((name) => name != '.')
-                .toList(),
-          );
+        } catch (e) {
+          // If we can't determine location, err on the side of caution
+          return [];
         }
-        break;
-      case 'list':
-        // No positional arguments to complete
-        break;
-    }
 
-    return [];
+        // Completing worktree name for delete command from main workspace
+        // Exclude the main workspace since it cannot be deleted, and exclude current worktree
+        return (await getWorktreeCompletionsExcludingCurrent())
+            .where((name) => name != '.')
+            .toList();
+      case 'list':
+        return []; // No positional arguments
+      default:
+        return [];
+    }
   }
 }

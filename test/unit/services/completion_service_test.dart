@@ -1,5 +1,6 @@
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:args/args.dart';
 
 import 'package:gwm/src/services/completion_service.dart';
 
@@ -9,11 +10,13 @@ import '../../mock_objects/mock_git_client.dart';
 void main() {
   group('CompletionService', () {
     late MockGitClient mockGitClient;
+    late ArgParser argParser;
     late CompletionService completionService;
 
     setUp(() {
       mockGitClient = MockGitClient();
-      completionService = CompletionService(mockGitClient);
+      argParser = ArgParser();
+      completionService = CompletionService(mockGitClient, argParser);
     });
 
     group('getWorktreeCompletions', () {
