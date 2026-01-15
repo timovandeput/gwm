@@ -1,7 +1,7 @@
 /// Represents a hook configuration that can be either a simple list of commands
 /// or an object with timeout and commands.
 ///
-/// Hooks are executed during various worktree operations (add, switch, clean).
+/// Hooks are executed during various worktree operations (add, switch, delete).
 class Hook {
   /// The commands to execute for this hook
   final List<String> commands;

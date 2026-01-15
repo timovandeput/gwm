@@ -6,7 +6,7 @@ development scenarios where multiple tool instances work in parallel on differen
 
 ## Features
 
-- 🌳 **Simplified Worktree Management**: Create, switch, and clean worktrees with intuitive commands
+- 🌳 **Simplified Worktree Management**: Create, switch, and delete worktrees with intuitive commands
 - 🚀 **Automatic Directory Navigation**: Seamlessly switch between worktrees and main repository
 - 🔧 **Configurable Hooks**: Automate workflows with pre/post hooks for worktree operations
 - 📁 **File/Directory Copying**: Copy local files and directories to all worktrees automatically
@@ -91,7 +91,7 @@ function gwm
 end
 
 # Tab completion (save to ~/.config/fish/completions/gwm.fish)
-complete -c gwm -a 'add switch clean list' -d 'GWM commands'
+complete -c gwm -a 'add switch delete list' -d 'GWM commands'
 ```
 
 ### PowerShell 💻
@@ -136,8 +136,8 @@ gwm switch
 # List all worktrees 📋
 gwm list -v
 
-# Clean up current worktree and return to main repo 🧹
-gwm clean
+# Delete current worktree and return to main repo 🧹
+gwm delete
 ```
 
 ## Usage
@@ -176,16 +176,16 @@ gwm switch .
 
 ```
 
-### gwm clean 🧹
+### gwm delete 🧹
 
 Delete current worktree and return to main repository.
 
 ```bash
-# Normal clean (prompts if uncommitted changes exist)
-gwm clean
+# Normal delete (prompts if uncommitted changes exist)
+gwm delete
 
-# Force clean (no prompts)
-gwm clean --force
+# Force delete (no prompts)
+gwm delete --force
 ```
 
 **Options:**
@@ -260,7 +260,7 @@ Repository-specific settings that can be committed to Git and shared with the te
     "post_switch": [
       "npm run dev"
     ],
-    "pre_clean": [
+    "pre_delete": [
       "git stash"
     ]
   },
@@ -335,8 +335,8 @@ Hooks are shell commands that run at specific points during worktree operations.
 | `post_add`    | After creating worktree                | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `pre_switch`  | Before switching worktree              | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `post_switch` | After switching worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
-| `pre_clean`   | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
-| `post_clean`  | After deleting worktree (in main repo) | `GWM_ORIGIN_PATH`                      |
+| `pre_delete`  | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_delete` | After deleting worktree (in main repo) | `GWM_ORIGIN_PATH`                      |
 
 ```json
 {
@@ -404,7 +404,7 @@ gwm add -b feature/new-ui
 # Directory is already switched by gwm add
 
 # Clean up when done 🧹
-gwm clean
+gwm delete 
 ```
 
 ### Multi-Feature Workflow 🔀

@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:gwm/src/commands/clean.dart';
+import 'package:gwm/src/commands/delete.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/models/config.dart';
 import 'package:gwm/src/infrastructure/git_client.dart';
@@ -23,14 +23,14 @@ void main() {
   late MockConfigService mockConfigService;
   late MockHookService mockHookService;
   late MockShellIntegration mockShellIntegration;
-  late CleanCommand cleanCommand;
+  late DeleteCommand deleteCommand;
 
   setUp(() {
     mockGitClient = MockGitClient();
     mockConfigService = MockConfigService();
     mockHookService = MockHookService();
     mockShellIntegration = MockShellIntegration();
-    cleanCommand = CleanCommand(
+    deleteCommand = DeleteCommand(
       mockGitClient,
       mockConfigService,
       mockHookService,
@@ -41,10 +41,10 @@ void main() {
     registerFallbackValue('');
   });
 
-  group('CleanCommand', () {
+  group('DeleteCommand', () {
     test('shows help message when --help flag is provided', () async {
-      final results = cleanCommand.parser.parse(['--help']);
-      final exitCode = await cleanCommand.execute(results);
+      final results = deleteCommand.parser.parse(['--help']);
+      final exitCode = await deleteCommand.execute(results);
       expect(exitCode, ExitCode.success);
     });
 
@@ -54,8 +54,8 @@ void main() {
       ).thenAnswer((_) async => '/path/to/repo');
       when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
 
-      final results = cleanCommand.parser.parse([]);
-      final exitCode = await cleanCommand.execute(results);
+      final results = deleteCommand.parser.parse([]);
+      final exitCode = await deleteCommand.execute(results);
 
       expect(exitCode, ExitCode.invalidArguments);
       verify(() => mockGitClient.getRepoRoot()).called(1);
@@ -93,8 +93,8 @@ void main() {
         () => mockGitClient.removeWorktree(any(), force: any(named: 'force')),
       ).thenAnswer((_) async {});
 
-      final results = cleanCommand.parser.parse(['--force']);
-      final exitCode = await cleanCommand.execute(results);
+      final results = deleteCommand.parser.parse(['--force']);
+      final exitCode = await deleteCommand.execute(results);
 
       expect(exitCode, ExitCode.success);
       verify(
@@ -130,8 +130,8 @@ void main() {
         () => mockGitClient.removeWorktree(any(), force: any(named: 'force')),
       ).thenAnswer((_) async {});
 
-      final results = cleanCommand.parser.parse([]);
-      final exitCode = await cleanCommand.execute(results);
+      final results = deleteCommand.parser.parse([]);
+      final exitCode = await deleteCommand.execute(results);
 
       expect(exitCode, ExitCode.success);
       verify(
@@ -158,8 +158,8 @@ void main() {
         ),
       );
 
-      final results = cleanCommand.parser.parse([]);
-      final exitCode = await cleanCommand.execute(results);
+      final results = deleteCommand.parser.parse([]);
+      final exitCode = await deleteCommand.execute(results);
 
       expect(exitCode, ExitCode.invalidArguments);
     });
@@ -168,8 +168,8 @@ void main() {
       when(() => mockGitClient.isWorktree()).thenAnswer((_) async => true);
       when(() => mockGitClient.getRepoRoot()).thenThrow(Exception('Git error'));
 
-      final results = cleanCommand.parser.parse([]);
-      final exitCode = await cleanCommand.execute(results);
+      final results = deleteCommand.parser.parse([]);
+      final exitCode = await deleteCommand.execute(results);
 
       expect(exitCode, ExitCode.gitFailed);
     });

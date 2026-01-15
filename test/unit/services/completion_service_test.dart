@@ -2,7 +2,7 @@ import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:gwm/src/services/completion_service.dart';
-import 'package:gwm/src/infrastructure/git_client.dart';
+
 import 'package:gwm/src/models/worktree.dart';
 import '../../mock_objects/mock_git_client.dart';
 
@@ -153,8 +153,8 @@ void main() {
           'hooks.post_add',
           'hooks.pre_switch',
           'hooks.post_switch',
-          'hooks.pre_clean',
-          'hooks.post_clean',
+          'hooks.pre_delete',
+          'hooks.post_delete',
           'shell_integration.enable_eval_output',
         ]);
       });
@@ -164,7 +164,7 @@ void main() {
       test('returns expected subcommands', () {
         final completions = completionService.getCommandCompletions();
 
-        expect(completions, ['add', 'switch', 'clean', 'list']);
+        expect(completions, ['add', 'switch', 'delete', 'list']);
       });
     });
 
@@ -174,7 +174,7 @@ void main() {
         () async {
           final completions = await completionService.getCompletions();
 
-          expect(completions, ['add', 'switch', 'clean', 'list']);
+          expect(completions, ['add', 'switch', 'delete', 'list']);
         },
       );
 
@@ -328,9 +328,9 @@ void main() {
         },
       );
 
-      test('returns empty list for clean command', () async {
+      test('returns empty list for delete command', () async {
         final completions = await completionService.getCompletions(
-          command: 'clean',
+          command: 'delete',
           position: 0,
         );
 

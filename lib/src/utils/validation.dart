@@ -85,8 +85,8 @@ void validateConfigFile(Map<String, dynamic> config, String configPath) {
       'postAdd',
       'preSwitch',
       'postSwitch',
-      'preClean',
-      'postClean',
+      'preDelete',
+      'postDelete',
     ];
     for (final hookName in hookNames) {
       if (hooks.containsKey(hookName)) {

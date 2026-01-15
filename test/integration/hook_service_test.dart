@@ -179,18 +179,18 @@ void main() {
         );
       });
 
-      test('executePreClean works', () async {
+      test('executePreDelete works', () async {
         fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
-          'echo "pre-clean integration test"',
-        ], stdout: 'pre-clean integration test\n');
+          'echo "pre-delete integration test"',
+        ], stdout: 'pre-delete integration test\n');
 
         final config = HooksConfig(
           timeout: 30,
-          preClean: Hook.fromList(['echo "pre-clean integration test"']),
+          preDelete: Hook.fromList(['echo "pre-delete integration test"']),
         );
 
-        await hookService.executePreClean(
+        await hookService.executePreDelete(
           config,
           '/fake/worktree',
           '/fake/origin',
@@ -198,18 +198,18 @@ void main() {
         );
       });
 
-      test('executePostClean works', () async {
+      test('executePostDelete works', () async {
         fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
-          'echo "post-clean integration test"',
-        ], stdout: 'post-clean integration test\n');
+          'echo "post-delete integration test"',
+        ], stdout: 'post-delete integration test\n');
 
         final config = HooksConfig(
           timeout: 30,
-          postClean: Hook.fromList(['echo "post-clean integration test"']),
+          postDelete: Hook.fromList(['echo "post-delete integration test"']),
         );
 
-        await hookService.executePostClean(
+        await hookService.executePostDelete(
           config,
           '/fake/worktree',
           '/fake/origin',

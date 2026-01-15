@@ -24,7 +24,7 @@ _gwm_complete_worktrees() {
             ;;
         *)
             # Default completion - command names
-            COMPREPLY=( $(compgen -W "add switch clean list" -- "${cur}") )
+            COMPREPLY=( $(compgen -W "add switch delete list" -- "${cur}") )
             ;;
     esac
 }

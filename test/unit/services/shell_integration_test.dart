@@ -92,10 +92,10 @@ void main() {
     });
 
     test(
-      'outputWorktreesCleaned does not throw when enabled with worktrees',
+      'outputWorktreesDeleted does not throw when enabled with worktrees',
       () {
         expect(
-          () => shellIntegrationEnabled.outputWorktreesCleaned([
+          () => shellIntegrationEnabled.outputWorktreesDeleted([
             'worktree1',
             'worktree2',
           ]),
@@ -105,18 +105,18 @@ void main() {
     );
 
     test(
-      'outputWorktreesCleaned does not throw when enabled with empty list',
+      'outputWorktreesDeleted does not throw when enabled with empty list',
       () {
         expect(
-          () => shellIntegrationEnabled.outputWorktreesCleaned([]),
+          () => shellIntegrationEnabled.outputWorktreesDeleted([]),
           returnsNormally,
         );
       },
     );
 
-    test('outputWorktreesCleaned does not throw when disabled', () {
+    test('outputWorktreesDeleted does not throw when disabled', () {
       expect(
-        () => shellIntegrationDisabled.outputWorktreesCleaned(['worktree1']),
+        () => shellIntegrationDisabled.outputWorktreesDeleted(['worktree1']),
         returnsNormally,
       );
     });

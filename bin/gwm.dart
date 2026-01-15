@@ -4,7 +4,7 @@ import 'package:args/args.dart';
 import 'package:gwm/src/commands/add.dart';
 import 'package:gwm/src/commands/base.dart';
 import 'package:gwm/src/commands/switch.dart';
-import 'package:gwm/src/commands/clean.dart';
+import 'package:gwm/src/commands/delete.dart';
 import 'package:gwm/src/commands/list.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/exceptions.dart';
@@ -137,8 +137,8 @@ ArgParser buildParser() {
       ).parser,
     )
     ..addCommand(
-      'clean',
-      CleanCommand(
+      'delete',
+      DeleteCommand(
         dummyGitClient,
         dummyConfigService,
         dummyHookService,
@@ -227,8 +227,8 @@ Future<void> main(List<String> arguments) async {
           skipEvalCheck: skipEvalCheck,
         );
         break;
-      case 'clean':
-        command = CleanCommand(
+      case 'delete':
+        command = DeleteCommand(
           gitClient,
           configService,
           hookService,

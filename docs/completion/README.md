@@ -63,7 +63,7 @@ cp gwm.fish ~/.config/fish/completions/gwm.fish
 
 The completion scripts provide intelligent tab completion for:
 
-- **Commands**: `add`, `switch`, `clean`, `list`
+- **Commands**: `add`, `switch`, `delete`, `list`
 - **Branch names**: For `gwm add <TAB>`
 - **Worktree names**: For `gwm switch <TAB>` (includes "." for main workspace)
 - **Command flags**: Appropriate flags for each command

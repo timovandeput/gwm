@@ -268,19 +268,19 @@ void main() {
       });
     });
 
-    group('executePreClean', () {
-      test('executes preClean hook commands', () async {
+    group('executePreDelete', () {
+      test('executes preDelete hook commands', () async {
         fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
-          'echo "pre-clean command"',
-        ], stdout: 'pre-clean command\n');
+          'echo "pre-delete command"',
+        ], stdout: 'pre-delete command\n');
 
         final config = HooksConfig(
           timeout: 30,
-          preClean: Hook.fromList(['echo "pre-clean command"']),
+          preDelete: Hook.fromList(['echo "pre-delete command"']),
         );
 
-        await hookService.executePreClean(
+        await hookService.executePreDelete(
           config,
           '/path/to/worktree',
           '/path/to/origin',
@@ -289,19 +289,19 @@ void main() {
       });
     });
 
-    group('executePostClean', () {
-      test('executes postClean hook commands', () async {
+    group('executePostDelete', () {
+      test('executes postDelete hook commands', () async {
         fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
-          'echo "post-clean command"',
-        ], stdout: 'post-clean command\n');
+          'echo "post-delete command"',
+        ], stdout: 'post-delete command\n');
 
         final config = HooksConfig(
           timeout: 30,
-          postClean: Hook.fromList(['echo "post-clean command"']),
+          postDelete: Hook.fromList(['echo "post-delete command"']),
         );
 
-        await hookService.executePostClean(
+        await hookService.executePostDelete(
           config,
           '/path/to/worktree',
           '/path/to/origin',

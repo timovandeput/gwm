@@ -108,21 +108,21 @@ class HookService {
     );
   }
 
-  /// Executes hooks for the 'preClean' phase.
+  /// Executes hooks for the 'preDelete' phase.
   ///
   /// [config] contains the hook configuration.
-  /// [worktreePath] is the path to the worktree being cleaned.
+  /// [worktreePath] is the path to the worktree being deleted.
   /// [originPath] is the path to the origin repository.
   /// [branch] is the branch name for the worktree.
-  Future<void> executePreClean(
+  Future<void> executePreDelete(
     HooksConfig config,
     String worktreePath,
     String originPath,
     String branch,
   ) async {
     await _executeHook(
-      config.preClean,
-      'preClean',
+      config.preDelete,
+      'preDelete',
       config.timeout,
       worktreePath,
       worktreePath,
@@ -131,21 +131,21 @@ class HookService {
     );
   }
 
-  /// Executes hooks for the 'postClean' phase.
+  /// Executes hooks for the 'postDelete' phase.
   ///
   /// [config] contains the hook configuration.
-  /// [worktreePath] is the path to the worktree that was cleaned.
+  /// [worktreePath] is the path to the worktree that was deleted.
   /// [originPath] is the path to the origin repository.
   /// [branch] is the branch name for the worktree.
-  Future<void> executePostClean(
+  Future<void> executePostDelete(
     HooksConfig config,
     String worktreePath,
     String originPath,
     String branch,
   ) async {
     await _executeHook(
-      config.postClean,
-      'postClean',
+      config.postDelete,
+      'postDelete',
       config.timeout,
       originPath, // Use origin path since worktree may no longer exist
       worktreePath,

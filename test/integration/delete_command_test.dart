@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 // These tests are placeholders and would need proper setup in a real environment.
 
 void main() {
-  group('CleanCommand Integration', () {
+  group('DeleteCommand Integration', () {
     // TODO: Implement real integration test with proper dependency injection
     test('placeholder test - disabled', () async {
       // Placeholder test disabled due to dependency injection refactoring
@@ -13,7 +13,7 @@ void main() {
 
     // Future integration tests would include:
     // - Setting up a temporary Git repo with worktrees
-    // - Testing clean command removes worktree and returns to main repo
+    // - Testing delete command removes worktree and returns to main repo
     // - Testing force flag bypasses prompts
     // - Testing error handling for various failure scenarios
     // - Testing hook execution (when implemented)

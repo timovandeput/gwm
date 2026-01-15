@@ -57,8 +57,8 @@ class CompletionService {
       'hooks.post_add',
       'hooks.pre_switch',
       'hooks.post_switch',
-      'hooks.pre_clean',
-      'hooks.post_clean',
+      'hooks.pre_delete',
+      'hooks.post_delete',
       'shell_integration.enable_eval_output',
     ];
   }
@@ -67,7 +67,7 @@ class CompletionService {
   ///
   /// Returns the list of available GWM subcommands.
   List<String> getCommandCompletions() {
-    return ['add', 'switch', 'clean', 'list'];
+    return ['add', 'switch', 'delete', 'list'];
   }
 
   /// Gets completion candidates for a specific command and partial input.
@@ -104,7 +104,7 @@ class CompletionService {
           return filterCandidates(await getWorktreeCompletions());
         }
         break;
-      case 'clean':
+      case 'delete':
         // No positional arguments to complete
         break;
       case 'list':

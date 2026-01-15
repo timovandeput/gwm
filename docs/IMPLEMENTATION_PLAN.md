@@ -189,7 +189,7 @@ test/unit/commands/version_test.dart
 2. [ ] `gwm --version` displays version information
 3. [ ] `gwm add --help` shows help for add command with all options
 4. [ ] `gwm switch --help` shows help for switch command
-5. [ ] `gwm clean --help` shows help for clean command with force flag
+5. [ ] `gwm delete --help` shows help for delete command with force flag
 6. [ ] `gwm list --help` shows help for list command with verbose/json flags
 7. [ ] Invalid commands display error message and exit with code 2
 8. [ ] Missing required arguments display error and exit with code 2
@@ -401,51 +401,51 @@ test/integration/switch_command_test.dart
 
 ---
 
-## Increment 9: Clean Command
+## Increment 9: Delete Command
 
 ### Description
 
-Implement the clean command for deleting worktrees and returning to main repository. This completes the core worktree
+Implement the delete command for deleting worktrees and returning to main repository. This completes the core worktree
 lifecycle.
 
 ### Deliverables
 
-- `CleanCommand` implementation
+- `DeleteCommand` implementation
 - Confirmation prompts for uncommitted changes
 - Force flag to bypass safety checks
-- Hook execution placeholders (pre_clean, post_clean)
+- Hook execution placeholders (pre_delete, post_delete)
 
 ### Files Created
 
 ```
-lib/src/commands/clean.dart
-test/unit/commands/clean_test.dart
-test/integration/clean_command_test.dart
+lib/src/commands/delete.dart
+test/unit/commands/delete_test.dart
+test/integration/delete_command_test.dart
 ```
 
 ### Acceptance Criteria
 
-1. [ ] `gwm clean` deletes current worktree and returns to main repo
+1. [ ] `gwm delete` deletes current worktree and returns to main repo
 2. [ ] Prompts for confirmation if uncommitted changes exist
-3. [ ] `gwm clean --force` deletes without prompts
+3. [ ] `gwm delete --force` deletes without prompts
 4. [ ] Fails with exit code 2 if run from main workspace (not a worktree)
-5. [ ] Uses Git to remove worktree (proper cleanup)
+5. [ ] Uses Git to remove worktree (proper delete)
 6. [ ] Returns to main repository directory after deletion
-7. [ ] Executes pre_clean hooks (placeholder for now)
-8. [ ] Executes post_clean hooks (placeholder for now)
+7. [ ] Executes pre_delete hooks (placeholder for now)
+8. [ ] Executes post_delete hooks (placeholder for now)
 9. [ ] Validates current directory is a worktree before proceeding
 10. [ ] Handles worktree removal failures with exit code 7
 
 ### Test Coverage
 
-- [ ] Unit tests for CleanCommand with mocked services
-- [ ] Integration test for successful clean
-- [ ] Integration test for clean with uncommitted changes (prompt)
-- [ ] Integration test for force clean (no prompts)
+- [ ] Unit tests for DeleteCommand with mocked services
+- [ ] Integration test for successful delete
+- [ ] Integration test for delete with uncommitted changes (prompt)
+- [ ] Integration test for force delete (no prompts)
 - [ ] Tests for error case (running from main workspace)
 - [ ] Tests for Git removal failures
 - [ ] Tests verify return to main repo
-- [ ] 90%+ coverage for CleanCommand
+- [ ] 90%+ coverage for DeleteCommand
 
 ---
 
@@ -544,7 +544,7 @@ test/integration/hook_service_test.dart
 - [ ] Tests for per-hook timeout vs global timeout
 - [ ] Integration tests with AddCommand
 - [ ] Integration tests with SwitchCommand
-- [ ] Integration tests with CleanCommand
+- [ ] Integration tests with DeleteCommand
 - [ ] 95%+ coverage for HookService
 
 ---
@@ -619,7 +619,7 @@ tool.
 ```
 lib/src/commands/add.dart (full integration)
 lib/src/commands/switch.dart (full integration)
-lib/src/commands/clean.dart (full integration)
+lib/src/commands/delete.dart (full integration)
 lib/src/commands/list.dart (final polish)
 test/integration/ (comprehensive integration tests)
 ```
@@ -628,10 +628,10 @@ test/integration/ (comprehensive integration tests)
 
 1. [ ] `gwm add` supports: existing branches, new branches (-b), hooks, file copying
 2. [ ] `gwm switch` supports: direct switch, interactive selection, hooks, shell integration
-3. [ ] `gwm clean` supports: normal mode, force mode, hooks, uncommitted changes detection
+3. [ ] `gwm delete` supports: normal mode, force mode, hooks, uncommitted changes detection
 4. [ ] `gwm list` supports: simple, verbose, JSON output, current worktree marker
 5. [ ] Configuration hierarchy works correctly (global + repo + local with override strategies)
-6. [ ] All hooks execute in correct order (pre/post for add/switch/clean)
+6. [ ] All hooks execute in correct order (pre/post for add/switch/delete)
 7. [ ] All exit codes match PRD specification
 8. [ ] All error messages are clear and actionable
 9. [ ] File copying works with glob patterns and CoW optimization
@@ -784,7 +784,7 @@ Each increment must pass:
 | 6: List Command              | 4 hours          | 3, 5                |
 | 7: Add Command (Basic)       | 6 hours          | 3, 5, 6             |
 | 8: Switch Command            | 5 hours          | 3, 5, 6             |
-| 9: Clean Command             | 4 hours          | 3, 5                |
+| 9: Delete Command            | 4 hours          | 3, 5                |
 | 10: Copy Service             | 5 hours          | 2, 3                |
 | 11: Hook Service             | 6 hours          | 2, 3                |
 | 12: Shell Integration        | 4 hours          | 8, 11               |

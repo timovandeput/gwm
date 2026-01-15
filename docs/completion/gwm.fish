@@ -27,9 +27,9 @@ complete -c gwm -f -n '__fish_seen_subcommand_from switch' -l 'reconfigure' -s '
 complete -c gwm -f -n '__fish_seen_subcommand_from switch' -l 'help' -s 'h' -d 'Print usage information for this command'
 complete -c gwm -A -f -n '__fish_seen_subcommand_from switch' -a '(gwm --complete switch (commandline -ct) (__fish_number_of_cmd_args) 2>/dev/null)' -d 'Worktree name'
 
-# Complete clean command options
-complete -c gwm -f -n '__fish_seen_subcommand_from clean' -l 'force' -s 'f' -d 'Bypass safety checks and delete immediately'
-complete -c gwm -f -n '__fish_seen_subcommand_from clean' -l 'help' -s 'h' -d 'Print usage information for this command'
+# Complete delete command options
+complete -c gwm -f -n '__fish_seen_subcommand_from delete' -l 'force' -s 'f' -d 'Bypass safety checks and delete immediately'
+complete -c gwm -f -n '__fish_seen_subcommand_from delete' -l 'help' -s 'h' -d 'Print usage information for this command'
 
 # Complete list command options
 complete -c gwm -f -n '__fish_seen_subcommand_from list' -l 'verbose' -s 'v' -d 'Show detailed information about each worktree'

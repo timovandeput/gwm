@@ -120,11 +120,11 @@ class HooksConfig {
   /// Commands to run after switching worktrees
   final Hook? postSwitch;
 
-  /// Commands to run before cleaning a worktree
-  final Hook? preClean;
+  /// Commands to run before deleting a worktree
+  final Hook? preDelete;
 
-  /// Commands to run after cleaning a worktree
-  final Hook? postClean;
+  /// Commands to run after deleting a worktree
+  final Hook? postDelete;
 
   const HooksConfig({
     required this.timeout,
@@ -132,8 +132,8 @@ class HooksConfig {
     this.postAdd,
     this.preSwitch,
     this.postSwitch,
-    this.preClean,
-    this.postClean,
+    this.preDelete,
+    this.postDelete,
   });
 
   /// Creates a copy of this config with some fields updated.
@@ -143,8 +143,8 @@ class HooksConfig {
     Hook? postAdd,
     Hook? preSwitch,
     Hook? postSwitch,
-    Hook? preClean,
-    Hook? postClean,
+    Hook? preDelete,
+    Hook? postDelete,
   }) {
     return HooksConfig(
       timeout: timeout ?? this.timeout,
@@ -152,8 +152,8 @@ class HooksConfig {
       postAdd: postAdd ?? this.postAdd,
       preSwitch: preSwitch ?? this.preSwitch,
       postSwitch: postSwitch ?? this.postSwitch,
-      preClean: preClean ?? this.preClean,
-      postClean: postClean ?? this.postClean,
+      preDelete: preDelete ?? this.preDelete,
+      postDelete: postDelete ?? this.postDelete,
     );
   }
 
@@ -167,8 +167,8 @@ class HooksConfig {
         other.postAdd == postAdd &&
         other.preSwitch == preSwitch &&
         other.postSwitch == postSwitch &&
-        other.preClean == preClean &&
-        other.postClean == postClean;
+        other.preDelete == preDelete &&
+        other.postDelete == postDelete;
   }
 
   @override
@@ -178,15 +178,15 @@ class HooksConfig {
         postAdd.hashCode ^
         preSwitch.hashCode ^
         postSwitch.hashCode ^
-        preClean.hashCode ^
-        postClean.hashCode;
+        preDelete.hashCode ^
+        postDelete.hashCode;
   }
 
   @override
   String toString() {
     return 'HooksConfig(timeout: $timeout, preAdd: $preAdd, postAdd: $postAdd, '
         'preSwitch: $preSwitch, postSwitch: $postSwitch, '
-        'preClean: $preClean, postClean: $postClean)';
+        'preDelete: $preDelete, postDelete: $postDelete)';
   }
 }
 

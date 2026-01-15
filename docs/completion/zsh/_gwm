@@ -9,7 +9,7 @@ _gwm() {
     commands=(
         'add:Add a new worktree'
         'switch:Switch to an existing worktree'
-        'clean:Delete current worktree and return to main repo'
+        'delete:Delete current worktree and return to main repo'
         'list:List all worktrees'
     )
 

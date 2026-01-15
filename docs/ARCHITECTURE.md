@@ -86,7 +86,7 @@ gwm/
 │   │   ├── commands/             # Command handlers
 │   │   │   ├── add.dart
 │   │   │   ├── switch.dart
-│   │   │   ├── clean.dart
+│   │   │   ├── delete.dart
 │   │   │   ├── list.dart
 │   │   │   └── base.dart        # Base command interface
 │   │   ├── services/             # Business logic
@@ -159,7 +159,7 @@ classDiagram
         +execute() ExitCode
     }
 
-    class CleanCommand {
+    class DeleteCommand {
         +bool force
         +execute() ExitCode
     }
@@ -172,7 +172,7 @@ classDiagram
 
     BaseCommand <|-- AddCommand
     BaseCommand <|-- SwitchCommand
-    BaseCommand <|-- CleanCommand
+    BaseCommand <|-- DeleteCommand
     BaseCommand <|-- ListCommand
 ```
 
@@ -371,29 +371,29 @@ enum WorktreeStatus {
 
 ```dart
 class Config {
-  final String version;
-  final CopyConfig copy;
-  final HooksConfig hooks;
-  final ShellIntegrationConfig shellIntegration;
+   final String version;
+   final CopyConfig copy;
+   final HooksConfig hooks;
+   final ShellIntegrationConfig shellIntegration;
 }
 
 class CopyConfig {
-  final List<String> files;
-  final List<String> directories;
+   final List<String> files;
+   final List<String> directories;
 }
 
 class HooksConfig {
-  final int timeout;
-  final List<String>? preAdd;
-  final List<String>? postAdd;
-  final List<String>? preSwitch;
-  final List<String>? postSwitch;
-  final List<String>? preClean;
-  final List<String>? postClean;
+   final int timeout;
+   final List<String>? preAdd;
+   final List<String>? postAdd;
+   final List<String>? preSwitch;
+   final List<String>? postSwitch;
+   final List<String>? preDelete;
+   final List<String>? postDelete;
 }
 
 class ShellIntegrationConfig {
-  final bool enableEvalOutput;
+   final bool enableEvalOutput;
 }
 ```
 
@@ -668,14 +668,14 @@ void main() {
       });
     });
 
-    group('clean', () {
+    group('delete', () {
       test('deletes worktree and returns to main repo', () async {
         when(mockGitClient.removeWorktree('/path/to/worktree'))
             .thenAnswer((_) async {});
         when(mockFileSystem.deleteDirectory('/path/to/worktree'))
             .thenAnswer((_) async {});
 
-        final result = await service.clean(
+        final result = await service.delete(
           currentPath: '/path/to/worktree',
           repoPath: '/path/to/repo',
           force: false,
@@ -691,7 +691,7 @@ void main() {
             .thenAnswer((_) async => true);
 
         // Prompt would be mocked in real implementation
-        final result = await service.clean(
+        final result = await service.delete(
           currentPath: '/path/to/worktree',
           repoPath: '/path/to/repo',
           force: false,

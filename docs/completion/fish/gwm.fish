@@ -12,7 +12,7 @@ end
 # Complete subcommands
 complete -c gwm -f -n '__fish_is_first_arg' -a 'add' -d 'Add a new worktree'
 complete -c gwm -f -n '__fish_is_first_arg' -a 'switch' -d 'Switch to an existing worktree'
-complete -c gwm -f -n '__fish_is_first_arg' -a 'clean' -d 'Delete current worktree and return to main repo'
+complete -c gwm -f -n '__fish_is_first_arg' -a 'delete' -d 'Delete current worktree and return to main repo'
 complete -c gwm -f -n '__fish_is_first_arg' -a 'list' -d 'List all worktrees'
 
 # Complete worktree names for switch and list commands

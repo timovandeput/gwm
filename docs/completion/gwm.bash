@@ -22,7 +22,7 @@ _gwm_complete() {
     if commands=$(gwm --complete 2>/dev/null); then
         commands=$(echo "$commands" | tr '\n' ' ')
     else
-        commands="add switch clean list"
+        commands="add switch delete list"
     fi
     opts="--help --verbose --version --no-eval-check"
 
@@ -60,8 +60,8 @@ _gwm_complete() {
                     fi
                 fi
                 ;;
-            clean)
-                # Complete flags for clean command
+            delete)
+                # Complete flags for delete command
                 COMPREPLY=($(compgen -W "--force --help" -- "$cur"))
                 ;;
             list)

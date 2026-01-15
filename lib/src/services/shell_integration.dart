@@ -53,15 +53,15 @@ class ShellIntegration {
     print('echo "Found $count worktree(s)"');
   }
 
-  /// Outputs commands for worktree cleanup completion.
+  /// Outputs commands for worktree deletion completion.
   ///
-  /// Provides feedback about cleaned worktrees.
-  void outputWorktreesCleaned(List<String> cleanedWorktrees) {
+  /// Provides feedback about deleted worktrees.
+  void outputWorktreesDeleted(List<String> deletedWorktrees) {
     if (!config.enableEvalOutput) return;
-    if (cleanedWorktrees.isEmpty) {
-      print('echo "No worktrees needed cleaning"');
+    if (deletedWorktrees.isEmpty) {
+      print('echo "No worktrees needed deletion."');
     } else {
-      print('echo "Cleaned worktrees: ${cleanedWorktrees.join(", ")}"');
+      print('echo "Deleted worktrees: ${deletedWorktrees.join(", ")}"');
     }
   }
 

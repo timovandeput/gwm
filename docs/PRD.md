@@ -106,17 +106,17 @@ gwm switch
 # 4. api-v2 (~/work/worktrees/project_api-v2)
 ```
 
-#### 3.1.3 Clean Worktree
+#### 3.1.3 Delete Worktree
 
 Delete current worktree and return to main repository.
 
-**Usage**: `gwm clean [options]`
+**Usage**: `gwm delete [options]`
 
 **Behavior**:
 
 - Removes the current worktree directory
 - Can only be run from within a worktree (fails if run from main Git workspace ".")
-- Executes `pre_clean` and `post_clean` hooks
+- Executes `pre_delete` and `post_delete` hooks
 - Returns to main repository directory
 - Checks for uncommitted changes and prompts for confirmation
 - `--force` bypasses prompts and deletes regardless of uncommitted changes
@@ -129,14 +129,14 @@ Delete current worktree and return to main repository.
 **Examples**:
 
 ```bash
-# Normal clean (prompts if uncommitted changes exist)
-gwm clean
+# Normal delete (prompts if uncommitted changes exist)
+gwm delete
 # Uncommitted changes detected in 'feature-auth'
 # Continue? (y/N) y
 # Worktree removed successfully
 
-# Force clean (no prompts)
-gwm clean --force
+# Force delete (no prompts)
+gwm delete --force
 ```
 
 #### 3.1.4 List Worktrees
@@ -301,11 +301,11 @@ Local configuration can override, prepend to, or append to settings from the per
     "post_switch": [
       "npm run dev"
     ],
-    "pre_clean": [
+    "pre_delete": [
       "git stash"
     ],
-    "post_clean": [
-      "echo 'Cleanup complete'"
+    "post_delete": [
+      "echo 'Delete complete'"
     ]
   },
   "shell_integration": {
@@ -373,11 +373,11 @@ Local configuration can override, prepend to, or append to settings from the per
     "post_switch": [
       "npm run dev"
     ],
-    "pre_clean": [
+    "pre_delete": [
       "git stash"
     ],
-    "post_clean": [
-      "echo 'Cleanup complete'"
+    "post_delete": [
+      "echo 'Delete complete'"
     ]
   },
   "shell_integration": {
@@ -419,10 +419,10 @@ hooks:
     - "echo 'Switching to $GWM_WORKTREE_PATH'"
   post_switch:
     - "npm run dev"
-  pre_clean:
-    - "git stash"
-  post_clean:
-    - "echo 'Cleanup complete'"
+   pre_delete:
+     - "git stash"
+   post_delete:
+     - "echo 'Delete complete'"
 shell_integration:
   enable_eval_output: true
 ```
@@ -485,8 +485,8 @@ GWM automatically selects the best copy strategy based on the operating system a
 | `post_add`    | After creating worktree                | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `pre_switch`  | Before switching worktree              | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `post_switch` | After switching worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
-| `pre_clean`   | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
-| `post_clean`  | After deleting worktree (in main repo) | `GWM_ORIGIN_PATH`                      |
+| `pre_delete`  | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_delete` | After deleting worktree (in main repo) | `GWM_ORIGIN_PATH`                      |
 
 #### 3.4.2 Environment Variables
 
@@ -509,7 +509,7 @@ GWM automatically selects the best copy strategy based on the operating system a
 
 When an external command fails (non-zero exit status):
 1. The command's error output is displayed
-2. GWM stops the current operation (add, switch, or clean)
+2. GWM stops the current operation (add, switch, or delete)
 3. An error message is shown indicating which hook failed
 4. GWM exits with a non-zero exit code (exit code 5 for hook failures)
 
@@ -653,7 +653,7 @@ Auto-completion support for:
 
 - Configuration file validation
 - Safe execution of hooks (no arbitrary code injection)
-- Clear prompts for destructive operations (clean, remove)
+- Clear prompts for destructive operations (delete, remove)
 - Support for `.gitignore`-like patterns for local config files
 - `.gwm.local.json` should be added to `.gitignore` to prevent committing local-only settings to the repository
 
@@ -736,7 +736,7 @@ gwm add -b feature/new-ui
 # ... make changes ...
 
 # Clean up when done
-gwm clean
+gwm delete
 # Removes worktree, returns to main repo
 ```
 
@@ -759,7 +759,7 @@ gwm list -v
 
 # Clean up completed features
 gwm switch feature-auth
-gwm clean
+gwm delete
 ```
 
 ### 6.3 AI-Assisted Development Workflow
@@ -806,12 +806,12 @@ gwm list -v
       "npm install",
       "npm run build"
     ],
-    "pre_clean": [
-      "git stash"
-    ],
-    "post_switch": [
-      "npm run dev"
-    ]
+     "pre_delete": [
+       "git stash"
+     ],
+     "post_delete": [
+       "echo 'Delete complete'"
+     ]
   }
 }
 ```
@@ -861,7 +861,7 @@ gwm add feature/new-component
 
 - Status dashboard with watch mode
 - Remote worktree support
-- Automatic worktree cleanup (prune old/inactive worktrees)
+- Automatic worktree delete (prune old/inactive worktrees)
 - Branch management (delete branch when removing worktree)
 - Configuration validation and schema enforcement
 - Hash verification for configuration files (security)
@@ -920,7 +920,7 @@ The following decisions have been made for the implementation:
 | `gwm add <branch>`    | Create worktree from existing branch                    |
 | `gwm add -b <branch>` | Create new Git branch and worktree                      |
 | `gwm switch [name]`   | Switch to worktree (use "." for main, interactive if no name) |
-| `gwm clean [--force]` | Delete current worktree and return to main repo         |
+| `gwm delete [--force]` | Delete current worktree and return to main repo         |
 | `gwm list [-v|-j]`    | List all worktrees (includes main workspace as ".")     |
 | `gwm --help`          | Show help message                                       |
 | `gwm --version`       | Show version information                                |
@@ -986,12 +986,12 @@ The following decisions have been made for the implementation:
     "post_switch": [
       "npm run dev"
     ],
-    "pre_clean": [
-      "git stash"
-    ],
-    "post_clean": [
-      "echo 'Cleaned up'"
-    ]
+     "pre_delete": [
+       "git stash"
+     ],
+     "post_delete": [
+       "echo 'Delete complete'"
+     ]
   },
   "shell_integration": {
     "enable_eval_output": true
@@ -1068,7 +1068,7 @@ The following decisions have been made for the implementation:
 
 - **Solution**: Review the error message to understand which hook failed and why. Manually complete or fix the failed steps, then either:
   - Use the partial worktree as-is (if the failure was non-critical)
-  - Run `gwm clean` from the partial worktree to remove it and retry
+  - Run `gwm delete` from the partial worktree to remove it and retry
   - Manually run the remaining hook commands
 
 **Issue**: Local settings not taking effect

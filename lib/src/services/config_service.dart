@@ -284,8 +284,8 @@ class ConfigService {
       postAdd: _parseHook(hooks['postAdd']),
       preSwitch: _parseHook(hooks['preSwitch']),
       postSwitch: _parseHook(hooks['postSwitch']),
-      preClean: _parseHook(hooks['preClean']),
-      postClean: _parseHook(hooks['postClean']),
+      preDelete: _parseHook(hooks['preDelete']),
+      postDelete: _parseHook(hooks['postDelete']),
     );
   }
 

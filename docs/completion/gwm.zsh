@@ -26,7 +26,7 @@ _gwm() {
         case $words[2] in
             add) _gwm_add_args ;;
             switch) _gwm_switch_args ;;
-            clean) _gwm_clean_args ;;
+            delete) _gwm_delete_args ;;
             list) _gwm_list_args ;;
         esac
     fi
@@ -36,7 +36,7 @@ _gwm_args() {
     case $line[2] in
         add) _gwm_add_args ;;
         switch) _gwm_switch_args ;;
-        clean) _gwm_clean_args ;;
+        delete) _gwm_delete_args ;;
         list) _gwm_list_args ;;
         *) _message 'unknown command' ;;
     esac
@@ -44,7 +44,7 @@ _gwm_args() {
 
 _gwm_commands() {
     # Use simple compadd to avoid issues with _describe
-    compadd add switch clean list
+    compadd add switch delete list
 }
 
 _gwm_add_args() {
@@ -75,7 +75,7 @@ _gwm_switch_args() {
     fi
 }
 
-_gwm_clean_args() {
+_gwm_delete_args() {
     compadd --force --help
 }
 

@@ -83,7 +83,7 @@ lib/
     commands/               # Command handlers
       add.dart
       switch.dart
-      clean.dart
+      delete.dart
       list.dart
       base.dart            # Base command interface
     services/               # Business logic

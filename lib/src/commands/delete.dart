@@ -10,16 +10,16 @@ import '../utils/eval_validator.dart';
 import '../exceptions.dart';
 import '../cli_utils.dart';
 
-/// Command for cleaning up the current Git worktree.
+/// Command for deleting the current Git worktree.
 ///
-/// Usage: gwm clean [options]
-class CleanCommand extends BaseCommand {
+/// Usage: gwm delete [options]
+class DeleteCommand extends BaseCommand {
   final GitClient _gitClient;
   final ConfigService _configService;
   final HookService _hookService;
   final ShellIntegration _shellIntegration;
 
-  CleanCommand(
+  DeleteCommand(
     this._gitClient,
     this._configService,
     this._hookService,
@@ -47,7 +47,7 @@ class CleanCommand extends BaseCommand {
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
       printCommandUsage(
-        'clean [options]',
+        'delete [options]',
         'Delete the current worktree and return to the main repository.',
         parser,
       );
@@ -65,7 +65,9 @@ class CleanCommand extends BaseCommand {
         // Check if we're in a git repository at all
         try {
           await _gitClient.getRepoRoot();
-          printSafe('Error: gwm clean can only be run from within a worktree.');
+          printSafe(
+            'Error: gwm delete can only be run from within a worktree.',
+          );
         } catch (e) {
           printSafe('Error: Not in a Git repository.');
         }
@@ -90,39 +92,39 @@ class CleanCommand extends BaseCommand {
       // Get branch name for hooks
       final branch = await _gitClient.getCurrentBranch();
 
-      // Execute pre-clean hooks
-      if (config.hooks.preClean != null) {
+      // Execute pre-delete hooks
+      if (config.hooks.preDelete != null) {
         try {
-          await _hookService.executePreClean(
+          await _hookService.executePreDelete(
             config.hooks,
             repoRoot,
-            repoRoot, // origin path is the same as worktree path for clean
+            repoRoot, // origin path is the same as worktree path for delete
             branch,
           );
         } catch (e) {
-          printSafe('Error: Pre-clean hook failed: $e');
+          printSafe('Error: Pre-delete hook failed: $e');
           return ExitCode.hookFailed;
         }
       }
 
-      // Get main repo path for navigation after cleanup
+      // Get main repo path for navigation after delete
       final mainRepoPath = await _gitClient.getMainRepoPath();
 
       // Remove the worktree using Git
       printSafe('Removing worktree: $repoRoot');
       await _gitClient.removeWorktree(repoRoot, force: force);
 
-      // Execute post-clean hooks
-      if (config.hooks.postClean != null) {
+      // Execute post-delete hooks
+      if (config.hooks.postDelete != null) {
         try {
-          await _hookService.executePostClean(
+          await _hookService.executePostDelete(
             config.hooks,
             repoRoot,
             mainRepoPath, // origin path
             branch,
           );
         } catch (e) {
-          printSafe('Error: Post-clean hook failed: $e');
+          printSafe('Error: Post-delete hook failed: $e');
           return ExitCode.hookFailed;
         }
       }
