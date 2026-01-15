@@ -7,6 +7,7 @@ import 'package:gwm/src/models/config.dart';
 import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/services/config_service.dart';
 import 'package:gwm/src/services/hook_service.dart';
+import 'package:gwm/src/services/shell_integration.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}
@@ -15,20 +16,25 @@ class MockConfigService extends Mock implements ConfigService {}
 
 class MockHookService extends Mock implements HookService {}
 
+class MockShellIntegration extends Mock implements ShellIntegration {}
+
 void main() {
   late MockGitClient mockGitClient;
   late MockConfigService mockConfigService;
   late MockHookService mockHookService;
+  late MockShellIntegration mockShellIntegration;
   late CleanCommand cleanCommand;
 
   setUp(() {
     mockGitClient = MockGitClient();
     mockConfigService = MockConfigService();
     mockHookService = MockHookService();
+    mockShellIntegration = MockShellIntegration();
     cleanCommand = CleanCommand(
-      gitClient: mockGitClient,
-      configService: mockConfigService,
-      hookService: mockHookService,
+      mockGitClient,
+      mockConfigService,
+      mockHookService,
+      mockShellIntegration,
     );
 
     // Register fallback values for mocks

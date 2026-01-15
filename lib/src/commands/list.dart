@@ -5,8 +5,6 @@ import 'package:args/args.dart';
 import 'base.dart';
 import '../models/exit_codes.dart';
 import '../infrastructure/git_client.dart';
-import '../infrastructure/git_client_impl.dart';
-import '../infrastructure/process_wrapper_impl.dart';
 import '../utils/output_formatter.dart';
 import '../cli_utils.dart';
 
@@ -17,12 +15,7 @@ class ListCommand extends BaseCommand {
   final GitClient _gitClient;
   final OutputFormatter _formatter;
 
-  ListCommand({
-    GitClient? gitClient,
-    OutputFormatter? formatter,
-    super.skipEvalCheck = false,
-  }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
-       _formatter = formatter ?? OutputFormatter();
+  ListCommand(this._gitClient, this._formatter, {super.skipEvalCheck = false});
 
   @override
   ArgParser get parser {

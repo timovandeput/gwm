@@ -10,6 +10,8 @@ import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/infrastructure/prompt_selector.dart';
 import 'package:gwm/src/services/shell_integration.dart';
 import 'package:gwm/src/services/copy_service.dart';
+import 'package:gwm/src/services/config_service.dart';
+import 'package:gwm/src/services/hook_service.dart';
 import 'package:gwm/src/models/config.dart';
 
 // Mock classes
@@ -20,6 +22,10 @@ class MockPromptSelector extends Mock implements PromptSelector {}
 class MockShellIntegration extends Mock implements ShellIntegration {}
 
 class MockCopyService extends Mock implements CopyService {}
+
+class MockConfigService extends Mock implements ConfigService {}
+
+class MockHookService extends Mock implements HookService {}
 
 // Fake classes for fallbacks
 class FakeCopyConfig extends Fake implements CopyConfig {}
@@ -32,18 +38,25 @@ void main() {
   late MockGitClient mockGitClient;
   late MockPromptSelector mockPromptSelector;
   late MockShellIntegration mockShellIntegration;
+  late MockConfigService mockConfigService;
+  late MockHookService mockHookService;
+  late MockCopyService mockCopyService;
   late SwitchCommand switchCommand;
 
   setUp(() {
     mockGitClient = MockGitClient();
     mockPromptSelector = MockPromptSelector();
     mockShellIntegration = MockShellIntegration();
-    final mockCopyService = MockCopyService();
+    mockConfigService = MockConfigService();
+    mockHookService = MockHookService();
+    mockCopyService = MockCopyService();
     switchCommand = SwitchCommand(
-      gitClient: mockGitClient,
-      promptSelector: mockPromptSelector,
-      shellIntegration: mockShellIntegration,
-      copyService: mockCopyService,
+      mockGitClient,
+      mockPromptSelector,
+      mockConfigService,
+      mockHookService,
+      mockCopyService,
+      mockShellIntegration,
     );
 
     // Register fallback values
@@ -54,6 +67,18 @@ void main() {
         path: '/fallback',
         isMain: false,
         status: WorktreeStatus.clean,
+      ),
+    );
+
+    // Set up default config service mock
+    when(
+      () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
+    ).thenAnswer(
+      (_) async => Config(
+        version: '1.0',
+        copy: CopyConfig(files: [], directories: []),
+        hooks: HooksConfig(timeout: 30),
+        shellIntegration: ShellIntegrationConfig(enableEvalOutput: true),
       ),
     );
   });
@@ -137,9 +162,12 @@ void main() {
 
         // Create command with eval check skipped
         final commandWithSkipEval = SwitchCommand(
-          gitClient: mockGitClient,
-          promptSelector: mockPromptSelector,
-          shellIntegration: mockShellIntegration,
+          mockGitClient,
+          mockPromptSelector,
+          mockConfigService,
+          mockHookService,
+          mockCopyService,
+          mockShellIntegration,
           skipEvalCheck: true,
         );
 
@@ -287,10 +315,12 @@ void main() {
     test('reconfigures worktree when --reconfigure flag is used', () async {
       final mockCopyService = MockCopyService();
       final switchCommandWithCopy = SwitchCommand(
-        gitClient: mockGitClient,
-        promptSelector: mockPromptSelector,
-        shellIntegration: mockShellIntegration,
-        copyService: mockCopyService,
+        mockGitClient,
+        mockPromptSelector,
+        mockConfigService,
+        mockHookService,
+        mockCopyService,
+        mockShellIntegration,
       );
 
       final worktrees = [

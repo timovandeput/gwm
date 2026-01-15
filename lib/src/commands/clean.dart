@@ -3,12 +3,9 @@ import 'package:args/args.dart';
 import 'base.dart';
 import '../models/exit_codes.dart';
 import '../infrastructure/git_client.dart';
-import '../infrastructure/git_client_impl.dart';
-import '../infrastructure/process_wrapper_impl.dart';
 import '../services/config_service.dart';
 import '../services/hook_service.dart';
 import '../services/shell_integration.dart';
-import '../models/config.dart';
 import '../utils/eval_validator.dart';
 import '../exceptions.dart';
 import '../cli_utils.dart';
@@ -22,22 +19,13 @@ class CleanCommand extends BaseCommand {
   final HookService _hookService;
   final ShellIntegration _shellIntegration;
 
-  CleanCommand({
-    GitClient? gitClient,
-    ConfigService? configService,
-    HookService? hookService,
-    ShellIntegration? shellIntegration,
-    Config? config,
+  CleanCommand(
+    this._gitClient,
+    this._configService,
+    this._hookService,
+    this._shellIntegration, {
     super.skipEvalCheck = false,
-  }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
-       _configService = configService ?? ConfigService(),
-       _hookService = hookService ?? HookService(ProcessWrapperImpl()),
-       _shellIntegration =
-           shellIntegration ??
-           ShellIntegration(
-             config?.shellIntegration ??
-                 ShellIntegrationConfig(enableEvalOutput: true),
-           );
+  });
 
   @override
   ArgParser get parser {

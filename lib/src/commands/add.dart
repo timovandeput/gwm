@@ -4,11 +4,10 @@ import 'base.dart';
 import '../models/exit_codes.dart';
 import '../services/worktree_service.dart';
 import '../services/config_service.dart';
-import '../infrastructure/git_client.dart';
+
 import '../infrastructure/git_client_impl.dart';
 import '../infrastructure/process_wrapper_impl.dart';
 import '../services/shell_integration.dart';
-import '../models/config.dart';
 import '../utils/eval_validator.dart';
 import '../exceptions.dart';
 import '../cli_utils.dart';
@@ -21,23 +20,12 @@ class AddCommand extends BaseCommand {
   final ConfigService _configService;
   final ShellIntegration _shellIntegration;
 
-  AddCommand({
-    WorktreeService? worktreeService,
-    ConfigService? configService,
-    GitClient? gitClient,
-    ShellIntegration? shellIntegration,
-    Config? config,
+  AddCommand(
+    this._worktreeService,
+    this._configService,
+    this._shellIntegration, {
     super.skipEvalCheck = false,
-  }) : _worktreeService =
-           worktreeService ??
-           WorktreeService(gitClient ?? GitClientImpl(ProcessWrapperImpl())),
-       _configService = configService ?? ConfigService(),
-       _shellIntegration =
-           shellIntegration ??
-           ShellIntegration(
-             config?.shellIntegration ??
-                 ShellIntegrationConfig(enableEvalOutput: true),
-           );
+  });
   @override
   ArgParser get parser {
     return ArgParser()

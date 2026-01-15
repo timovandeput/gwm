@@ -21,20 +21,19 @@ class MockShellIntegration extends Mock implements ShellIntegration {}
 void main() {
   late MockWorktreeService mockWorktreeService;
   late MockConfigService mockConfigService;
-  late MockGitClient mockGitClient;
+
   late MockShellIntegration mockShellIntegration;
   late AddCommand addCommand;
 
   setUp(() {
     mockWorktreeService = MockWorktreeService();
     mockConfigService = MockConfigService();
-    mockGitClient = MockGitClient();
+
     mockShellIntegration = MockShellIntegration();
     addCommand = AddCommand(
-      worktreeService: mockWorktreeService,
-      configService: mockConfigService,
-      gitClient: mockGitClient,
-      shellIntegration: mockShellIntegration,
+      mockWorktreeService,
+      mockConfigService,
+      mockShellIntegration,
     );
 
     // Register fallback values for mocks

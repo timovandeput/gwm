@@ -5,10 +5,7 @@ import '../models/exit_codes.dart';
 import '../models/config.dart';
 import '../services/hook_service.dart';
 import '../services/copy_service.dart';
-import '../infrastructure/file_system_adapter.dart';
-import '../infrastructure/file_system_adapter_impl.dart';
-import '../infrastructure/process_wrapper.dart';
-import '../infrastructure/process_wrapper_impl.dart';
+
 import '../utils/path_utils.dart';
 import '../cli_utils.dart';
 
@@ -21,17 +18,7 @@ class WorktreeService {
   final HookService _hookService;
   final CopyService _copyService;
 
-  WorktreeService(
-    this._gitClient, {
-    HookService? hookService,
-    CopyService? copyService,
-    ProcessWrapper? processWrapper,
-    FileSystemAdapter? fileSystemAdapter,
-  }) : _hookService =
-           hookService ?? HookService(processWrapper ?? ProcessWrapperImpl()),
-       _copyService =
-           copyService ??
-           CopyService(fileSystemAdapter ?? FileSystemAdapterImpl());
+  WorktreeService(this._gitClient, this._hookService, this._copyService);
 
   /// Adds a new worktree for the specified branch.
   ///

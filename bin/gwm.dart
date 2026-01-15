@@ -9,10 +9,40 @@ import 'package:gwm/src/commands/list.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/exceptions.dart';
 import 'package:gwm/src/cli_utils.dart';
+import 'package:gwm/src/infrastructure/git_client_impl.dart';
+import 'package:gwm/src/infrastructure/process_wrapper_impl.dart';
+import 'package:gwm/src/infrastructure/prompt_selector.dart';
+import 'package:gwm/src/infrastructure/file_system_adapter_impl.dart';
+import 'package:gwm/src/services/worktree_service.dart';
+import 'package:gwm/src/services/config_service.dart';
+import 'package:gwm/src/services/hook_service.dart';
+import 'package:gwm/src/services/copy_service.dart';
+import 'package:gwm/src/services/shell_integration.dart';
+import 'package:gwm/src/utils/output_formatter.dart';
+import 'package:gwm/src/models/config.dart';
 
 const String version = '0.0.1';
 
 ArgParser buildParser() {
+  // Create dummy commands just for their parsers
+  // These won't be used for actual execution
+  final dummyProcessWrapper = ProcessWrapperImpl();
+  final dummyGitClient = GitClientImpl(dummyProcessWrapper);
+  final dummyFileSystemAdapter = FileSystemAdapterImpl();
+  final dummyPromptSelector = PromptSelectorImpl();
+  final dummyOutputFormatter = OutputFormatter();
+  final dummyConfigService = ConfigService();
+  final dummyHookService = HookService(dummyProcessWrapper);
+  final dummyCopyService = CopyService(dummyFileSystemAdapter);
+  final dummyShellIntegration = ShellIntegration(
+    ShellIntegrationConfig(enableEvalOutput: true),
+  );
+  final dummyWorktreeService = WorktreeService(
+    dummyGitClient,
+    dummyHookService,
+    dummyCopyService,
+  );
+
   return ArgParser()
     ..addFlag(
       'help',
@@ -32,13 +62,59 @@ ArgParser buildParser() {
       negatable: false,
       help: 'Skip shell wrapper validation check (not recommended).',
     )
-    ..addCommand('add', AddCommand().parser)
-    ..addCommand('switch', SwitchCommand().parser)
-    ..addCommand('clean', CleanCommand().parser)
-    ..addCommand('list', ListCommand().parser);
+    ..addCommand(
+      'add',
+      AddCommand(
+        dummyWorktreeService,
+        dummyConfigService,
+        dummyShellIntegration,
+      ).parser,
+    )
+    ..addCommand(
+      'switch',
+      SwitchCommand(
+        dummyGitClient,
+        dummyPromptSelector,
+        dummyConfigService,
+        dummyHookService,
+        dummyCopyService,
+        dummyShellIntegration,
+      ).parser,
+    )
+    ..addCommand(
+      'clean',
+      CleanCommand(
+        dummyGitClient,
+        dummyConfigService,
+        dummyHookService,
+        dummyShellIntegration,
+      ).parser,
+    )
+    ..addCommand(
+      'list',
+      ListCommand(dummyGitClient, dummyOutputFormatter).parser,
+    );
 }
 
 Future<void> main(List<String> arguments) async {
+  // Create infrastructure dependencies
+  final processWrapper = ProcessWrapperImpl();
+  final gitClient = GitClientImpl(processWrapper);
+  final fileSystemAdapter = FileSystemAdapterImpl();
+  final promptSelector = PromptSelectorImpl();
+  final outputFormatter = OutputFormatter();
+
+  // Create service dependencies
+  final configService = ConfigService();
+  final hookService = HookService(processWrapper);
+  final copyService = CopyService(fileSystemAdapter);
+  final shellIntegration = ShellIntegration(
+    ShellIntegrationConfig(enableEvalOutput: true),
+  );
+
+  // Create worktree service with its dependencies
+  final worktreeService = WorktreeService(gitClient, hookService, copyService);
+
   final ArgParser argParser = buildParser();
 
   try {
@@ -70,16 +146,39 @@ Future<void> main(List<String> arguments) async {
 
     switch (commandName) {
       case 'add':
-        command = AddCommand(skipEvalCheck: skipEvalCheck);
+        command = AddCommand(
+          worktreeService,
+          configService,
+          shellIntegration,
+          skipEvalCheck: skipEvalCheck,
+        );
         break;
       case 'switch':
-        command = SwitchCommand(skipEvalCheck: skipEvalCheck);
+        command = SwitchCommand(
+          gitClient,
+          promptSelector,
+          configService,
+          hookService,
+          copyService,
+          shellIntegration,
+          skipEvalCheck: skipEvalCheck,
+        );
         break;
       case 'clean':
-        command = CleanCommand(skipEvalCheck: skipEvalCheck);
+        command = CleanCommand(
+          gitClient,
+          configService,
+          hookService,
+          shellIntegration,
+          skipEvalCheck: skipEvalCheck,
+        );
         break;
       case 'list':
-        command = ListCommand(skipEvalCheck: skipEvalCheck);
+        command = ListCommand(
+          gitClient,
+          outputFormatter,
+          skipEvalCheck: skipEvalCheck,
+        );
         break;
       default:
         printSafe('Error: Unknown command "$commandName".');

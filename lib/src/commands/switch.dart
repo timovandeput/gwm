@@ -6,16 +6,11 @@ import 'base.dart';
 import '../models/exit_codes.dart';
 import '../models/worktree.dart';
 import '../infrastructure/git_client.dart';
-import '../infrastructure/git_client_impl.dart';
-import '../infrastructure/process_wrapper_impl.dart';
 import '../infrastructure/prompt_selector.dart';
-import '../infrastructure/file_system_adapter_impl.dart';
 import '../services/shell_integration.dart';
 import '../services/config_service.dart';
 import '../services/hook_service.dart';
 import '../services/copy_service.dart';
-import '../infrastructure/file_system_adapter.dart';
-import '../models/config.dart';
 import '../utils/eval_validator.dart';
 import '../exceptions.dart';
 import '../cli_utils.dart';
@@ -31,29 +26,15 @@ class SwitchCommand extends BaseCommand {
   final CopyService _copyService;
   final ShellIntegration _shellIntegration;
 
-  SwitchCommand({
-    GitClient? gitClient,
-    PromptSelector? promptSelector,
-    ConfigService? configService,
-    HookService? hookService,
-    CopyService? copyService,
-    FileSystemAdapter? fileSystemAdapter,
-    ShellIntegration? shellIntegration,
-    Config? config,
+  SwitchCommand(
+    this._gitClient,
+    this._promptSelector,
+    this._configService,
+    this._hookService,
+    this._copyService,
+    this._shellIntegration, {
     super.skipEvalCheck = false,
-  }) : _gitClient = gitClient ?? GitClientImpl(ProcessWrapperImpl()),
-       _promptSelector = promptSelector ?? PromptSelectorImpl(),
-       _configService = configService ?? ConfigService(),
-       _hookService = hookService ?? HookService(ProcessWrapperImpl()),
-       _copyService =
-           copyService ??
-           CopyService(fileSystemAdapter ?? FileSystemAdapterImpl()),
-       _shellIntegration =
-           shellIntegration ??
-           ShellIntegration(
-             config?.shellIntegration ??
-                 ShellIntegrationConfig(enableEvalOutput: true),
-           );
+  });
 
   @override
   ArgParser get parser {

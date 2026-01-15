@@ -20,10 +20,7 @@ void main() {
   setUp(() {
     mockGitClient = MockGitClient();
     mockFormatter = MockOutputFormatter();
-    listCommand = ListCommand(
-      gitClient: mockGitClient,
-      formatter: mockFormatter,
-    );
+    listCommand = ListCommand(mockGitClient, mockFormatter);
 
     // Register fallback values for mocks
     registerFallbackValue('');
