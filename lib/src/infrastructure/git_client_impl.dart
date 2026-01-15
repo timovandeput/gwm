@@ -104,11 +104,71 @@ class GitClientImpl implements GitClient {
   }
 
   @override
-  Future<String> getBranchStatus(String branch) async {
-    // TODO: Implement branch status checking
-    // This might involve comparing with remote, etc.
-    // For now, return 'unknown'
-    return 'unknown';
+  Future<WorktreeStatus> getBranchStatus(String branch, String path) async {
+    try {
+      // Check if branch has uncommitted changes
+      final statusResult = await _processWrapper.run('git', [
+        'status',
+        '--porcelain',
+      ], workingDirectory: path);
+      if (statusResult.exitCode != 0) {
+        return WorktreeStatus.clean;
+      }
+      final hasChanges = (statusResult.stdout as String).trim().isNotEmpty;
+
+      // Check relationship to remote tracking branch
+      final remoteStatusResult = await _processWrapper.run('git', [
+        'status',
+        '-b',
+        '--ahead-behind',
+      ], workingDirectory: path);
+      if (remoteStatusResult.exitCode != 0) {
+        // No remote tracking branch
+        return hasChanges ? WorktreeStatus.modified : WorktreeStatus.clean;
+      }
+
+      final statusOutput = remoteStatusResult.stdout as String;
+      final aheadMatch = RegExp(r'ahead (\d+)').firstMatch(statusOutput);
+      final behindMatch = RegExp(r'behind (\d+)').firstMatch(statusOutput);
+
+      final ahead = aheadMatch != null ? int.parse(aheadMatch.group(1)!) : 0;
+      final behind = behindMatch != null ? int.parse(behindMatch.group(1)!) : 0;
+
+      if (hasChanges) {
+        return WorktreeStatus.modified;
+      } else if (ahead > 0 && behind > 0) {
+        return WorktreeStatus.diverged;
+      } else if (ahead > 0) {
+        return WorktreeStatus.ahead;
+      } else if (behind > 0) {
+        return WorktreeStatus.behind;
+      } else {
+        return WorktreeStatus.clean;
+      }
+    } catch (e) {
+      return WorktreeStatus.clean;
+    }
+  }
+
+  @override
+  Future<DateTime?> getLastCommitTime(String path) async {
+    try {
+      final result = await _processWrapper.run('git', [
+        'log',
+        '-1',
+        '--format=%ct',
+      ], workingDirectory: path);
+      if (result.exitCode != 0) {
+        return null;
+      }
+      final timestamp = int.tryParse((result.stdout as String).trim());
+      if (timestamp != null) {
+        return DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -169,7 +229,7 @@ class GitClientImpl implements GitClient {
     }
   }
 
-  List<Worktree> _parseWorktreeList(String output) {
+  Future<List<Worktree>> _parseWorktreeList(String output) async {
     final lines = output.split('\n').where((line) => line.isNotEmpty);
     final worktrees = <Worktree>[];
     String? worktreePath;
@@ -181,13 +241,18 @@ class GitClientImpl implements GitClient {
         // Finish previous worktree if exists
         if (worktreePath != null && branch != null) {
           final name = branch == 'HEAD' ? 'detached' : branch.split('/').last;
+          final status = branch == 'HEAD'
+              ? WorktreeStatus.detached
+              : await getBranchStatus(branch, worktreePath);
+          final lastModified = await getLastCommitTime(worktreePath);
           worktrees.add(
             Worktree(
               name: name,
               branch: branch,
               path: worktreePath,
               isMain: isMain,
-              status: WorktreeStatus.clean, // TODO: Determine actual status
+              status: status,
+              lastModified: lastModified,
             ),
           );
         }
@@ -203,13 +268,18 @@ class GitClientImpl implements GitClient {
     // Add the last worktree
     if (worktreePath != null && branch != null) {
       final name = branch == 'HEAD' ? 'detached' : branch.split('/').last;
+      final status = branch == 'HEAD'
+          ? WorktreeStatus.detached
+          : await getBranchStatus(branch, worktreePath);
+      final lastModified = await getLastCommitTime(worktreePath);
       worktrees.add(
         Worktree(
           name: name,
           branch: branch,
           path: worktreePath,
           isMain: isMain,
-          status: WorktreeStatus.clean,
+          status: status,
+          lastModified: lastModified,
         ),
       );
     }

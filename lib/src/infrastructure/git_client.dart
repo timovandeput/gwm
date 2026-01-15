@@ -31,7 +31,10 @@ abstract class GitClient {
   Future<bool> hasUncommittedChanges(String path);
 
   /// Gets the status of a branch (e.g., ahead, behind, modified).
-  Future<String> getBranchStatus(String branch);
+  Future<WorktreeStatus> getBranchStatus(String branch, String path);
+
+  /// Gets the last commit time for the current branch in the worktree.
+  Future<DateTime?> getLastCommitTime(String path);
 
   /// Gets the root directory of the Git repository.
   Future<String> getRepoRoot();

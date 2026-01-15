@@ -90,6 +90,12 @@ enum WorktreeStatus {
   /// Local branch is ahead of remote branch
   ahead,
 
+  /// Local branch is behind remote branch
+  behind,
+
+  /// Local branch has diverged from remote branch
+  diverged,
+
   /// Worktree is in detached HEAD state
   detached,
 }

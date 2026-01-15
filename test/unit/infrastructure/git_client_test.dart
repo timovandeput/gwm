@@ -4,6 +4,7 @@ import 'package:path/path.dart' as path;
 
 import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/infrastructure/git_client_impl.dart';
+import 'package:gwm/src/models/worktree.dart';
 import '../../mock_objects/fake_process_wrapper.dart';
 
 void main() {
@@ -349,10 +350,13 @@ HEAD abc123def456
     });
 
     group('getBranchStatus', () {
-      test('returns unknown status', () async {
-        final status = await gitClient.getBranchStatus('any-branch');
+      test('returns clean status when no changes', () async {
+        final status = await gitClient.getBranchStatus(
+          'any-branch',
+          '/some/path',
+        );
 
-        expect(status, 'unknown');
+        expect(status, WorktreeStatus.clean);
       });
     });
 
