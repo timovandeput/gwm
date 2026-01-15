@@ -361,5 +361,37 @@ void main() {
         ),
       ).called(1);
     });
+
+    test('does nothing when switching to current worktree', () async {
+      final currentPath = Directory.current.path;
+      final worktrees = [
+        Worktree(
+          name: 'main',
+          branch: 'main',
+          path: currentPath,
+          isMain: true,
+          status: WorktreeStatus.clean,
+        ),
+        Worktree(
+          name: 'feature-auth',
+          branch: 'feature/auth',
+          path: '/repo/worktrees/feature-auth',
+          isMain: false,
+          status: WorktreeStatus.clean,
+        ),
+      ];
+
+      when(() => mockGitClient.getRepoRoot()).thenAnswer((_) async => '/repo');
+      when(
+        () => mockGitClient.listWorktrees(),
+      ).thenAnswer((_) async => worktrees);
+
+      final results = switchCommand.parser.parse(['main']);
+      final exitCode = await switchCommand.execute(results);
+
+      expect(exitCode, ExitCode.success);
+      // Should not call outputCdCommand since we're already in the target worktree
+      verifyNever(() => mockShellIntegration.outputCdCommand(any()));
+    });
   });
 }

@@ -109,6 +109,13 @@ class SwitchCommand extends BaseCommand {
         return ExitCode.generalError;
       }
 
+      // Check if we're already in the target worktree
+      final currentPath = Directory.current.path;
+      if (targetWorktree.path == currentPath) {
+        // Already in the target worktree, nothing to do
+        return ExitCode.success;
+      }
+
       // Load configuration for hooks
       final repoRoot = await _getRepoRoot();
       final config = repoRoot != null

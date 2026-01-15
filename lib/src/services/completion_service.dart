@@ -17,8 +17,8 @@ class CompletionService {
   Future<List<String>> getWorktreeCompletions() async {
     try {
       final worktrees = await _gitClient.listWorktrees();
-      final names = worktrees.map((w) => w.name).toList();
-      // Always include "." for main workspace
+      final names = worktrees.map((w) => w.isMain ? '.' : w.name).toList();
+      // Always include "." for main workspace if not already present
       if (!names.contains('.')) {
         names.insert(0, '.');
       }
