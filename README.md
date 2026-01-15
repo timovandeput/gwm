@@ -4,6 +4,16 @@ GWM (Git Worktree Manager) is a command-line tool that simplifies the management
 development sessions on the same Git repository. It's designed for both manual worktree workflows and AI-assisted
 development scenarios where multiple tool instances work in parallel on different features.
 
+I created GWM to streamline my own development process, allowing me to easily switch between multiple worktrees for
+different features and bug fixes without the hassle of managing Git commands manually. GWM automates directory
+navigation,
+file copying, and hook execution, making it a powerful tool for developers looking to enhance their productivity.
+
+Note that because GWM modifies the shell environment for directory switching, GWM requires shell integration via wrapper
+functions. Carefully follow the Shell Integration instructions below to set it up correctly.
+
+<a href="https://www.buymeacoffee.com/software101" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me a Coffee" height="41" width="174"></a>
+
 ## Features
 
 - 🌳 **Simplified Worktree Management**: Create, switch, and delete worktrees with intuitive commands
@@ -460,16 +470,18 @@ gwm list -v
 
 ## Exit Codes 📊
 
-| Code | Meaning                           |
-|------|-----------------------------------|
-| 0    | ✅ Success                         |
-| 1    | ❌ General error                   |
-| 2    | ❌ Invalid usage (wrong arguments) |
-| 3    | ❌ Worktree already exists         |
-| 4    | ❌ Branch not found                |
-| 5    | ❌ Hook execution failed           |
-| 6    | ❌ Configuration error             |
-| 7    | ❌ Git command failed              |
+| Code | Meaning                                             |
+|------|-----------------------------------------------------|
+| 0    | ✅ Success                                           |
+| 1    | ❌ General error                                     |
+| 2    | ❌ Invalid usage (wrong arguments)                   |
+| 3    | ❌ Worktree already exists                           |
+| 4    | ❌ Branch not found                                  |
+| 5    | ❌ Hook execution failed                             |
+| 6    | ❌ Configuration error                               |
+| 7    | ❌ Git command failed                                |
+| 8    | ❌ Shell wrapper missing or not configured           |
+| 9    | ❌ Worktree already exists but successfully switched |
 
 ## Development
 
