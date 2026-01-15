@@ -175,6 +175,9 @@ void main() {
           () => mockGitClient.getRepoRoot(),
         ).thenAnswer((_) async => '/repo');
         when(
+          () => mockGitClient.isWorktree(),
+        ).thenAnswer((_) async => false); // In main workspace
+        when(
           () => mockGitClient.listWorktrees(),
         ).thenAnswer((_) async => worktrees);
         when(
@@ -190,41 +193,50 @@ void main() {
       },
     );
 
-    test(
-      'returns error when interactive selection requested but eval check not skipped',
-      () async {
-        final worktrees = [
-          Worktree(
-            name: 'main',
-            branch: 'main',
-            path: '/repo',
-            isMain: true,
-            status: WorktreeStatus.clean,
-          ),
-          Worktree(
-            name: 'feature-auth',
-            branch: 'feature/auth',
-            path: '/repo/worktrees/feature-auth',
-            isMain: false,
-            status: WorktreeStatus.clean,
-          ),
-        ];
+    test('shows interactive selection when no argument provided', () async {
+      final worktrees = [
+        Worktree(
+          name: 'main',
+          branch: 'main',
+          path: '/repo',
+          isMain: true,
+          status: WorktreeStatus.clean,
+        ),
+        Worktree(
+          name: 'feature-auth',
+          branch: 'feature/auth',
+          path: '/repo/worktrees/feature-auth',
+          isMain: false,
+          status: WorktreeStatus.clean,
+        ),
+      ];
 
-        when(
-          () => mockGitClient.getRepoRoot(),
-        ).thenAnswer((_) async => '/repo');
-        when(
-          () => mockGitClient.listWorktrees(),
-        ).thenAnswer((_) async => worktrees);
+      final selectedWorktree = worktrees[1]; // feature-auth
 
-        final results = switchCommand.parser.parse([]);
-        final exitCode = await switchCommand.execute(results);
+      when(() => mockGitClient.getRepoRoot()).thenAnswer((_) async => '/repo');
+      when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
+      when(
+        () => mockGitClient.listWorktrees(),
+      ).thenAnswer((_) async => worktrees);
+      when(
+        () => mockPromptSelector.selectWorktree(any()),
+      ).thenAnswer((_) async => selectedWorktree);
 
-        expect(exitCode, ExitCode.invalidArguments);
-        verifyNever(() => mockPromptSelector.selectWorktree(any()));
-        verifyNever(() => mockShellIntegration.outputCdCommand(any()));
-      },
-    );
+      final results = switchCommand.parser.parse([]);
+      final exitCode = await switchCommand.execute(results);
+
+      expect(exitCode, ExitCode.success);
+      verify(
+        () => mockPromptSelector.selectWorktree(
+          worktrees,
+        ), // Both worktrees available since current dir != main path
+      ).called(1);
+      verify(
+        () => mockShellIntegration.outputCdCommand(
+          '/repo/worktrees/feature-auth',
+        ),
+      ).called(1);
+    });
 
     test('returns error when specified worktree does not exist', () async {
       final worktrees = [

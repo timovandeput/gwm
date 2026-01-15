@@ -81,22 +81,7 @@ class SwitchCommand extends BaseCommand {
 
       final worktrees = await _gitClient.listWorktrees();
 
-      // Check if interactive mode is requested but we're in eval context
-      if (worktreeName == null && !skipEvalCheck) {
-        // Filter out the current worktree from the list
-        final currentPath = Directory.current.path;
-        final availableWorktrees = worktrees.where(
-          (w) => w.path != currentPath,
-        );
-        final message = availableWorktrees.isEmpty
-            ? 'No worktrees available to switch to.'
-            : 'Available worktrees: ${availableWorktrees.map((w) => w.name).join(', ')}\nPlease specify a worktree name: gwm switch <worktree-name>';
-        printSafe(
-          'Error: Interactive worktree selection is not available when using the shell wrapper.\n'
-          '$message',
-        );
-        return ExitCode.invalidArguments;
-      }
+      // Interactive selection is now supported even in shell wrapper context
       final targetWorktree = await _resolveTargetWorktree(
         worktreeName,
         worktrees,
@@ -105,8 +90,12 @@ class SwitchCommand extends BaseCommand {
       if (targetWorktree == null) {
         if (worktreeName != null) {
           printSafe('Error: Worktree "$worktreeName" does not exist.');
+          return ExitCode.generalError;
+        } else {
+          // Interactive selection: user cancelled or no worktrees available
+          // In both cases, just return success without error
+          return ExitCode.success;
         }
-        return ExitCode.generalError;
       }
 
       // Check if we're already in the target worktree
@@ -260,6 +249,26 @@ class SwitchCommand extends BaseCommand {
     }
   }
 
+  /// Gets the path of the current worktree.
+  ///
+  /// Returns the main repo path if in main workspace, or the worktree path if in a worktree.
+  Future<String> _getCurrentWorktreePath() async {
+    try {
+      final isWorktree = await _gitClient.isWorktree();
+      if (isWorktree) {
+        // In a worktree, current path is the worktree path
+        return Directory.current.path;
+      } else {
+        // In main workspace, get the main repo path
+        final repoRoot = await _getRepoRoot();
+        return repoRoot ?? Directory.current.path;
+      }
+    } catch (e) {
+      // Fallback to current directory
+      return Directory.current.path;
+    }
+  }
+
   /// Resolves the target worktree based on the provided name or interactive selection.
   ///
   /// Returns null if the worktree is not found or selection is cancelled.
@@ -281,8 +290,17 @@ class SwitchCommand extends BaseCommand {
         return matchingWorktrees.isNotEmpty ? matchingWorktrees.first : null;
       }
     } else {
-      // Interactive selection
-      final selected = _promptSelector.selectWorktree(worktrees);
+      // Interactive selection - filter out current worktree
+      final currentPath = Directory.current.path;
+      final availableWorktrees = worktrees
+          .where((w) => w.path != currentPath)
+          .toList();
+
+      if (availableWorktrees.isEmpty) {
+        return null;
+      }
+
+      final selected = await _promptSelector.selectWorktree(availableWorktrees);
       return selected;
     }
   }
