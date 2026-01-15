@@ -60,10 +60,18 @@ _gwm_complete() {
                     fi
                 fi
                 ;;
-            delete)
-                # Complete flags for delete command
-                COMPREPLY=($(compgen -W "--force --help" -- "$cur"))
-                ;;
+             delete)
+                 # Complete worktree names for delete command
+                 if [[ $cword -ge $arg_pos ]]; then
+                     local worktrees
+                     if worktrees=$(gwm --complete delete "$cur" $((cword - arg_pos)) 2>/dev/null); then
+                         COMPREPLY=($(compgen -W "$worktrees" -- "$cur"))
+                     fi
+                 else
+                     # Complete flags for delete command
+                     COMPREPLY=($(compgen -W "--force --help" -- "$cur"))
+                 fi
+                 ;;
             list)
                 # Complete flags for list command
                 COMPREPLY=($(compgen -W "--verbose --json --help" -- "$cur"))

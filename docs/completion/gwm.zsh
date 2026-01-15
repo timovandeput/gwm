@@ -76,7 +76,17 @@ _gwm_switch_args() {
 }
 
 _gwm_delete_args() {
-    compadd --force --help
+    # For delete command: gwm delete [options] [worktree]
+    if (( CURRENT == 3 )); then
+        # Complete worktree names
+        local -a worktrees
+        if worktrees=($(gwm --complete delete "${words[CURRENT]}" 0 2>/dev/null)); then
+            _describe -t worktrees 'worktrees' worktrees
+        fi
+    else
+        # Complete options
+        compadd --force --help
+    fi
 }
 
 _gwm_list_args() {
