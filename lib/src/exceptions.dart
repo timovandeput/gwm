@@ -86,6 +86,12 @@ class GitException extends GwmException {
       );
 }
 
+/// Exception thrown when no worktrees are available to switch to.
+class NoWorktreesAvailableException extends GwmException {
+  const NoWorktreesAvailableException()
+    : super(ExitCode.invalidArguments, 'No worktrees available to switch to.');
+}
+
 /// Exception thrown when GWM is run without proper shell wrapper.
 class ShellWrapperMissingException extends GwmException {
   const ShellWrapperMissingException(String message)

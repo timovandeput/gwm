@@ -199,7 +199,7 @@ class SwitchCommand extends BaseCommand {
       }
 
       return ExitCode.success;
-    } on ShellWrapperMissingException catch (e) {
+    } on GwmException catch (e) {
       printSafe(e.message);
       return e.exitCode;
     } catch (e) {
@@ -249,26 +249,6 @@ class SwitchCommand extends BaseCommand {
     }
   }
 
-  /// Gets the path of the current worktree.
-  ///
-  /// Returns the main repo path if in main workspace, or the worktree path if in a worktree.
-  Future<String> _getCurrentWorktreePath() async {
-    try {
-      final isWorktree = await _gitClient.isWorktree();
-      if (isWorktree) {
-        // In a worktree, current path is the worktree path
-        return Directory.current.path;
-      } else {
-        // In main workspace, get the main repo path
-        final repoRoot = await _getRepoRoot();
-        return repoRoot ?? Directory.current.path;
-      }
-    } catch (e) {
-      // Fallback to current directory
-      return Directory.current.path;
-    }
-  }
-
   /// Resolves the target worktree based on the provided name or interactive selection.
   ///
   /// Returns null if the worktree is not found or selection is cancelled.
@@ -297,7 +277,7 @@ class SwitchCommand extends BaseCommand {
           .toList();
 
       if (availableWorktrees.isEmpty) {
-        return null;
+        throw NoWorktreesAvailableException();
       }
 
       final selected = await _promptSelector.selectWorktree(availableWorktrees);
