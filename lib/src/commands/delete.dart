@@ -77,10 +77,14 @@ class DeleteCommand extends BaseCommand {
 
         // Find the worktree to delete
         final worktrees = await _gitClient.listWorktrees();
-        final targetWorktree = worktrees.firstWhere(
+        final matchingWorktrees = worktrees.where(
           (w) => w.name == worktreeName,
-          orElse: () => throw StateError('Worktree "$worktreeName" not found'),
         );
+        if (matchingWorktrees.isEmpty) {
+          printSafe('Error: Worktree "$worktreeName" not found.');
+          return ExitCode.invalidArguments;
+        }
+        final targetWorktree = matchingWorktrees.first;
 
         // Cannot delete the main workspace
         if (targetWorktree.isMain) {
@@ -118,12 +122,12 @@ class DeleteCommand extends BaseCommand {
           isCurrentWorktree: true,
         );
       }
-    } on ShellWrapperMissingException catch (e) {
+    } on GwmException catch (e) {
       printSafe(e.message);
       return e.exitCode;
     } catch (e) {
-      printSafe('Error: Failed to remove worktree: $e');
-      return ExitCode.gitFailed;
+      printSafe('Unexpected error: Failed to remove worktree: $e');
+      return ExitCode.generalError;
     }
   }
 

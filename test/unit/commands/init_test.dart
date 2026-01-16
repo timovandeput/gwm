@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:gwm/src/commands/init.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/infrastructure/git_client.dart';
+import 'package:gwm/src/exceptions.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}
@@ -57,9 +58,11 @@ void main() {
     });
 
     test('returns error when not in a Git repository', () async {
-      when(
-        () => mockGitClient.getRepoRoot(),
-      ).thenThrow(Exception('Not in a Git repository'));
+      when(() => mockGitClient.getRepoRoot()).thenThrow(
+        GitException('rev-parse', [
+          '--show-toplevel',
+        ], 'fatal: not a git repository'),
+      );
 
       final result = await initCommand.execute(initCommand.parser.parse([]));
 

@@ -6,6 +6,7 @@ import 'package:args/args.dart';
 import 'base.dart';
 import '../models/exit_codes.dart';
 import '../infrastructure/git_client.dart';
+import '../exceptions.dart';
 import '../cli_utils.dart';
 
 /// Command for initializing GWM configuration in a Git repository.
@@ -88,13 +89,19 @@ class InitCommand extends BaseCommand {
       printSafe('You can now customize the configuration file as needed.');
 
       return ExitCode.success;
-    } catch (e) {
-      if (e.toString().contains('Not in a Git repository')) {
+    } on GitException catch (e) {
+      if (e.message.contains('Not in a Git repository')) {
         printSafe('Error: Not in a Git repository.');
         printSafe('Please navigate to a Git repository and try again.');
         return ExitCode.gitFailed;
       }
-      printSafe('Error: Failed to initialize GWM configuration: $e');
+      printSafe(e.message);
+      return e.exitCode;
+    } on GwmException catch (e) {
+      printSafe(e.message);
+      return e.exitCode;
+    } catch (e) {
+      printSafe('Unexpected error: Failed to initialize GWM configuration: $e');
       return ExitCode.generalError;
     }
   }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'git_client.dart';
 import 'process_wrapper.dart';
 import '../models/worktree.dart';
+import '../exceptions.dart';
 import '../cli_utils.dart';
 
 /// Implementation of GitClient using ProcessWrapper for Git operations.
@@ -27,7 +28,7 @@ class GitClientImpl implements GitClient {
     final result = await _processWrapper.run('git', args);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git ${args.join(' ')}');
+      throw GitException('worktree', args, result.stderr as String);
     }
     return path;
   }
@@ -48,7 +49,11 @@ class GitClientImpl implements GitClient {
     ]);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git worktree list --porcelain');
+      throw GitException('git', [
+        'worktree',
+        'list',
+        '--porcelain',
+      ], result.stderr as String);
     }
     return _parseWorktreeList(result.stdout as String);
   }
@@ -64,9 +69,7 @@ class GitClientImpl implements GitClient {
     final result = await _processWrapper.run('git', args);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception(
-        'Git command failed: git worktree remove${force ? ' --force' : ''} $path',
-      );
+      throw GitException('worktree', args, result.stderr as String);
     }
   }
 
@@ -78,7 +81,10 @@ class GitClientImpl implements GitClient {
     ]);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git branch --show-current');
+      throw GitException('git', [
+        'rev-parse',
+        '--git-dir',
+      ], result.stderr as String);
     }
     return (result.stdout as String).trim();
   }
@@ -92,7 +98,11 @@ class GitClientImpl implements GitClient {
     ]);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git branch --list $branch');
+      throw GitException('git', [
+        'branch',
+        '--list',
+        branch,
+      ], result.stderr as String);
     }
     return (result.stdout as String).trim().isNotEmpty;
   }
@@ -105,7 +115,10 @@ class GitClientImpl implements GitClient {
     ], workingDirectory: path);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git status --porcelain');
+      throw GitException('git', [
+        'status',
+        '--porcelain',
+      ], result.stderr as String);
     }
     return (result.stdout as String).trim().isNotEmpty;
   }
@@ -185,7 +198,10 @@ class GitClientImpl implements GitClient {
       '--show-toplevel',
     ]);
     if (result.exitCode != 0) {
-      throw Exception('Not in a Git repository');
+      throw GitException('git', [
+        'rev-parse',
+        '--show-toplevel',
+      ], result.stderr as String);
     }
     return (result.stdout as String).trim();
   }
@@ -212,7 +228,10 @@ class GitClientImpl implements GitClient {
     final result = await _processWrapper.run('git', ['rev-parse', '--git-dir']);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception('Git command failed: git rev-parse --git-dir');
+      throw GitException('git', [
+        'status',
+        '--porcelain',
+      ], result.stderr as String);
     }
     final gitDir = (result.stdout as String).trim();
     if (gitDir.endsWith('.git')) {
@@ -227,7 +246,10 @@ class GitClientImpl implements GitClient {
         return Directory(gitPath).parent.parent.parent.path;
       }
     }
-    throw Exception('Unable to determine main repository path');
+    throw GitException('git', [
+      'rev-parse',
+      '--git-dir',
+    ], 'Unable to determine main repository path');
   }
 
   @override
@@ -238,9 +260,10 @@ class GitClientImpl implements GitClient {
     ]);
     _printOutput(result);
     if (result.exitCode != 0) {
-      throw Exception(
-        'Git command failed: git branch --format=%(refname:short)',
-      );
+      throw GitException('git', [
+        'branch',
+        '--format=%(refname:short)',
+      ], result.stderr as String);
     }
     final output = result.stdout as String;
     return output

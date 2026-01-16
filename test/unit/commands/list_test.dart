@@ -6,6 +6,7 @@ import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/models/worktree.dart';
 import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/utils/output_formatter.dart';
+import 'package:gwm/src/exceptions.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}
@@ -138,9 +139,9 @@ void main() {
     test(
       'returns git failed exit code when GitClient throws exception',
       () async {
-        when(
-          () => mockGitClient.listWorktrees(),
-        ).thenThrow(Exception('Git error'));
+        when(() => mockGitClient.listWorktrees()).thenThrow(
+          GitException('worktree', ['list', '--porcelain'], 'fatal: git error'),
+        );
 
         final results = listCommand.parser.parse([]);
         final exitCode = await listCommand.execute(results);

@@ -314,7 +314,17 @@ The configuration system uses hierarchical loading with global, repo, and local 
 
 ## 6. Error Handling
 
-### 6.1 Exception Hierarchy
+### 6.1 Error Handling Strategy
+
+GWM uses a consistent error handling approach across all layers:
+
+1. **Exception Hierarchy**: All errors inherit from `GwmException` with associated exit codes
+2. **Infrastructure Layer**: Throws specific `GwmException` subclasses for domain-specific errors
+3. **Service Layer**: May return `ExitCode` directly or throw `GwmException` depending on context
+4. **Command Layer**: Always catches `GwmException` and converts to appropriate `ExitCode`
+5. **Main Entry Point**: Handles uncaught exceptions with user-friendly messages
+
+### 6.2 Exception Hierarchy
 
 ```mermaid
 classDiagram
@@ -349,14 +359,71 @@ classDiagram
         +String output
     }
 
+    class ShellWrapperMissingException {
+        +String message
+    }
+
     GwmException <|-- WorktreeExistsException
     GwmException <|-- BranchNotFoundException
     GwmException <|-- HookExecutionException
     GwmException <|-- ConfigException
     GwmException <|-- GitException
+    GwmException <|-- ShellWrapperMissingException
 ```
 
-### 6.2 Error Recovery Strategy
+### 6.3 Error Handling Patterns by Layer
+
+#### Infrastructure Layer (GitClient, FileSystemAdapter, etc.)
+- **Throws**: Specific `GwmException` subclasses
+- **Purpose**: Convert low-level errors to domain-specific exceptions
+- **Example**:
+```dart
+// GitClientImpl.createWorktree()
+if (result.exitCode != 0) {
+  throw GitException('worktree', ['add', path, branch], result.stderr);
+}
+```
+
+#### Service Layer (WorktreeService, ConfigService, etc.)
+- **Returns**: `ExitCode` for success/failure indication
+- **Throws**: `GwmException` for domain errors that should bubble up
+- **Purpose**: Business logic with clear success/failure paths
+- **Example**:
+```dart
+// WorktreeService.addWorktree()
+try {
+  // ... business logic
+  return ExitCode.success;
+} catch (e) {
+  printSafe('Error: Failed to create worktree: $e');
+  return ExitCode.gitFailed;
+}
+```
+
+#### Command Layer (AddCommand, SwitchCommand, etc.)
+- **Returns**: `ExitCode` from `execute()` method
+- **Catches**: `GwmException` and converts to appropriate exit codes
+- **Purpose**: CLI interface with proper exit codes
+- **Example**:
+```dart
+// AddCommand.execute()
+try {
+  // ... command logic
+} on ShellWrapperMissingException catch (e) {
+  printSafe(e.message);
+  return e.exitCode;
+} catch (e) {
+  printSafe('Error: Failed to create worktree: $e');
+  return ExitCode.gitFailed;
+}
+```
+
+#### Main Entry Point (bin/gwm.dart)
+- **Catches**: All unhandled exceptions
+- **Converts**: To user-friendly messages and exit codes
+- **Purpose**: Final safety net with graceful degradation
+
+### 6.4 Error Recovery Strategy
 
 The PRD specifies: **Leave partial state with clear error message**
 

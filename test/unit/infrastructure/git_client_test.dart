@@ -5,6 +5,7 @@ import 'package:path/path.dart' as path;
 import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/infrastructure/git_client_impl.dart';
 import 'package:gwm/src/models/worktree.dart';
+import 'package:gwm/src/exceptions.dart';
 import '../../mock_objects/fake_process_wrapper.dart';
 
 void main() {
@@ -48,15 +49,7 @@ void main() {
 
         await expectLater(
           gitClient.createWorktree('/invalid/path', 'branch'),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains(
-                'Git command failed: git worktree add /invalid/path branch',
-              ),
-            ),
-          ),
+          throwsA(isA<GitException>()),
         );
       });
 
@@ -136,13 +129,7 @@ HEAD abc123def456
 
         await expectLater(
           gitClient.listWorktrees(),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Git command failed: git worktree list --porcelain'),
-            ),
-          ),
+          throwsA(isA<GitException>()),
         );
       });
 
@@ -198,13 +185,7 @@ branch refs/heads/main
 
         await expectLater(
           gitClient.removeWorktree('/nonexistent'),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Git command failed: git worktree remove /nonexistent'),
-            ),
-          ),
+          throwsA(isA<GitException>()),
         );
       });
 
@@ -245,13 +226,7 @@ branch refs/heads/main
 
         await expectLater(
           gitClient.getCurrentBranch(),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Git command failed: git branch --show-current'),
-            ),
-          ),
+          throwsA(isA<GitException>()),
         );
       });
     });
@@ -291,13 +266,7 @@ branch refs/heads/main
 
         await expectLater(
           gitClient.branchExists('branch'),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Git command failed: git branch --list branch'),
-            ),
-          ),
+          throwsA(isA<GitException>()),
         );
       });
     });
@@ -337,13 +306,7 @@ branch refs/heads/main
 
         await expectLater(
           gitClient.hasUncommittedChanges('/invalid/path'),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Git command failed: git status --porcelain'),
-            ),
-          ),
+          throwsA(isA<GitException>()),
         );
       });
 
@@ -368,13 +331,7 @@ branch refs/heads/main
 
         await expectLater(
           gitClient.hasUncommittedChanges('/invalid/path'),
-          throwsA(
-            isA<Exception>().having(
-              (e) => e.toString(),
-              'message',
-              contains('Git command failed: git status --porcelain'),
-            ),
-          ),
+          throwsA(isA<GitException>()),
         );
       });
     });

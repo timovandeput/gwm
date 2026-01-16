@@ -131,12 +131,12 @@ class AddCommand extends BaseCommand {
       }
 
       return exitCode;
-    } on ShellWrapperMissingException catch (e) {
+    } on GwmException catch (e) {
       printSafe(e.message);
       return e.exitCode;
     } catch (e) {
-      printSafe('Error: Failed to create worktree: $e');
-      return ExitCode.gitFailed;
+      printSafe('Unexpected error: Failed to create worktree: $e');
+      return ExitCode.generalError;
     }
   }
 

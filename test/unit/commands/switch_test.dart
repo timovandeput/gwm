@@ -13,6 +13,7 @@ import 'package:gwm/src/services/copy_service.dart';
 import 'package:gwm/src/services/config_service.dart';
 import 'package:gwm/src/services/hook_service.dart';
 import 'package:gwm/src/models/config.dart';
+import 'package:gwm/src/exceptions.dart';
 
 // Mock classes
 class MockGitClient extends Mock implements GitClient {}
@@ -262,9 +263,11 @@ void main() {
     });
 
     test('returns error when not in a git repository', () async {
-      when(
-        () => mockGitClient.getRepoRoot(),
-      ).thenThrow(Exception('Not a git repo'));
+      when(() => mockGitClient.getRepoRoot()).thenThrow(
+        GitException('rev-parse', [
+          '--show-toplevel',
+        ], 'fatal: not a git repository'),
+      );
 
       final results = switchCommand.parser.parse(['main']);
       final exitCode = await switchCommand.execute(results);
@@ -275,9 +278,9 @@ void main() {
 
     test('returns git failed when git operation fails', () async {
       when(() => mockGitClient.getRepoRoot()).thenAnswer((_) async => '/repo');
-      when(
-        () => mockGitClient.listWorktrees(),
-      ).thenThrow(Exception('Git error'));
+      when(() => mockGitClient.listWorktrees()).thenThrow(
+        GitException('worktree', ['list', '--porcelain'], 'fatal: git error'),
+      );
 
       final results = switchCommand.parser.parse(['main']);
       final exitCode = await switchCommand.execute(results);

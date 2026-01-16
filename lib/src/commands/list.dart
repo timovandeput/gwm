@@ -6,6 +6,7 @@ import 'base.dart';
 import '../models/exit_codes.dart';
 import '../infrastructure/git_client.dart';
 import '../utils/output_formatter.dart';
+import '../exceptions.dart';
 import '../cli_utils.dart';
 
 /// Command for listing Git worktrees.
@@ -65,9 +66,12 @@ class ListCommand extends BaseCommand {
       }
 
       return ExitCode.success;
+    } on GwmException catch (e) {
+      printSafe(e.message);
+      return e.exitCode;
     } catch (e) {
-      printSafe('Error: Failed to list worktrees: $e');
-      return ExitCode.gitFailed;
+      printSafe('Unexpected error: Failed to list worktrees: $e');
+      return ExitCode.generalError;
     }
   }
 }

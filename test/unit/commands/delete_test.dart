@@ -8,6 +8,7 @@ import 'package:gwm/src/models/worktree.dart';
 import 'package:gwm/src/services/config_service.dart';
 import 'package:gwm/src/services/hook_service.dart';
 import 'package:gwm/src/services/shell_integration.dart';
+import 'package:gwm/src/exceptions.dart';
 
 import '../../mock_objects/mock_git_client.dart';
 // Use the shared MockGitClient
@@ -156,7 +157,9 @@ void main() {
 
     test('handles Git command failures', () async {
       when(() => mockGitClient.isWorktree()).thenAnswer((_) async => true);
-      when(() => mockGitClient.getRepoRoot()).thenThrow(Exception('Git error'));
+      when(() => mockGitClient.getRepoRoot()).thenThrow(
+        GitException('rev-parse', ['--show-toplevel'], 'fatal: git error'),
+      );
 
       final results = deleteCommand.parser.parse([]);
       final exitCode = await deleteCommand.execute(results);
@@ -259,7 +262,7 @@ void main() {
       final results = deleteCommand.parser.parse(['nonexistent-branch']);
       final exitCode = await deleteCommand.execute(results);
 
-      expect(exitCode, ExitCode.gitFailed);
+      expect(exitCode, ExitCode.invalidArguments);
       verify(() => mockGitClient.listWorktrees()).called(1);
     });
 
