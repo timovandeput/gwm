@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:gwm/src/commands/add.dart';
 import 'package:gwm/src/commands/base.dart';
+import 'package:gwm/src/commands/init.dart';
 import 'package:gwm/src/commands/switch.dart';
 import 'package:gwm/src/commands/delete.dart';
 import 'package:gwm/src/commands/list.dart';
@@ -149,7 +150,8 @@ ArgParser buildParser() {
     ..addCommand(
       'list',
       ListCommand(dummyGitClient, dummyOutputFormatter).parser,
-    );
+    )
+    ..addCommand('init', InitCommand(dummyGitClient).parser);
 }
 
 Future<void> main(List<String> arguments) async {
@@ -246,6 +248,9 @@ Future<void> main(List<String> arguments) async {
           outputFormatter,
           skipEvalCheck: skipEvalCheck,
         );
+        break;
+      case 'init':
+        command = InitCommand(gitClient, skipEvalCheck: skipEvalCheck);
         break;
       default:
         printSafe('Error: Unknown command "$commandName".');

@@ -203,6 +203,9 @@ def --env gwm [...args] {
 (Use `-h` or `--help` with any command to see detailed usage information)
 
 ```bash
+# Initialize GWM configuration in current repository ⚙️
+gwm init
+
 # Create a worktree with a new branch 🌳
 gwm add -b feature/new-ui
 
@@ -237,6 +240,16 @@ GWM supports configuration at three levels:
 * Global: `~/.config/gwm/config.json` (or `.yaml`) applies to all repositories.
 * Per-repository: `.gwm.json` (or `.yaml`) in repository root applies to that repository.
 * Per-repository local: `.gwm.local.json` (or `.yaml`) in repository root applies only locally. (Should be gitignored.)
+
+### Initializing configuration
+
+To quickly set up a basic GWM configuration file in your repository, use the `init` command:
+
+```bash
+gwm init
+```
+
+This creates a `.gwm.json` file in the repository root with default settings that you can customize as needed.
 
 ### Configuration file format
 
