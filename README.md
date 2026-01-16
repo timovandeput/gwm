@@ -59,18 +59,22 @@ functions. Carefully follow the Shell Integration instructions below to set it u
 
 For automatic directory switching and tab completion, add the following wrapper functions to your shell configuration.
 
+> [!IMPORTANT]
+> GWM detects when it's running inside a shell `eval` context using the `GWM_EVAL` environment variable. The shell
+> wrapper functions set this variable before executing `eval`, which tells GWM to enable eval output for automatic
+> directory switching. Without this detection, GWM defaults to not outputting eval commands.
+
 ### Bash 🐚
 
 Add to `~/.bashrc`:
 
 ```bash
 # Wrapper for automatic directory switching
-gwm() { eval "$(command gwm "$@")"; }
+gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")"; }
 
 # Tab completion - Option 1: Source in your shell profile
 source /path/to/gwm/docs/completion/gwm.bash
 ```
-
 
 Or Option 2: Install system-wide
 
@@ -95,7 +99,7 @@ Add to `~/.zshrc`:
 
 ```bash
 # Wrapper for automatic directory switching
-gwm() { eval "$(command gwm "$@")" }
+gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")" }
 
 # Tab completion - Create completions directory if it doesn't exist
 mkdir -p ~/.zsh/completions
@@ -124,6 +128,7 @@ Add to `~/.config/fish/config.fish`:
 ```fish
 # Wrapper for automatic directory switching
 function gwm
+    set -x GWM_EVAL 1
     eval (command gwm $argv)
 end
 
@@ -143,7 +148,7 @@ Add to your PowerShell profile (`$PROFILE`):
 
 ```powershell
 # Wrapper for automatic directory switching
-function gwm { Invoke-Expression (& gwm $args) }
+function gwm { $env:GWM_EVAL = '1'; Invoke-Expression (& gwm $args) }
 ```
 
 ### Nushell 🦀
@@ -153,6 +158,7 @@ Add to `~/.config/nushell/config.nu`:
 ```nu
 # Wrapper for automatic directory switching
 def --env gwm [...args] {
+    $env.GWM_EVAL = '1'
     ^gwm ...$args | lines | each { |line| nu -c $line }
 }
 ```
