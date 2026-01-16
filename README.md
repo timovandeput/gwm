@@ -6,11 +6,47 @@ development scenarios where multiple tool instances work in parallel on differen
 
 I created GWM to streamline my own development process, allowing me to easily switch between multiple worktrees for
 different features and bug fixes without the hassle of managing Git commands manually. GWM automates directory
-navigation,
-file copying, and hook execution, making it a powerful tool for developers looking to enhance their productivity.
+navigation, file copying, and hook execution, hopefully making it a powerful tool for developers looking to enhance
+their productivity.
 
-Note that because GWM modifies the shell environment for directory switching, GWM requires shell integration via wrapper
+The diagram below shows the typical directory structure when using GWM:
+
+```mermaid
+flowchart LR
+    P["work/
+(Parent Directory)"] --> A["my-project/
+(some branch)"]
+P --> B["worktrees/
+(Worktrees Directory)"]
+A --> GitRepo[("Git Repository
+for
+my-project")]
+B --> C["my-project_feature_auth/
+('feature/auth' branch)"]
+B --> D["my-project_bugfix_login/
+('bugfix/login' branch)"]
+B --> E["my-project_api-v2/
+('api-v2' branch)"]
+C -.-> GitRepo
+D -.-> GitRepo
+E -.-> GitRepo
+
+subgraph Work["Work happens here"]
+A
+C
+D
+E
+end
+```
+
+The "worktrees" directory is shared among all projects in the parent directory, hiding the complexity of the individual
+worktree paths. When working on multiple projects, GWM only considers the worktree directories of the current Git
+repository.
+
+Note that because GWM updates the shell environment by switching directories, GWM requires shell integration via wrapper
 functions. Carefully follow the Shell Integration instructions below to set it up correctly.
+
+Issues and feature requests are welcome on the [GitHub repository](
 
 <a href="https://www.buymeacoffee.com/software101" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me a Coffee" height="41" width="174"></a>
 
@@ -70,6 +106,7 @@ GWM requires shell integration for automatic directory switching. This consists 
 ### Bash 🐚
 
 #### Required: Wrapper Function
+
 Add to `~/.bashrc`:
 
 ```bash
@@ -78,14 +115,17 @@ gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")"; }
 ```
 
 #### Optional: Tab Completion
+
 Choose one of the following completion setups:
 
 **User-level completion** (add to `~/.bashrc`):
+
 ```bash
 source /path/to/gwm/completions/gwm.bash
 ```
 
 **System-wide completion**:
+
 ```bash
 sudo cp gwm.bash /usr/local/share/bash-completion/completions/gwm
 
@@ -104,6 +144,7 @@ source ~/.bashrc
 ### Zsh 🦓
 
 #### Required: Wrapper Function
+
 Add to `~/.zshrc`:
 
 ```bash
@@ -112,6 +153,7 @@ gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")" }
 ```
 
 #### Optional: Tab Completion
+
 Add to `~/.zshrc`:
 
 ```bash
@@ -138,6 +180,7 @@ source ~/.zshrc
 ### Fish 🐠
 
 #### Required: Wrapper Function
+
 Add to `~/.config/fish/config.fish`:
 
 ```fish
@@ -149,6 +192,7 @@ end
 ```
 
 #### Optional: Tab Completion
+
 ```fish
 cp /path/to/gwm/completions/gwm.fish ~/.config/fish/completions/gwm.fish
 ```
@@ -162,6 +206,7 @@ source ~/.config/fish/config.fish
 ### PowerShell 💻
 
 #### Required: Wrapper Function
+
 Add to your PowerShell profile (`$PROFILE`):
 
 ```powershell
@@ -170,11 +215,13 @@ function gwm { $env:GWM_EVAL = '1'; Invoke-Expression (& gwm $args) }
 ```
 
 #### Optional: Tab Completion
+
 PowerShell tab completion is built-in and doesn't require additional setup.
 
 ### Nushell 🦀
 
 #### Required: Wrapper Function
+
 Add to `~/.config/nushell/config.nu`:
 
 ```nu
@@ -186,6 +233,7 @@ def --env gwm [...args] {
 ```
 
 #### Optional: Tab Completion
+
 Nushell tab completion is built-in and doesn't require additional setup.
 
 ## Quick Start
