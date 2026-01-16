@@ -125,6 +125,7 @@ ArgParser buildParser() {
         dummyConfigService,
         dummyShellIntegration,
         dummyHookService,
+        dummyGitClient,
       ).parser,
     )
     ..addCommand(
@@ -219,6 +220,7 @@ Future<void> main(List<String> arguments) async {
           configService,
           shellIntegration,
           hookService,
+          gitClient,
           skipEvalCheck: skipEvalCheck,
         );
         break;

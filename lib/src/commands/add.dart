@@ -8,8 +8,7 @@ import '../services/worktree_service.dart';
 import '../services/config_service.dart';
 import '../services/hook_service.dart';
 
-import '../infrastructure/git_client_impl.dart';
-import '../infrastructure/process_wrapper_impl.dart';
+import '../infrastructure/git_client.dart';
 import '../services/shell_integration.dart';
 import '../utils/eval_validator.dart';
 import '../exceptions.dart';
@@ -23,12 +22,14 @@ class AddCommand extends BaseCommand {
   final ConfigService _configService;
   final ShellIntegration _shellIntegration;
   final HookService _hookService;
+  final GitClient _gitClient;
 
   AddCommand(
     this._worktreeService,
     this._configService,
     this._shellIntegration,
-    this._hookService, {
+    this._hookService,
+    this._gitClient, {
     super.skipEvalCheck = false,
   });
   @override
@@ -144,8 +145,7 @@ class AddCommand extends BaseCommand {
   /// Returns the current directory if not in a git repo (for error handling).
   Future<String?> _getRepoRoot() async {
     try {
-      final gitClient = GitClientImpl(ProcessWrapperImpl());
-      return await gitClient.getRepoRoot();
+      return await _gitClient.getRepoRoot();
     } catch (e) {
       // If not in a git repo, return null - config will use global only
       return null;
