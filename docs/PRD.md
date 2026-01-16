@@ -629,7 +629,6 @@ Auto-completion support for:
 
 - Git 2.5+ (for worktree support)
 - Dart SDK (for running GWM)
-- Optional: fzf (for enhanced interactive selection)
 
 ### 4.3 Performance
 
@@ -645,7 +644,7 @@ Auto-completion support for:
   - This includes: Git commands, hook commands, and any other external tool invocations
 - **All external command output (both stdout and stderr) is displayed to the user**
   - This ensures users can diagnose failures and see error messages from invoked tools
-- Graceful degradation for optional features (e.g., fzf not installed)
+
 - Proper exit codes for scripting (0 for success, non-zero for failure)
 - Exit codes reflect the type of failure (see Section 10.2)
 
@@ -662,7 +661,7 @@ Auto-completion support for:
 ### 5.1 Technology Stack
 
 - **Language**: Dart
-- **External Dependencies**: Git CLI (required), fzf (optional)
+- **External Dependencies**: Git CLI (required)
 - **Configuration Formats**: JSON (primary), YAML (alternative)
 - **Shell Integration**: Eval-based wrapper functions
 
@@ -880,14 +879,7 @@ gwm add feature/new-component
 
 The following decisions have been made for the implementation:
 
-### 9.1 Interactive Selection
-**Decision**: Use fzf (if available) or build a simple selector in Dart
-
-- If fzf is installed on the system, use it for interactive worktree selection
-- If fzf is not available, fall back to a simple Dart-based selector
-- This provides the best user experience when possible while maintaining cross-platform compatibility
-
-### 9.2 Hook Timeout
+### 9.1 Hook Timeout
 **Decision**: 30-second default timeout, configurable in settings
 
 - Hooks have a default timeout of 30 seconds to prevent hanging

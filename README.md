@@ -57,7 +57,7 @@ Issues and feature requests are welcome on the [GitHub repository](
 - 🔧 **Configurable Hooks**: Automate workflows with pre/post hooks for worktree operations
 - 📁 **File/Directory Copying**: Copy local files and directories to all worktrees automatically
 - 💻 **Cross-Platform Support**: Works on Windows, Linux, and macOS
-- 🔍 **Interactive Selection**: Use fuzzy finder (fzf) or built-in selector for worktree navigation
+- 🔍 **Interactive Selection**: Built-in console selector for worktree navigation
 - ⚙️ **Configuration System**: Global, per-repository, and local configurations with JSON/YAML support
 
 ## Installation
@@ -66,7 +66,6 @@ Issues and feature requests are welcome on the [GitHub repository](
 
 - 📦 Git 2.5+ (for worktree support)
 - 🎯 Dart SDK (for building GWM)
-- 🔍 Optional: [fzf](https://github.com/junegunn/fzf) for enhanced interactive selection
 
 ### Building the Executable
 
