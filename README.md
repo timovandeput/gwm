@@ -105,33 +105,14 @@ GWM requires shell integration for automatic directory switching. This consists 
 
 ### Bash 🐚
 
-#### Required: Wrapper Function
-
 Add to `~/.bashrc`:
 
 ```bash
 # Wrapper for automatic directory switching
 gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")"; }
-```
 
-#### Optional: Tab Completion
-
-Choose one of the following completion setups:
-
-**User-level completion** (add to `~/.bashrc`):
-
-```bash
+# Tab completion
 source /path/to/gwm/completions/gwm.bash
-```
-
-**System-wide completion**:
-
-```bash
-sudo cp gwm.bash /usr/local/share/bash-completion/completions/gwm
-
-# or for local user:
-mkdir -p ~/.local/share/bash-completion/completions
-cp gwm.bash ~/.local/share/bash-completion/completions/gwm
 ```
 
 After setup, reload your shell configuration:
@@ -143,18 +124,7 @@ source ~/.bashrc
 
 ### Zsh 🦓
 
-#### Required: Wrapper Function
-
-Add to `~/.zshrc`:
-
-```bash
-# Wrapper for automatic directory switching
-gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")" }
-```
-
-#### Optional: Tab Completion
-
-Add to `~/.zshrc`:
+Set up the completions support once:
 
 ```bash
 # Create completions directory if it doesn't exist
@@ -162,11 +132,18 @@ mkdir -p ~/.zsh/completions
 
 # Copy the completion script
 cp path/to/gwm/completions/gwm.zsh ~/.zsh/completions/_gwm
+````
+
+Add to `~/.zshrc`:
+
+```bash
+# Wrapper for automatic directory switching
+gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")" }
 
 # Add to your fpath
 fpath=(~/.zsh/completions $fpath)
 
-# Reload completions
+# Load completions
 autoload -Uz compinit && compinit
 ```
 
@@ -179,7 +156,11 @@ source ~/.zshrc
 
 ### Fish 🐠
 
-#### Required: Wrapper Function
+Prepare completions support once:
+
+```bash
+cp /path/to/gwm/completions/gwm.fish ~/.config/fish/completions/gwm.fish
+```
 
 Add to `~/.config/fish/config.fish`:
 
@@ -191,21 +172,13 @@ function gwm
 end
 ```
 
-#### Optional: Tab Completion
-
-```fish
-cp /path/to/gwm/completions/gwm.fish ~/.config/fish/completions/gwm.fish
-```
-
 After setup, reload your shell configuration:
 
-```fish
+```bash
 source ~/.config/fish/config.fish
 ```
 
 ### PowerShell 💻
-
-#### Required: Wrapper Function
 
 Add to your PowerShell profile (`$PROFILE`):
 
@@ -214,13 +187,7 @@ Add to your PowerShell profile (`$PROFILE`):
 function gwm { $env:GWM_EVAL = '1'; Invoke-Expression (& gwm $args) }
 ```
 
-#### Optional: Tab Completion
-
-PowerShell tab completion is built-in and doesn't require additional setup.
-
 ### Nushell 🦀
-
-#### Required: Wrapper Function
 
 Add to `~/.config/nushell/config.nu`:
 
@@ -232,11 +199,9 @@ def --env gwm [...args] {
 }
 ```
 
-#### Optional: Tab Completion
-
-Nushell tab completion is built-in and doesn't require additional setup.
-
 ## Quick Start
+
+(Use `-h` or `--help` with any command to see detailed usage information)
 
 ```bash
 # Create a worktree with a new branch 🌳
@@ -257,124 +222,29 @@ gwm switch .
 # Delete current worktree and return to main repo 🧹
 gwm delete
 
+# Delete worktree despite uncommitted changes 💪
+gwm delete --force
+
 # Delete the new-ui worktree from the main workspace 🗑️
 gwm delete new-ui
 ```
-
-## Usage
-
-### gwm add ➕
-
-Create a new worktree with automatic directory navigation.
-
-```bash
-# Create worktree from existing branch
-gwm add feature/new-ui
-
-# Create worktree with new branch
-gwm add -b feature/authentication
-
-# Create worktree with new branch (long form)
-gwm add --branch feature/authentication
-```
-
-**Options:**
-
-- `-b, --branch`: Create a new Git branch instead of using an existing one
-- `-h, --help`: Show help message
-
-### gwm switch 🔄
-
-Navigate to an existing worktree or main repository.
-
-```bash
-# Switch to specific worktree
-gwm switch feature-auth
-
-# Switch to main Git workspace
-gwm switch .
-```
-
-**Options:**
-
-- `-r, --reconfigure`: Re-apply the "add" hooks and file copies
-- `-h, --help`: Show help message
-
-### gwm delete 🧹
-
-Delete the specified worktree, or the current worktree if no name is provided.
-
-Can only delete worktrees from the main workspace. Cannot delete the main workspace.
-
-```bash
-# Delete current worktree (prompts if uncommitted changes exist)
-gwm delete
-
-# Delete named worktree from main workspace
-gwm delete feature-branch
-
-# Force delete (no prompts)
-gwm delete --force
-gwm delete feature-branch --force
-```
-
-**Options:**
-
-- `-f, --force`: Bypass safety checks and delete immediately
-- `-h, --help`: Show help message
-
-### gwm list 📋
-
-Display all available worktrees for current repository.
-
-```bash
-# Simple list
-gwm list
-
-# Detailed list
-gwm list -v
-
-# JSON output for scripting
-gwm list -j
-```
-
-**Options:**
-
-- `-v, --verbose`: Show additional information (branch status, last modified)
-- `-j, --json`: Output in JSON format for scripting
-- `-h, --help`: Show help message
 
 ## Configuration
 
 GWM supports configuration at three levels:
 
-### Global Configuration 🌍
+### Configuration locations
 
-Location: `~/.config/gwm/config.json` (or `.yaml`)
+* Global: `~/.config/gwm/config.json` (or `.yaml`) applies to all repositories.
+* Per-repository: `.gwm.json` (or `.yaml`) in repository root applies to that repository.
+* Per-repository local: `.gwm.local.json` (or `.yaml`) in repository root applies only locally. (Should be gitignored.)
 
-Applies to all repositories and contains default settings.
+### Configuration file format
 
-```json
-{
-  "version": "1.0",
-  "hooks": {
-    "timeout": 30
-  }
-}
-```
-
-- "version" specifies the configuration schema version
-- "timeout" sets hook execution timeout in seconds
-
-### Per-Repository Configuration 📁
-
-Location: `.gwm.json` (or `.yaml`) in repository root
-
-Repository-specific settings that can be committed to Git and shared with the team.
+Configuration files can be in JSON or YAML format. GWM automatically detects the format based on the file extension.
 
 ```json
 {
-  "version": "1.0",
   "copy": {
     "files": [
       ".env",
@@ -386,16 +256,13 @@ Repository-specific settings that can be committed to Git and shared with the te
     ]
   },
   "hooks": {
+    "timeout": 60,
     "post_add": [
       "npm install",
       "npm run build"
     ],
-    "post_switch": [
-      "npm run dev"
-    ],
-    "pre_delete": [
-      "git stash"
-    ]
+    "post_switch": "npm run dev",
+    "pre_delete": "git stash"
   },
   "shell_integration": {
     "enable_eval_output": true
@@ -403,64 +270,20 @@ Repository-specific settings that can be committed to Git and shared with the te
 }
 ```
 
-### Per-Repository Local Configuration 🔒
+The `copy` section allows for copying files and directories from the current directory to a new created worktree. Use
+this to copy git-ignored local configuration files or large directories like `node_modules` to each worktree. The file
+and directory specification supports glob patterns (`*` and `**`) for flexible matching.
 
-Location: `.gwm.local.json` (or `.yaml`) in repository root
+The `hooks` section allows defining shell commands that run at specific points during worktree operations.
+Hooks are defined for `pre_add`, `post_add`, `pre_switch`, `post_switch`, `pre_delete`, and `post_delete` events. By
+appending `_prepend` or `_append` to the hook name, you can add commands to the beginning or end of the hook instead of
+overriding it.
 
-Local-only overrides that should be added to `.gitignore`.
+The command invocation can be either specified as a string or as an array of strings for multiple sequential
+commands. The `timeout` field sets hook execution timeout in seconds (default: 30 seconds).
 
-```json
-{
-  "version": "1.0",
-  "copy": {
-    "files": [
-      ".env.local",
-      ".secrets"
-    ]
-  },
-  "hooks": {
-    "post_add_append": [
-      "npm run typecheck"
-    ]
-  }
-}
-```
-
-**Override Strategies:**
-
-- 🔄 **Complete Override**: Use the field name directly (e.g., `post_add = [...]`)
-- ⬆️ **Prepend Items**: Use `_prepend` suffix (e.g., `post_add_prepend = [...]`)
-- ⬇️ **Append Items**: Use `_append` suffix (e.g., `post_add_append = [...]`)
-
-## Configuration Schema
-
-### copy 📁
-
-Files and directories to copy from the main repository to each worktree.
-
-```json
-{
-  "copy": {
-    "files": [
-      ".env",
-      "*.env.*",
-      "config/*.json"
-    ],
-    "directories": [
-      "node_modules",
-      ".cache"
-    ]
-  }
-}
-```
-
-- Supports glob patterns for flexible file matching
-- Large directories may take time to copy
-- Copy-on-Write optimization on supported filesystems (APFS, Btrfs, XFS)
-
-### hooks 🔧
-
-Hooks are shell commands that run at specific points during worktree operations.
+Hooks are shell commands that run at specific points during worktree operations. Environment variables provide access to
+the worktree and origin paths:
 
 | Hook          | When Executed                          | Environment Variables                  |
 |---------------|----------------------------------------|----------------------------------------|
@@ -471,36 +294,8 @@ Hooks are shell commands that run at specific points during worktree operations.
 | `pre_delete`  | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `post_delete` | After deleting worktree (in main repo) | `GWM_ORIGIN_PATH`                      |
 
-```json
-{
-  "hooks": {
-    "timeout": 30,
-    "pre_add": [
-      "echo 'Creating worktree...'"
-    ],
-    "post_add": [
-      "npm install",
-      "npm run build"
-    ]
-  }
-}
-```
-
-**Per-Hook Timeout:**
-
-```json
-{
-  "hooks": {
-    "post_add": {
-      "timeout": 120,
-      "commands": [
-        "npm install",
-        "npm run build"
-      ]
-    }
-  }
-}
-```
+The `shell_integration` field allows for overriding the shell integration behavior and defaults to the `GWM_EVAL`
+environment variable being set.
 
 ## Directory Structure 📂
 
@@ -668,7 +463,7 @@ Contributions are welcome! Please see [AGENTS.md](AGENTS.md) for development gui
 
 ## License 📄
 
-[Specify your license here]
+MIT License. See [LICENSE](LICENSE) for details.
 
 ## Links 🔗
 
