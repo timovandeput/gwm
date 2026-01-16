@@ -475,6 +475,14 @@ flowchart TD
 
 Shell detection automatically identifies the user's shell environment for proper command execution. See `lib/src/utils/shell_detector.dart` for the shell detection implementation.
 
+### 8.4 Prompt Selector
+
+The prompt selector provides interactive user interfaces for selecting worktrees from lists. See `lib/src/infrastructure/prompt_selector.dart` for the prompt selector interface and implementation.
+
+### 8.5 File System Adapter
+
+The file system adapter abstracts file system operations to enable testing and cross-platform compatibility. See `lib/src/infrastructure/file_system_adapter.dart` for the interface and `lib/src/infrastructure/file_system_adapter_impl.dart` for the implementation.
+
 ## 9. Security Considerations
 
 ### 9.1 Command Injection Prevention
@@ -499,4 +507,63 @@ Copy operations automatically detect filesystem capabilities to use efficient co
 
 Configuration loading uses lazy initialization and caching to minimize I/O operations during repeated access. See `lib/src/services/config_service.dart` for configuration loading implementation.
 
+## 11. Eval Wrappers
+
+### 11.1 Why Eval Wrappers Are Necessary
+
+Command-line tools cannot directly modify the shell's current working directory. When a CLI application exits, any directory changes it made internally are lost. To enable persistent directory switching (as required for worktree management), GWM uses eval wrappers that output shell commands which are then executed by the shell itself.
+
+Without eval wrappers, commands like `gwm switch feature-branch` would change directories temporarily within the GWM process but immediately return the user to their original directory upon completion. Eval wrappers solve this by having GWM output commands like `cd /path/to/worktree` that the shell then executes in its own context.
+
+### 11.2 How Eval Wrapping Works
+
+Eval wrapping operates through a shell function or alias that captures GWM's output and evaluates it:
+
+```bash
+# Example shell function wrapper
+gwm() {
+  # Execute gwm and capture its output
+  local output
+  output=$(command gwm "$@")
+
+  # Check exit code
+  local exit_code=$?
+
+  # If successful and output contains shell commands, eval them
+  if [[ $exit_code -eq 0 && -n "$output" ]]; then
+    eval "$output"
+  fi
+
+  # Return the original exit code
+  return $exit_code
+}
+```
+
+**Process Flow:**
+
+1. User runs `gwm switch feature-auth`
+2. Shell executes the wrapper function instead of gwm directly
+3. Wrapper calls actual gwm binary and captures output
+4. GWM processes the command and outputs shell commands (e.g., `cd ~/worktrees/project_feature-auth`)
+5. Wrapper evaluates the output, changing the shell's directory
+6. User remains in the new directory after command completion
+
+### 11.3 Manual Configuration Requirement
+
+Eval wrappers require manual installation because:
+
+**Shell-Specific Configuration:** Different shells (bash, zsh, fish, etc.) have different syntax for functions and aliases. The wrapper must be written in the appropriate shell syntax and added to the correct configuration file (.bashrc, .zshrc, .config/fish/config.fish).
+
+**Security Considerations:** Automatically modifying shell configuration files could introduce security risks. Manual installation ensures users review and understand what code is being added to their shell environment.
+
+**User Choice:** Not all users may want directory switching functionality, or they may prefer alternative integration methods. Manual configuration allows users to opt-in to this feature.
+
+**Installation Process:**
+
+1. User runs `gwm shell init` to generate appropriate wrapper code
+2. User manually adds the generated code to their shell configuration file
+3. User restarts shell or sources the configuration file
+4. Wrapper becomes active for future gwm commands
+
+This approach provides flexibility while ensuring users maintain control over their shell environment.
 
