@@ -156,7 +156,9 @@ class ConfigService {
       'version': '1.0',
       'copy': {'files': <String>[], 'directories': <String>[]},
       'hooks': {'timeout': 30},
-      'shellIntegration': {'enableEvalOutput': false},
+      'shellIntegration': {
+        'enableEvalOutput': Platform.environment['GWM_EVAL'] != null,
+      },
     };
   }
 

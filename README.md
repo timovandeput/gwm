@@ -69,12 +69,24 @@ gwm() { eval "$(command gwm "$@")"; }
 
 # Tab completion - Option 1: Source in your shell profile
 source /path/to/gwm/docs/completion/gwm.bash
+```
 
-# Or Option 2: Install system-wide
-# sudo cp gwm.bash /usr/local/share/bash-completion/completions/gwm
-# # or for local user:
-# mkdir -p ~/.local/share/bash-completion/completions
-# cp gwm.bash ~/.local/share/bash-completion/completions/gwm
+
+Or Option 2: Install system-wide
+
+```bash
+sudo cp gwm.bash /usr/local/share/bash-completion/completions/gwm
+
+# or for local user:
+mkdir -p ~/.local/share/bash-completion/completions
+cp gwm.bash ~/.local/share/bash-completion/completions/gwm
+```
+
+After adding the wrapper, reload your shell configuration:
+
+```bash
+# Bash
+source ~/.bashrc
 ```
 
 ### Zsh 🦓
@@ -89,13 +101,20 @@ gwm() { eval "$(command gwm "$@")" }
 mkdir -p ~/.zsh/completions
 
 # Copy the completion script
-cp gwm.zsh ~/.zsh/completions/_gwm
+cp path/to/gwm/docs/completion/gwm.zsh ~/.zsh/completions/_gwm
 
 # Add to your fpath
 fpath=(~/.zsh/completions $fpath)
 
 # Reload completions
 autoload -Uz compinit && compinit
+```
+
+After adding the wrapper, reload your shell configuration:
+
+```bash
+# Bash
+source ~/.zshrc
 ```
 
 ### Fish 🐠
@@ -110,6 +129,12 @@ end
 
 # Tab completion
 cp /path/to/gwm/docs/completion/gwm.fish ~/.config/fish/completions/gwm.fish
+```
+
+After adding the wrapper, reload your shell configuration:
+
+```fish
+source ~/.config/fish/config.fish
 ```
 
 ### PowerShell 💻
@@ -132,33 +157,29 @@ def --env gwm [...args] {
 }
 ```
 
-After adding the wrapper, reload your shell configuration:
-
-```bash
-# Bash/Zsh
-source ~/.bashrc  # or source ~/.zshrc
-
-# Fish
-source ~/.config/fish/config.fish
-```
-
 ## Quick Start
 
 ```bash
 # Create a worktree with a new branch 🌳
 gwm add -b feature/new-ui
 
+# List all worktrees 📋
+gwm list -v
+
 # Switch to an existing worktree (interactive) 🔄
 gwm switch
 
-# List all worktrees 📋
-gwm list -v
+# Switch to a named worktree 🎯
+gwm switch new-ui
+
+# Switch to the main repo 🏠
+gwm switch .
 
 # Delete current worktree and return to main repo 🧹
 gwm delete
 
-# Delete a specific worktree from main workspace 🗑️
-gwm delete feature-branch
+# Delete the new-ui worktree from the main workspace 🗑️
+gwm delete new-ui
 ```
 
 ## Usage
@@ -193,13 +214,17 @@ gwm switch feature-auth
 
 # Switch to main Git workspace
 gwm switch .
-
-
 ```
+
+**Options:**
+
+- `-r, --reconfigure`: Re-apply the "add" hooks and file copies
+- `-h, --help`: Show help message
 
 ### gwm delete 🧹
 
 Delete the specified worktree, or the current worktree if no name is provided.
+
 Can only delete worktrees from the main workspace. Cannot delete the main workspace.
 
 ```bash
@@ -258,6 +283,9 @@ Applies to all repositories and contains default settings.
   }
 }
 ```
+
+- "version" specifies the configuration schema version
+- "timeout" sets hook execution timeout in seconds
 
 ### Per-Repository Configuration 📁
 
