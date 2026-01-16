@@ -82,7 +82,7 @@ Choose one of the following completion setups:
 
 **User-level completion** (add to `~/.bashrc`):
 ```bash
-source /path/to/gwm/docs/completion/gwm.bash
+source /path/to/gwm/completions/gwm.bash
 ```
 
 **System-wide completion**:
@@ -119,7 +119,7 @@ Add to `~/.zshrc`:
 mkdir -p ~/.zsh/completions
 
 # Copy the completion script
-cp path/to/gwm/docs/completion/gwm.zsh ~/.zsh/completions/_gwm
+cp path/to/gwm/completions/gwm.zsh ~/.zsh/completions/_gwm
 
 # Add to your fpath
 fpath=(~/.zsh/completions $fpath)
@@ -150,7 +150,7 @@ end
 
 #### Optional: Tab Completion
 ```fish
-cp /path/to/gwm/docs/completion/gwm.fish ~/.config/fish/completions/gwm.fish
+cp /path/to/gwm/completions/gwm.fish ~/.config/fish/completions/gwm.fish
 ```
 
 After setup, reload your shell configuration:
