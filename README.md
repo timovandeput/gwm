@@ -57,7 +57,10 @@ functions. Carefully follow the Shell Integration instructions below to set it u
 
 ## Shell Integration
 
-For automatic directory switching and tab completion, add the following wrapper functions to your shell configuration.
+GWM requires shell integration for automatic directory switching. This consists of:
+
+- **Required**: A wrapper function that executes GWM commands within `eval` for automatic directory navigation
+- **Optional**: Tab completion setup for enhanced command-line experience
 
 > [!IMPORTANT]
 > GWM detects when it's running inside a shell `eval` context using the `GWM_EVAL` environment variable. The shell
@@ -66,18 +69,23 @@ For automatic directory switching and tab completion, add the following wrapper 
 
 ### Bash 🐚
 
+#### Required: Wrapper Function
 Add to `~/.bashrc`:
 
 ```bash
 # Wrapper for automatic directory switching
 gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")"; }
+```
 
-# Tab completion - Option 1: Source in your shell profile
+#### Optional: Tab Completion
+Choose one of the following completion setups:
+
+**User-level completion** (add to `~/.bashrc`):
+```bash
 source /path/to/gwm/docs/completion/gwm.bash
 ```
 
-Or Option 2: Install system-wide
-
+**System-wide completion**:
 ```bash
 sudo cp gwm.bash /usr/local/share/bash-completion/completions/gwm
 
@@ -86,7 +94,7 @@ mkdir -p ~/.local/share/bash-completion/completions
 cp gwm.bash ~/.local/share/bash-completion/completions/gwm
 ```
 
-After adding the wrapper, reload your shell configuration:
+After setup, reload your shell configuration:
 
 ```bash
 # Bash
@@ -95,13 +103,19 @@ source ~/.bashrc
 
 ### Zsh 🦓
 
+#### Required: Wrapper Function
 Add to `~/.zshrc`:
 
 ```bash
 # Wrapper for automatic directory switching
 gwm() { export GWM_EVAL=1; eval "$(command gwm "$@")" }
+```
 
-# Tab completion - Create completions directory if it doesn't exist
+#### Optional: Tab Completion
+Add to `~/.zshrc`:
+
+```bash
+# Create completions directory if it doesn't exist
 mkdir -p ~/.zsh/completions
 
 # Copy the completion script
@@ -114,15 +128,16 @@ fpath=(~/.zsh/completions $fpath)
 autoload -Uz compinit && compinit
 ```
 
-After adding the wrapper, reload your shell configuration:
+After setup, reload your shell configuration:
 
 ```bash
-# Bash
+# Zsh
 source ~/.zshrc
 ```
 
 ### Fish 🐠
 
+#### Required: Wrapper Function
 Add to `~/.config/fish/config.fish`:
 
 ```fish
@@ -131,12 +146,14 @@ function gwm
     set -x GWM_EVAL 1
     eval (command gwm $argv)
 end
+```
 
-# Tab completion
+#### Optional: Tab Completion
+```fish
 cp /path/to/gwm/docs/completion/gwm.fish ~/.config/fish/completions/gwm.fish
 ```
 
-After adding the wrapper, reload your shell configuration:
+After setup, reload your shell configuration:
 
 ```fish
 source ~/.config/fish/config.fish
@@ -144,6 +161,7 @@ source ~/.config/fish/config.fish
 
 ### PowerShell 💻
 
+#### Required: Wrapper Function
 Add to your PowerShell profile (`$PROFILE`):
 
 ```powershell
@@ -151,8 +169,12 @@ Add to your PowerShell profile (`$PROFILE`):
 function gwm { $env:GWM_EVAL = '1'; Invoke-Expression (& gwm $args) }
 ```
 
+#### Optional: Tab Completion
+PowerShell tab completion is built-in and doesn't require additional setup.
+
 ### Nushell 🦀
 
+#### Required: Wrapper Function
 Add to `~/.config/nushell/config.nu`:
 
 ```nu
@@ -162,6 +184,9 @@ def --env gwm [...args] {
     ^gwm ...$args | lines | each { |line| nu -c $line }
 }
 ```
+
+#### Optional: Tab Completion
+Nushell tab completion is built-in and doesn't require additional setup.
 
 ## Quick Start
 
