@@ -4,12 +4,10 @@ import 'package:gwm/src/infrastructure/prompt_selector.dart';
 
 void main() {
   group('PromptSelectorImpl', () {
-    test('returns null when worktrees list is empty', () {
+    test('returns null when worktrees list is empty', () async {
       final selector = PromptSelectorImpl();
-
-      // Since it uses stdin, we can't easily test interactive behavior
-      // This test just verifies the class can be instantiated
-      expect(selector, isNotNull);
+      final result = await selector.selectWorktree([]);
+      expect(result, isNull);
     });
 
     test('can be instantiated', () {
