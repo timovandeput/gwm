@@ -265,6 +265,88 @@ void main() {
           ),
         ).called(1);
       });
+
+      test(
+        'creates worktree with tracking when local branch does not exist but remote does',
+        () async {
+          // Arrange
+          const branch = 'feature/remote-only';
+          final repoPath = '${tempDir.path}/repo';
+          final worktreePath =
+              '${tempDir.path}/worktrees/repo_feature_remote-only';
+
+          when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
+          when(
+            () => mockGitClient.branchExists(branch),
+          ).thenAnswer((_) async => false);
+          when(
+            () => mockGitClient.remoteBranchExists(branch),
+          ).thenAnswer((_) async => true);
+          when(
+            () => mockGitClient.getRepoRoot(),
+          ).thenAnswer((_) async => repoPath);
+          when(
+            () => mockGitClient.createWorktree(
+              worktreePath,
+              branch,
+              createBranch: true,
+            ),
+          ).thenAnswer((_) async {
+            Directory(worktreePath).createSync(recursive: true);
+            return worktreePath;
+          });
+          when(
+            () => mockGitClient.setUpstreamBranch(branch),
+          ).thenAnswer((_) async {});
+
+          // Act
+          final result = await worktreeService.addWorktree(branch);
+
+          // Assert
+          expect(result, ExitCode.success);
+          verify(
+            () => mockGitClient.createWorktree(
+              worktreePath,
+              branch,
+              createBranch: true,
+            ),
+          ).called(1);
+          verify(() => mockGitClient.setUpstreamBranch(branch)).called(1);
+        },
+      );
+
+      test(
+        'returns branchNotFound when neither local nor remote branch exists',
+        () async {
+          // Arrange
+          const branch = 'nonexistent-branch';
+
+          when(() => mockGitClient.isWorktree()).thenAnswer((_) async => false);
+          when(
+            () => mockGitClient.branchExists(branch),
+          ).thenAnswer((_) async => false);
+          when(
+            () => mockGitClient.remoteBranchExists(branch),
+          ).thenAnswer((_) async => false);
+          when(
+            () => mockGitClient.getRepoRoot(),
+          ).thenAnswer((_) async => '${tempDir.path}/repo');
+
+          // Act
+          final result = await worktreeService.addWorktree(branch);
+
+          // Assert
+          expect(result, ExitCode.branchNotFound);
+          verifyNever(
+            () => mockGitClient.createWorktree(
+              any(),
+              any(),
+              createBranch: any(named: 'createBranch'),
+            ),
+          );
+          verifyNever(() => mockGitClient.setUpstreamBranch(any()));
+        },
+      );
     });
   });
 }

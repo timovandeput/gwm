@@ -47,4 +47,10 @@ abstract class GitClient {
 
   /// Lists all available Git branches.
   Future<List<String>> listBranches();
+
+  /// Checks if a remote branch with the given name exists.
+  Future<bool> remoteBranchExists(String branch);
+
+  /// Sets up tracking for a local branch to a remote branch.
+  Future<void> setUpstreamBranch(String branch);
 }

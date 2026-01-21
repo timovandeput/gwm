@@ -273,6 +273,43 @@ class GitClientImpl implements GitClient {
         .toList();
   }
 
+  @override
+  Future<bool> remoteBranchExists(String branch) async {
+    final result = await _processWrapper.run('git', [
+      'branch',
+      '-r',
+      '--list',
+      'origin/$branch',
+    ]);
+    _printOutput(result);
+    if (result.exitCode != 0) {
+      throw GitException('git', [
+        'branch',
+        '-r',
+        '--list',
+        'origin/$branch',
+      ], result.stderr as String);
+    }
+    return (result.stdout as String).trim().isNotEmpty;
+  }
+
+  @override
+  Future<void> setUpstreamBranch(String branch) async {
+    final result = await _processWrapper.run('git', [
+      'branch',
+      '--set-upstream-to=origin/$branch',
+      branch,
+    ]);
+    _printOutput(result);
+    if (result.exitCode != 0) {
+      throw GitException('git', [
+        'branch',
+        '--set-upstream-to=origin/$branch',
+        branch,
+      ], result.stderr as String);
+    }
+  }
+
   void _printOutput(ProcessResult result) {
     if (result.stderr.isNotEmpty) {
       printSafe(result.stderr);

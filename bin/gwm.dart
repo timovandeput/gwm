@@ -23,7 +23,7 @@ import 'package:gwm/src/services/completion_service.dart';
 import 'package:gwm/src/utils/output_formatter.dart';
 import 'package:gwm/src/models/config.dart';
 
-const String version = '0.1.0';
+const String version = '0.1.1';
 
 /// Handles tab completion requests.
 ///

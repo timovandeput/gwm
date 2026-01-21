@@ -41,14 +41,104 @@ class WorktreeService {
 
       final originPath = await _gitClient.getRepoRoot();
 
-      // Check if branch exists (unless createBranch is true)
-      if (!createBranch && !await _gitClient.branchExists(branch)) {
-        printSafe('Error: Branch "$branch" does not exist');
-        return ExitCode.branchNotFound;
+      // Determine worktree path early
+      final worktreePath = await _resolveWorktreePath(branch);
+
+      // Check branch availability (unless createBranch is true)
+      if (!createBranch) {
+        final localExists = await _gitClient.branchExists(branch);
+        if (!localExists) {
+          // Check if remote branch exists
+          final remoteExists = await _gitClient.remoteBranchExists(branch);
+          if (remoteExists) {
+            // Check if worktree already exists
+            final worktreeDir = Directory(worktreePath);
+            if (await worktreeDir.exists()) {
+              printSafe(
+                'Warning: Worktree already exists at $worktreePath, switching to it',
+              );
+              return ExitCode.worktreeExistsButSwitched;
+            }
+
+            // Ensure parent directory exists
+            final parentDir = worktreeDir.parent;
+            if (!await parentDir.exists()) {
+              await parentDir.create(recursive: true);
+            }
+
+            // Execute pre-add hooks
+            if (config?.hooks.preAdd != null) {
+              try {
+                await _hookService.executePreAdd(
+                  config!.hooks,
+                  worktreePath,
+                  originPath,
+                  branch,
+                );
+              } catch (e) {
+                printSafe('Error: Pre-add hook failed: $e');
+                return ExitCode.hookFailed;
+              }
+            }
+
+            // Create worktree with branch and tracking
+            final actualPath = await _gitClient.createWorktree(
+              worktreePath,
+              branch,
+              createBranch: true,
+            );
+
+            // Set up tracking
+            await _gitClient.setUpstreamBranch(branch);
+
+            // Verify the worktree was created successfully
+            if (!await Directory(actualPath).exists()) {
+              stderr.writeln('Error: Failed to create worktree at $actualPath');
+              return ExitCode.gitFailed;
+            }
+
+            // Copy files and directories to the new worktree
+            if (config?.copy != null) {
+              try {
+                await _copyService.copyFiles(
+                  config!.copy,
+                  originPath,
+                  actualPath,
+                );
+              } catch (e) {
+                printSafe('Warning: Failed to copy some files to worktree: $e');
+                // Continue anyway - copying failure shouldn't prevent worktree creation
+              }
+            }
+
+            // Execute post-add hooks
+            if (config?.hooks.postAdd != null) {
+              try {
+                await _hookService.executePostAdd(
+                  config!.hooks,
+                  actualPath,
+                  originPath,
+                  branch,
+                );
+              } catch (e) {
+                printSafe('Error: Post-add hook failed: $e');
+                return ExitCode.hookFailed;
+              }
+            }
+
+            printSafe(
+              'Successfully created worktree for branch "$branch" at $actualPath',
+            );
+            return ExitCode.success;
+          } else {
+            printSafe(
+              'Error: Branch "$branch" does not exist locally or remotely',
+            );
+            return ExitCode.branchNotFound;
+          }
+        }
       }
 
-      // Determine worktree path
-      final worktreePath = await _resolveWorktreePath(branch);
       final worktreeDir = Directory(worktreePath);
 
       // Check if worktree already exists
