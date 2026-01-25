@@ -67,7 +67,7 @@ class CompletionService {
 
   /// Gets completion candidates for Git branch names.
   ///
-  /// Used for commands like `gwm add` where a branch name is expected.
+  /// Used for commands like `gwm create` where a branch name is expected.
   Future<List<String>> getBranchCompletions() async {
     try {
       final branches = await _gitClient.listBranches();
@@ -89,8 +89,8 @@ class CompletionService {
       'copy.files',
       'copy.directories',
       'hooks.timeout',
-      'hooks.pre_add',
-      'hooks.post_add',
+      'hooks.pre_create',
+      'hooks.post_create',
       'hooks.pre_switch',
       'hooks.post_switch',
       'hooks.pre_delete',
@@ -103,7 +103,7 @@ class CompletionService {
   ///
   /// Returns the list of available GWM subcommands.
   List<String> getCommandCompletions() {
-    return ['add', 'switch', 'delete', 'list'];
+    return ['create', 'switch', 'delete', 'list'];
   }
 
   /// Gets completion candidates for flags/options.
@@ -123,7 +123,7 @@ class CompletionService {
 
   /// Gets completion candidates for a specific command and partial input.
   ///
-  /// [command] is the subcommand being completed (e.g., 'add', 'switch')
+  /// [command] is the subcommand being completed (e.g., 'create', 'switch')
   /// [partial] is the partial input being completed
   /// [position] indicates which argument position we're completing (0-based)
   Future<List<String>> getCompletions({
@@ -172,7 +172,7 @@ class CompletionService {
     if (position != 0) return []; // Only position 0 has positional args for now
 
     switch (command) {
-      case 'add':
+      case 'create':
         return await getBranchCompletions();
       case 'switch':
         return await getWorktreeCompletionsExcludingCurrent();

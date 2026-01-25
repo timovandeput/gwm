@@ -33,11 +33,11 @@ GWM provides a streamlined interface for:
 
 ### 3.1 Worktree Management
 
-#### 3.1.1 Add Worktree
+#### 3.1.1 Create Worktree
 
 Create a new worktree with automatic directory navigation.
 
-**Usage**: `gwm add <branch-name> [options]`
+**Usage**: `gwm create <branch-name> [options]`
 
 **Behavior**:
 
@@ -49,7 +49,7 @@ Create a new worktree with automatic directory navigation.
 - Fails if branch doesn't exist (unless `-b` flag is used to create it)
 - Fails if worktree already exists
 - Copies configured files/directories from main repo
-- Executes `pre_add` and `post_add` hooks
+- Executes `pre_create` and `post_create` hooks
 - Automatically switches to the new worktree directory
 - Never creates worktrees inside a Git workspace directory
 
@@ -62,15 +62,15 @@ Create a new worktree with automatic directory navigation.
 
 ```bash
 # Create worktree from existing branch
-gwm add feature/new-ui
+gwm create feature/new-ui
 # Uses existing "feature/new-ui" branch (fails if branch doesn't exist)
 
 # Create worktree with new branch
-gwm add -b feature/authentication
+gwm create -b feature/authentication
 # Creates new "feature/authentication" Git branch and worktree
 
 # Error case: worktree already exists
-gwm add feature/new-ui
+gwm create feature/new-ui
 # Error: Worktree 'myrepo_feature_new-ui' already exists
 ```
 
@@ -219,7 +219,7 @@ Local configuration can override, prepend to, or append to settings from the per
     "directories": ["node_modules"]
   },
   "hooks": {
-    "post_add": ["npm install", "npm run build"],
+    "post_create": ["npm install", "npm run build"],
     "post_switch": ["npm run dev"]
   }
 }
@@ -230,14 +230,14 @@ Local configuration can override, prepend to, or append to settings from the per
     "files": [".env.local", ".secrets"]  // Additional files to copy
   },
   "hooks": {
-    "post_add_prepend": ["echo 'Local setup starting'"],  // Run before shared hooks
-    "post_add_append": ["npm run dev"]  // Run after shared hooks
+    "post_create_prepend": ["echo 'Local setup starting'"],  // Run before shared hooks
+    "post_create_append": ["npm run dev"]  // Run after shared hooks
   }
 }
 
 // Result when using .gwm.local.json:
 // copy.files = [".env", "*.env.*", ".env.local", ".secrets"]  // Merged
-// hooks.post_add = [
+// hooks.post_create = [
 //   "echo 'Local setup starting'",
 //   "npm install",
 //   "npm run build",
@@ -247,9 +247,9 @@ Local configuration can override, prepend to, or append to settings from the per
 
 **Override Strategies**:
 
-- **Complete Override**: Use the field name directly (e.g., `post_add = [...]`) to replace the entire value
-- **Prepend Items**: Use `_prepend` suffix (e.g., `post_add_prepend = [...]`) to add items before the shared list
-- **Append Items**: Use `_append` suffix (e.g., `post_add_append = [...]`) to add items after the shared list
+- **Complete Override**: Use the field name directly (e.g., `post_create = [...]`) to replace the entire value
+- **Prepend Items**: Use `_prepend` suffix (e.g., `post_create_prepend = [...]`) to add items before the shared list
+- **Append Items**: Use `_append` suffix (e.g., `post_create_append = [...]`) to add items after the shared list
 
 **Configuration Hierarchy** (highest to lowest priority):
 
@@ -288,10 +288,10 @@ Local configuration can override, prepend to, or append to settings from the per
     ]
   },
   "hooks": {
-    "pre_add": [
+    "pre_create": [
       "echo 'Creating worktree...'"
     ],
-    "post_add": [
+    "post_create": [
       "npm install",
       "npm run build"
     ],
@@ -328,10 +328,10 @@ Local configuration can override, prepend to, or append to settings from the per
     ]
   },
   "hooks": {
-    "post_add_prepend": [
+    "post_create_prepend": [
       "echo 'Local setup starting'"
     ],
-    "post_add_append": [
+    "post_create_append": [
       "npm run dev"
     ]
   }
@@ -358,10 +358,10 @@ Local configuration can override, prepend to, or append to settings from the per
     ]
   },
   "hooks": {
-    "pre_add": [
+    "pre_create": [
       "echo 'Creating worktree...'"
     ],
-    "post_add": [
+    "post_create": [
       "echo 'Local setup starting'",  // From .gwm.local.json (prepended)
       "npm install",
       "npm run build",
@@ -410,9 +410,9 @@ copy:
     - ".cache"
     - "build/*"
 hooks:
-  pre_add:
+  pre_create:
     - "echo 'Creating worktree...'"
-  post_add:
+  post_create:
     - "npm install"
     - "npm run build"
   pre_switch:
@@ -436,9 +436,9 @@ copy:
     - ".env.local"
     - ".secrets"
 hooks:
-  post_add_prepend:
+  post_create_prepend:
     - "echo 'Local setup starting'"
-  post_add_append:
+  post_create_append:
     - "npm run dev"
 ```
 
@@ -481,8 +481,8 @@ GWM automatically selects the best copy strategy based on the operating system a
 
 | Hook          | When Executed                          | Environment Variables                  |
 |---------------|----------------------------------------|----------------------------------------|
-| `pre_add`     | Before creating worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
-| `post_add`    | After creating worktree                | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `pre_create`     | Before creating worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_create`    | After creating worktree                | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `pre_switch`  | Before switching worktree              | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `post_switch` | After switching worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `pre_delete`  | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
@@ -520,7 +520,7 @@ When an external command fails (non-zero exit status):
   "version": "1.0",
   "hooks": {
     "timeout": 30,
-    "post_add": [
+    "post_create": [
       "npm install",
       "npm run build"
     ]
@@ -534,7 +534,7 @@ When an external command fails (non-zero exit status):
 {
   "version": "1.0",
   "hooks": {
-    "post_add": {
+    "post_create": {
       "timeout": 120,
       "commands": [
         "npm install",
@@ -550,7 +550,7 @@ When an external command fails (non-zero exit status):
 ```json
 {
   "hooks": {
-    "post_add": [
+    "post_create": [
       "npm install",
       "npm run db:migrate",
       "echo 'Setup complete for $GWM_BRANCH'"
@@ -612,7 +612,7 @@ def --env gwm [...args] {
 Auto-completion support for:
 
 - Worktree names (list, switch commands) - includes "." for main workspace
-- Branch names (add command)
+- Branch names (create command)
 - Configuration options (config command)
 
 **Supported Shells**: bash, zsh, fish
@@ -725,8 +725,8 @@ This ensures full compatibility with Git and proper handling of all edge cases.
 ### 6.1 Basic Workflow
 
 ```bash
-# Start working on a new feature
-gwm add -b feature/new-ui
+gwm create -b feature
+gwm create -b feature/new-ui
 # Creates new "feature/new-ui" Git branch and worktree,
 # copies files, runs hooks, switches directory
 
@@ -743,9 +743,9 @@ gwm delete
 
 ```bash
 # Create multiple worktrees
-gwm add feature/auth
-gwm add feature/api
-gwm add bugfix/login
+gwm create feature/auth
+gwm create feature/api
+gwm create bugfix/login
 
 # Switch between worktrees
 gwm switch feature-auth  # or interactive: gwm switch
@@ -765,7 +765,7 @@ gwm delete
 
 ```bash
 # Terminal 1: Work on authentication
-gwm add feature/auth
+gwm create feature/auth
 # AI agent works in this worktree...
 
 # Terminal 2: Work on API
@@ -801,7 +801,7 @@ gwm list -v
     ]
   },
   "hooks": {
-    "post_add": [
+    "post_create": [
       "npm install",
       "npm run build"
     ],
@@ -820,10 +820,10 @@ gwm list -v
 {
   "version": "1.0",
   "hooks": {
-    "post_add_prepend": [
+    "post_create_prepend": [
       "echo 'Starting local setup...'"
     ],
-    "post_add_append": [
+    "post_create_append": [
       "npm run typecheck",
       "echo 'Local setup complete!'"
     ]
@@ -833,7 +833,7 @@ gwm list -v
 
 ```bash
 # Create new worktree with automatic setup
-gwm add feature/new-component
+gwm create feature/new-component
 # Automatically:
 # 1. Creates worktree in ~/work/worktrees/project_feature-new-component/
 # 2. Copies .env and node_modules from main repo
@@ -852,7 +852,7 @@ gwm add feature/new-component
 # - Exit with code 5 (hook execution failed)
 # - Leave the worktree in partial state
 # Example error:
-# ✗ Hook 'post_add' failed: Command 'npm install' exited with status 1
+# ✗ Hook `post_create` failed: Command 'npm install' exited with status 1
 # npm ERR! missing script: install
 ```
 
@@ -909,8 +909,8 @@ The following decisions have been made for the implementation:
 
 | Command               | Description                                             |
 |-----------------------|---------------------------------------------------------|
-| `gwm add <branch>`    | Create worktree from existing branch                    |
-| `gwm add -b <branch>` | Create new Git branch and worktree                      |
+| `gwm create <branch>`    | Create worktree from existing branch                    |
+| `gwm create -b <branch>` | Create new Git branch and worktree                      |
 | `gwm switch [name]`   | Switch to worktree (use "." for main, interactive if no name) |
 | `gwm delete [--force]` | Delete current worktree and return to main repo         |
 | `gwm list [-v|-j]`    | List all worktrees (includes main workspace as ".")     |
@@ -965,10 +965,10 @@ The following decisions have been made for the implementation:
     ]
   },
   "hooks": {
-    "pre_add": [
+    "pre_create": [
       "echo 'Setting up worktree...'"
     ],
-    "post_add": [
+    "post_create": [
       "npm install",
       "npm run build"
     ],
@@ -997,7 +997,7 @@ The following decisions have been made for the implementation:
 {
   "version": "1.0",
   "hooks": {
-    "post_add_append": [
+    "post_create_append": [
       "npm run typecheck"
     ]
   }
@@ -1010,7 +1010,7 @@ The following decisions have been made for the implementation:
 {
   "version": "1.0",
   "hooks": {
-    "post_add": {
+    "post_create": {
       "timeout": 120,
       "commands": [
         "npm install",
@@ -1025,7 +1025,7 @@ The following decisions have been made for the implementation:
 
 **Issue**: Worktree creation fails with "branch not found"
 
-- **Solution**: Use `-b` flag to create a new Git branch before creating the worktree (e.g., `gwm add -b feature/new-ui`), or ensure the branch exists locally
+- **Solution**: Use `-b` flag to create a new Git branch before creating the worktree (e.g., `gwm create -b feature/new-ui`), or ensure the branch exists locally
 
 **Issue**: Automatic directory switching doesn't work
 
@@ -1043,8 +1043,8 @@ The following decisions have been made for the implementation:
 
 - **Solution**: GWM will display the error output from the failed command. Review the output to understand the failure, fix the issue, and retry. Example:
   ```
-  gwm add feature/new-ui
-  ✗ Hook 'post_add' failed: Command 'npm install' exited with status 1
+  gwm create feature/new-ui
+  ✗ Hook `post_create` failed: Command 'npm install' exited with status 1
   npm ERR! missing script: install
   ```
 

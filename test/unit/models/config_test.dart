@@ -11,7 +11,7 @@ void main() {
 
     final hooksConfig = HooksConfig(
       timeout: 30,
-      postAdd: Hook.fromList(['npm install']),
+      postCreate: Hook.fromList(['npm install']),
     );
 
     final shellConfig = ShellIntegrationConfig(enableEvalOutput: true);
@@ -82,14 +82,14 @@ void main() {
   group('HooksConfig', () {
     final config = HooksConfig(
       timeout: 30,
-      preAdd: Hook.fromList(['echo starting']),
-      postAdd: Hook.fromList(['npm install']),
+      preCreate: Hook.fromList(['echo starting']),
+      postCreate: Hook.fromList(['npm install']),
     );
 
     test('creates hooks config with correct properties', () {
       expect(config.timeout, equals(30));
-      expect(config.preAdd, isNotNull);
-      expect(config.postAdd, isNotNull);
+      expect(config.preCreate, isNotNull);
+      expect(config.postCreate, isNotNull);
       expect(config.preSwitch, isNull);
     });
 
@@ -97,14 +97,14 @@ void main() {
       final updated = config.copyWith(timeout: 60);
 
       expect(updated.timeout, equals(60));
-      expect(updated.preAdd, equals(config.preAdd));
+      expect(updated.preCreate, equals(config.preCreate));
     });
 
     test('equality works correctly', () {
       final sameConfig = HooksConfig(
         timeout: 30,
-        preAdd: Hook.fromList(['echo starting']),
-        postAdd: Hook.fromList(['npm install']),
+        preCreate: Hook.fromList(['echo starting']),
+        postCreate: Hook.fromList(['npm install']),
       );
 
       expect(config, equals(sameConfig));

@@ -126,17 +126,17 @@ class SwitchCommand extends BaseCommand {
           }
         }
 
-        // Execute pre-add hooks (for reconfiguration)
-        if (config?.hooks.preAdd != null) {
+        // Execute pre-create hooks (for reconfiguration)
+        if (config?.hooks.preCreate != null) {
           try {
-            await _hookService.executePreAdd(
+            await _hookService.executePreCreate(
               config!.hooks,
               targetWorktree.path,
               repoRoot!,
               targetWorktree.branch,
             );
           } catch (e) {
-            printSafe('Error: Pre-add hook failed: $e');
+            printSafe('Error: Pre-create hook failed: $e');
             return ExitCode.hookFailed;
           }
         }
@@ -144,10 +144,10 @@ class SwitchCommand extends BaseCommand {
         // Output the cd command for shell integration
         _shellIntegration.outputCdCommand(targetWorktree.path);
 
-        // Execute post-add hooks (for reconfiguration)
-        if (config?.hooks.postAdd != null) {
+        // Execute post-create hooks (for reconfiguration)
+        if (config?.hooks.postCreate != null) {
           try {
-            await _hookService.executePostAdd(
+            await _hookService.executePostCreate(
               config!.hooks,
               targetWorktree.path,
               repoRoot!,

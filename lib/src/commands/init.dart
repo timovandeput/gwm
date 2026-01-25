@@ -69,8 +69,8 @@ class InitCommand extends BaseCommand {
         'copy': {'files': <String>[], 'directories': <String>[]},
         'hooks': {
           'timeout': 30,
-          'preAdd': <String>[],
-          'postAdd': <String>[],
+          'preCreate': <String>[],
+          'postCreate': <String>[],
           'preSwitch': <String>[],
           'postSwitch': <String>[],
           'preDelete': <String>[],

@@ -81,8 +81,8 @@ void validateConfigFile(Map<String, dynamic> config, String configPath) {
 
     // Validate individual hooks
     final hookNames = [
-      'preAdd',
-      'postAdd',
+      'preCreate',
+      'postCreate',
       'preSwitch',
       'postSwitch',
       'preDelete',

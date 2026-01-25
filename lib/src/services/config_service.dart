@@ -282,8 +282,8 @@ class ConfigService {
 
     return HooksConfig(
       timeout: timeout,
-      preAdd: _parseHook(hooks['preAdd']),
-      postAdd: _parseHook(hooks['postAdd']),
+      preCreate: _parseHook(hooks['preCreate']),
+      postCreate: _parseHook(hooks['postCreate']),
       preSwitch: _parseHook(hooks['preSwitch']),
       postSwitch: _parseHook(hooks['postSwitch']),
       preDelete: _parseHook(hooks['preDelete']),

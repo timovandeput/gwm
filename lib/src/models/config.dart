@@ -109,10 +109,10 @@ class HooksConfig {
   final int timeout;
 
   /// Commands to run before creating a worktree
-  final Hook? preAdd;
+  final Hook? preCreate;
 
   /// Commands to run after creating a worktree
-  final Hook? postAdd;
+  final Hook? postCreate;
 
   /// Commands to run before switching worktrees
   final Hook? preSwitch;
@@ -128,8 +128,8 @@ class HooksConfig {
 
   const HooksConfig({
     required this.timeout,
-    this.preAdd,
-    this.postAdd,
+    this.preCreate,
+    this.postCreate,
     this.preSwitch,
     this.postSwitch,
     this.preDelete,
@@ -139,8 +139,8 @@ class HooksConfig {
   /// Creates a copy of this config with some fields updated.
   HooksConfig copyWith({
     int? timeout,
-    Hook? preAdd,
-    Hook? postAdd,
+    Hook? preCreate,
+    Hook? postCreate,
     Hook? preSwitch,
     Hook? postSwitch,
     Hook? preDelete,
@@ -148,8 +148,8 @@ class HooksConfig {
   }) {
     return HooksConfig(
       timeout: timeout ?? this.timeout,
-      preAdd: preAdd ?? this.preAdd,
-      postAdd: postAdd ?? this.postAdd,
+      preCreate: preCreate ?? this.preCreate,
+      postCreate: postCreate ?? this.postCreate,
       preSwitch: preSwitch ?? this.preSwitch,
       postSwitch: postSwitch ?? this.postSwitch,
       preDelete: preDelete ?? this.preDelete,
@@ -163,8 +163,8 @@ class HooksConfig {
 
     return other is HooksConfig &&
         other.timeout == timeout &&
-        other.preAdd == preAdd &&
-        other.postAdd == postAdd &&
+        other.preCreate == preCreate &&
+        other.postCreate == postCreate &&
         other.preSwitch == preSwitch &&
         other.postSwitch == postSwitch &&
         other.preDelete == preDelete &&
@@ -174,8 +174,8 @@ class HooksConfig {
   @override
   int get hashCode {
     return timeout.hashCode ^
-        preAdd.hashCode ^
-        postAdd.hashCode ^
+        preCreate.hashCode ^
+        postCreate.hashCode ^
         preSwitch.hashCode ^
         postSwitch.hashCode ^
         preDelete.hashCode ^
@@ -184,7 +184,7 @@ class HooksConfig {
 
   @override
   String toString() {
-    return 'HooksConfig(timeout: $timeout, preAdd: $preAdd, postAdd: $postAdd, '
+    return 'HooksConfig(timeout: $timeout, preCreate: $preCreate, postCreate: $postCreate, '
         'preSwitch: $preSwitch, postSwitch: $postSwitch, '
         'preDelete: $preDelete, postDelete: $postDelete)';
   }

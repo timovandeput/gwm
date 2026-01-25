@@ -273,8 +273,8 @@ void main() {
           'copy.files',
           'copy.directories',
           'hooks.timeout',
-          'hooks.pre_add',
-          'hooks.post_add',
+          'hooks.pre_create',
+          'hooks.post_create',
           'hooks.pre_switch',
           'hooks.post_switch',
           'hooks.pre_delete',
@@ -288,7 +288,7 @@ void main() {
       test('returns expected subcommands', () {
         final completions = completionService.getCommandCompletions();
 
-        expect(completions, ['add', 'switch', 'delete', 'list']);
+        expect(completions, ['create', 'switch', 'delete', 'list']);
       });
     });
 
@@ -298,7 +298,7 @@ void main() {
         () async {
           final completions = await completionService.getCompletions();
 
-          expect(completions, ['add', 'switch', 'delete', 'list']);
+          expect(completions, ['create', 'switch', 'delete', 'list']);
         },
       );
 
@@ -325,7 +325,7 @@ void main() {
       );
 
       test(
-        'returns branch completions for add command at position 0',
+        'returns branch completions for create command at position 0',
         () async {
           final mockBranches = ['main', 'feature/auth', 'develop'];
           when(
@@ -333,7 +333,7 @@ void main() {
           ).thenAnswer((_) async => mockBranches);
 
           final completions = await completionService.getCompletions(
-            command: 'add',
+            command: 'create',
             position: 0,
           );
 
@@ -343,7 +343,7 @@ void main() {
       );
 
       test(
-        'returns filtered branch completions for add command with partial input',
+        'returns filtered branch completions for create command with partial input',
         () async {
           final mockBranches = [
             'main',
@@ -356,7 +356,7 @@ void main() {
           ).thenAnswer((_) async => mockBranches);
 
           final completions = await completionService.getCompletions(
-            command: 'add',
+            command: 'create',
             partial: 'feature',
             position: 0,
           );
@@ -423,7 +423,7 @@ void main() {
         ).thenThrow(Exception('Git error'));
 
         final completions = await completionService.getCompletions(
-          command: 'add',
+          command: 'create',
           position: 0,
         );
 

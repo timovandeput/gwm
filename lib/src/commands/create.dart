@@ -14,17 +14,17 @@ import '../utils/eval_validator.dart';
 import '../exceptions.dart';
 import '../cli_utils.dart';
 
-/// Command for adding a new Git worktree.
+/// Command for creating a new Git worktree.
 ///
-/// Usage: gwm add `<branch>` [options]
-class AddCommand extends BaseCommand {
+/// Usage: gwm create `<branch>` [options]
+class CreateCommand extends BaseCommand {
   final WorktreeService _worktreeService;
   final ConfigService _configService;
   final ShellIntegration _shellIntegration;
   final HookService _hookService;
   final GitClient _gitClient;
 
-  AddCommand(
+  CreateCommand(
     this._worktreeService,
     this._configService,
     this._shellIntegration,
@@ -36,7 +36,7 @@ class AddCommand extends BaseCommand {
   ArgParser get parser {
     return ArgParser()
       ..addFlag(
-        'create-branch',
+        'branch',
         abbr: 'b',
         help: 'Create the branch if it does not exist.',
       )
@@ -52,8 +52,8 @@ class AddCommand extends BaseCommand {
   Future<ExitCode> execute(ArgResults results) async {
     if (results.flag('help')) {
       printCommandUsage(
-        'add <branch> [options]',
-        'Add a new Git worktree for the specified branch.',
+        'create <branch> [options]',
+        'Create a new Git worktree for the specified branch.',
         parser,
       );
       return ExitCode.success;
@@ -62,12 +62,12 @@ class AddCommand extends BaseCommand {
     final args = results.rest;
     if (args.isEmpty) {
       printSafe('Error: Branch name is required.');
-      printSafe('Usage: gwm add <branch> [options]');
+      printSafe('Usage: gwm create <branch> [options]');
       return ExitCode.invalidArguments;
     }
 
     final branch = args[0];
-    final createBranch = results.flag('create-branch');
+    final createBranch = results.flag('branch');
 
     try {
       // Validate we're in eval wrapper
@@ -78,7 +78,7 @@ class AddCommand extends BaseCommand {
       final config = await _configService.loadConfig(repoRoot: repoRoot);
 
       // Use the worktree service to create the worktree
-      final exitCode = await _worktreeService.addWorktree(
+      final exitCode = await _worktreeService.createWorktree(
         branch,
         createBranch: createBranch,
         config: config,

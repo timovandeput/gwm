@@ -207,7 +207,7 @@ def --env gwm [...args] {
 gwm init
 
 # Create a worktree with a new branch 🌳
-gwm add -b feature/new-ui
+gwm create -b feature/new-ui
 
 # List all worktrees 📋
 gwm list -v
@@ -269,7 +269,7 @@ Configuration files can be in JSON or YAML format. GWM automatically detects the
   },
   "hooks": {
     "timeout": 60,
-    "post_add": [
+    "post_create": [
       "npm install",
       "npm run build"
     ],
@@ -287,7 +287,7 @@ this to copy git-ignored local configuration files or large directories like `no
 and directory specification supports glob patterns (`*` and `**`) for flexible matching.
 
 The `hooks` section allows defining shell commands that run at specific points during worktree operations.
-Hooks are defined for `pre_add`, `post_add`, `pre_switch`, `post_switch`, `pre_delete`, and `post_delete` events. By
+Hooks are defined for `pre_create`, `post_create`, `pre_switch`, `post_switch`, `pre_delete`, and `post_delete` events. By
 appending `_prepend` or `_append` to the hook name, you can add commands to the beginning or end of the hook instead of
 overriding it.
 
@@ -299,8 +299,8 @@ the worktree and origin paths:
 
 | Hook          | When Executed                          | Environment Variables                  |
 |---------------|----------------------------------------|----------------------------------------|
-| `pre_add`     | Before creating worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
-| `post_add`    | After creating worktree                | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `pre_create`  | Before creating worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
+| `post_create` | After creating worktree                | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `pre_switch`  | Before switching worktree              | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `post_switch` | After switching worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
 | `pre_delete`  | Before deleting worktree               | `GWM_WORKTREE_PATH`, `GWM_ORIGIN_PATH` |
@@ -338,10 +338,10 @@ GWM creates worktrees in a shared directory structure:
 
 ```bash
 # Create worktree with new branch 🌳
-gwm add -b feature/new-ui
+gwm create -b feature/new-ui
 
 # Work on feature...
-# Directory is already switched by gwm add
+# Directory is already switched by gwm create
 
 # Clean up when done 🧹
 gwm delete 
@@ -351,9 +351,9 @@ gwm delete
 
 ```bash
 # Create multiple worktrees 🌳
-gwm add feature/auth
-gwm add feature/api
-gwm add bugfix/login
+gwm create feature/auth
+gwm create feature/api
+gwm create bugfix/login
 
 # Switch between worktrees 🔄
 gwm switch feature-auth
@@ -369,7 +369,7 @@ gwm list -v
 
 ```bash
 # Terminal 1: Work on authentication 🤖
-gwm add feature/auth
+gwm create feature/auth
 
 # Terminal 2: Work on API 🤖
 gwm switch feature-api
@@ -453,7 +453,7 @@ dart test --coverage=coverage
 Use `-b` flag to create a new Git branch before creating the worktree:
 
 ```bash
-gwm add -b feature/new-ui
+gwm create -b feature/new-ui
 ```
 
 ### Automatic directory switching doesn't work ⚠️

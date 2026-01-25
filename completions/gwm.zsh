@@ -15,7 +15,7 @@
 #
 # Usage:
 #   Complete commands, subcommands, worktree names, and branch names.
-#   Works with: gwm add <TAB>, gwm switch <TAB>, etc.
+#   Works with: gwm create <TAB>, gwm switch <TAB>, etc.
 
 _gwm() {
     local completions

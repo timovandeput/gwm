@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:gwm/src/commands/add.dart';
+import 'package:gwm/src/commands/create.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/services/worktree_service.dart';
 import 'package:gwm/src/services/config_service.dart';
@@ -27,7 +27,7 @@ void main() {
   late MockShellIntegration mockShellIntegration;
   late MockHookService mockHookService;
   late MockGitClient mockGitClient;
-  late AddCommand addCommand;
+  late CreateCommand createCommand;
 
   setUp(() {
     mockWorktreeService = MockWorktreeService();
@@ -36,7 +36,7 @@ void main() {
     mockHookService = MockHookService();
     mockGitClient = MockGitClient();
 
-    addCommand = AddCommand(
+    createCommand = CreateCommand(
       mockWorktreeService,
       mockConfigService,
       mockShellIntegration,
@@ -61,31 +61,28 @@ void main() {
     ).thenAnswer((_) async => '/mock/repo/root');
   });
 
-  group('AddCommand', () {
+  group('CreateCommand', () {
     test('shows help message when --help flag is provided', () async {
-      final results = addCommand.parser.parse(['--help']);
-      final exitCode = await addCommand.execute(results);
+      final results = createCommand.parser.parse(['--help']);
+      final exitCode = await createCommand.execute(results);
       expect(exitCode, ExitCode.success);
     });
 
     test('returns invalidArguments when no branch is provided', () async {
-      final results = addCommand.parser.parse([]);
-      final exitCode = await addCommand.execute(results);
+      final results = createCommand.parser.parse([]);
+      final exitCode = await createCommand.execute(results);
       expect(exitCode, ExitCode.invalidArguments);
     });
 
-    test(
-      'returns invalidArguments when too many arguments are provided',
-      () async {
-        final results = addCommand.parser.parse(['branch1', 'branch2']);
-        final exitCode = addCommand.validate(results);
-        expect(exitCode, ExitCode.invalidArguments);
-      },
-    );
+    test('returns invalidArguments when too many arguments are provided', () {
+      final results = createCommand.parser.parse(['branch1', 'branch2']);
+      final exitCode = createCommand.validate(results);
+      expect(exitCode, ExitCode.invalidArguments);
+    });
 
     test('calls worktreeService.addWorktree with correct arguments', () async {
       const branch = 'feature/test';
-      final results = addCommand.parser.parse([branch]);
+      final results = createCommand.parser.parse([branch]);
 
       when(
         () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
@@ -99,7 +96,7 @@ void main() {
       );
 
       when(
-        () => mockWorktreeService.addWorktree(
+        () => mockWorktreeService.createWorktree(
           branch,
           createBranch: false,
           config: any(named: 'config'),
@@ -110,11 +107,11 @@ void main() {
         () => mockWorktreeService.getWorktreePath(branch),
       ).thenAnswer((_) async => '/worktree/path');
 
-      final exitCode = await addCommand.execute(results);
+      final exitCode = await createCommand.execute(results);
 
       expect(exitCode, ExitCode.success);
       verify(
-        () => mockWorktreeService.addWorktree(
+        () => mockWorktreeService.createWorktree(
           branch,
           createBranch: false,
           config: any(named: 'config'),
@@ -129,7 +126,7 @@ void main() {
       'calls worktreeService.addWorktree with createBranch true when -b flag is provided',
       () async {
         const branch = 'feature/test';
-        final results = addCommand.parser.parse(['-b', branch]);
+        final results = createCommand.parser.parse(['-b', branch]);
 
         when(
           () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
@@ -143,7 +140,7 @@ void main() {
         );
 
         when(
-          () => mockWorktreeService.addWorktree(
+          () => mockWorktreeService.createWorktree(
             branch,
             createBranch: true,
             config: any(named: 'config'),
@@ -154,11 +151,11 @@ void main() {
           () => mockWorktreeService.getWorktreePath(branch),
         ).thenAnswer((_) async => '/worktree/path');
 
-        final exitCode = await addCommand.execute(results);
+        final exitCode = await createCommand.execute(results);
 
         expect(exitCode, ExitCode.success);
         verify(
-          () => mockWorktreeService.addWorktree(
+          () => mockWorktreeService.createWorktree(
             branch,
             createBranch: true,
             config: any(named: 'config'),
@@ -172,7 +169,7 @@ void main() {
 
     test('returns exit code from worktreeService.addWorktree', () async {
       const branch = 'feature/test';
-      final results = addCommand.parser.parse([branch]);
+      final results = createCommand.parser.parse([branch]);
 
       when(
         () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
@@ -186,14 +183,14 @@ void main() {
       );
 
       when(
-        () => mockWorktreeService.addWorktree(
+        () => mockWorktreeService.createWorktree(
           branch,
           createBranch: false,
           config: any(named: 'config'),
         ),
       ).thenAnswer((_) async => ExitCode.gitFailed);
 
-      final exitCode = await addCommand.execute(results);
+      final exitCode = await createCommand.execute(results);
 
       expect(exitCode, ExitCode.gitFailed);
       verifyNever(() => mockShellIntegration.outputWorktreeCreated(any()));
@@ -203,7 +200,7 @@ void main() {
       'switches to existing worktree when worktree already exists',
       () async {
         const branch = 'existing-feature';
-        final results = addCommand.parser.parse([branch]);
+        final results = createCommand.parser.parse([branch]);
 
         when(
           () => mockConfigService.loadConfig(repoRoot: any(named: 'repoRoot')),
@@ -217,7 +214,7 @@ void main() {
         );
 
         when(
-          () => mockWorktreeService.addWorktree(
+          () => mockWorktreeService.createWorktree(
             branch,
             createBranch: false,
             config: any(named: 'config'),
@@ -228,7 +225,7 @@ void main() {
           () => mockWorktreeService.getWorktreePath(branch),
         ).thenAnswer((_) async => '/existing/worktree/path');
 
-        final exitCode = await addCommand.execute(results);
+        final exitCode = await createCommand.execute(results);
 
         expect(exitCode, ExitCode.worktreeExistsButSwitched);
         verify(

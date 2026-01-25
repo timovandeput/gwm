@@ -10,7 +10,7 @@
 #
 # Usage:
 #   Complete commands, subcommands, worktree names, and branch names.
-#   Works with: gwm add <TAB>, gwm switch <TAB>, etc.
+#   Works with: gwm create <TAB>, gwm switch <TAB>, etc.
 
 _gwm_complete() {
     local cur prev words cword
@@ -21,7 +21,7 @@ _gwm_complete() {
     if commands=$(gwm --complete 2>/dev/null); then
         commands=$(echo "$commands" | tr '\n' ' ')
     else
-        commands="add switch delete list"
+        commands="create switch delete list"
     fi
     opts="--help --verbose --version --no-eval-check --complete"
 
@@ -41,11 +41,11 @@ _gwm_complete() {
     # If we found a command, complete based on that command and position
     if [[ -n "$cmd" ]]; then
         case "$cmd" in
-            add)
-                # Complete branch names for add command
+            create)
+                # Complete branch names for create command
                 if [[ $cword -ge $arg_pos ]]; then
                     local branches
-                    if branches=$(gwm --complete add "$cur" $((cword - arg_pos)) 2>/dev/null); then
+                    if branches=$(gwm --complete create "$cur" $((cword - arg_pos)) 2>/dev/null); then
                         COMPREPLY=($(compgen -W "$branches" -- "$cur"))
                     fi
                 fi

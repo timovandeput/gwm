@@ -20,14 +20,14 @@ class WorktreeService {
 
   WorktreeService(this._gitClient, this._hookService, this._copyService);
 
-  /// Adds a new worktree for the specified branch.
+  /// Create a new worktree for the specified branch.
   ///
   /// [branch] is the name of the Git branch to create the worktree for.
   /// [createBranch] if true, creates the branch if it doesn't exist.
   /// [config] contains the configuration including hooks to execute.
   ///
   /// Returns the exit code indicating success or the type of failure.
-  Future<ExitCode> addWorktree(
+  Future<ExitCode> createWorktree(
     String branch, {
     bool createBranch = false,
     Config? config,
@@ -66,17 +66,17 @@ class WorktreeService {
               await parentDir.create(recursive: true);
             }
 
-            // Execute pre-add hooks
-            if (config?.hooks.preAdd != null) {
+            // Execute pre-create hooks
+            if (config?.hooks.preCreate != null) {
               try {
-                await _hookService.executePreAdd(
+                await _hookService.executePreCreate(
                   config!.hooks,
                   worktreePath,
                   originPath,
                   branch,
                 );
               } catch (e) {
-                printSafe('Error: Pre-add hook failed: $e');
+                printSafe('Error: Pre-create hook failed: $e');
                 return ExitCode.hookFailed;
               }
             }
@@ -111,17 +111,17 @@ class WorktreeService {
               }
             }
 
-            // Execute post-add hooks
-            if (config?.hooks.postAdd != null) {
+            // Execute post-create hooks
+            if (config?.hooks.postCreate != null) {
               try {
-                await _hookService.executePostAdd(
+                await _hookService.executePostCreate(
                   config!.hooks,
                   actualPath,
                   originPath,
                   branch,
                 );
               } catch (e) {
-                printSafe('Error: Post-add hook failed: $e');
+                printSafe('Error: Post-create hook failed: $e');
                 return ExitCode.hookFailed;
               }
             }
@@ -160,17 +160,17 @@ class WorktreeService {
         await parentDir.create(recursive: true);
       }
 
-      // Execute pre-add hooks
-      if (config?.hooks.preAdd != null) {
+      // Execute pre-create hooks
+      if (config?.hooks.preCreate != null) {
         try {
-          await _hookService.executePreAdd(
+          await _hookService.executePreCreate(
             config!.hooks,
             worktreePath,
             originPath,
             branch,
           );
         } catch (e) {
-          printSafe('Error: Pre-add hook failed: $e');
+          printSafe('Error: Pre-create hook failed: $e');
           return ExitCode.hookFailed;
         }
       }
@@ -198,17 +198,17 @@ class WorktreeService {
         }
       }
 
-      // Execute post-add hooks
-      if (config?.hooks.postAdd != null) {
+      // Execute post-create hooks
+      if (config?.hooks.postCreate != null) {
         try {
-          await _hookService.executePostAdd(
+          await _hookService.executePostCreate(
             config!.hooks,
             actualPath,
             originPath,
             branch,
           );
         } catch (e) {
-          printSafe('Error: Post-add hook failed: $e');
+          printSafe('Error: Post-create hook failed: $e');
           return ExitCode.hookFailed;
         }
       }

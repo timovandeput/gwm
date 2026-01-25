@@ -37,7 +37,7 @@ void main() {
         expect(config.copy.files, isEmpty);
         expect(config.copy.directories, isEmpty);
         expect(config.hooks.timeout, 30);
-        expect(config.hooks.preAdd, isNull);
+        expect(config.hooks.preCreate, isNull);
         expect(config.shellIntegration.enableEvalOutput, false);
       });
 
@@ -110,14 +110,14 @@ shellIntegration:
 {
   "version": "1.0",
   "hooks": {
-    "postAdd": ["echo 'repo hook'"]
+    "postCreate": ["echo 'repo hook'"]
   }
 }
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, ['echo \'repo hook\'']);
+        expect(config.hooks.postCreate?.commands, ['echo \'repo hook\'']);
       });
 
       test('loads local config with higher priority', () async {
@@ -125,7 +125,7 @@ shellIntegration:
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": ["echo 'repo hook'"]
+    "postCreate": ["echo 'repo hook'"]
   }
 }
 ''');
@@ -134,14 +134,14 @@ shellIntegration:
         localConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": ["echo 'local hook'"]
+    "postCreate": ["echo 'local hook'"]
   }
 }
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, ['echo \'local hook\'']);
+        expect(config.hooks.postCreate?.commands, ['echo \'local hook\'']);
       });
 
       test(
@@ -162,7 +162,7 @@ shellIntegration:
   },
   "hooks": {
     "timeout": 30,
-    "postAdd": ["echo 'global'"]
+    "postCreate": ["echo 'global'"]
   }
 }
 ''');
@@ -175,7 +175,7 @@ shellIntegration:
     "files": ["repo.md"]
   },
   "hooks": {
-    "postAdd": ["echo 'repo'"]
+    "postCreate": ["echo 'repo'"]
   }
 }
 ''');
@@ -188,7 +188,7 @@ shellIntegration:
     "files": ["local.md"]
   },
   "hooks": {
-    "postAdd": ["echo 'local'"]
+    "postCreate": ["echo 'local'"]
   }
 }
 ''');
@@ -197,7 +197,7 @@ shellIntegration:
 
           expect(config.copy.files, ['local.md']); // Local overrides
           expect(config.hooks.timeout, 30); // From global
-          expect(config.hooks.postAdd?.commands, [
+          expect(config.hooks.postCreate?.commands, [
             'echo \'local\'',
           ]); // Local overrides
         },
@@ -210,7 +210,7 @@ shellIntegration:
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": ["echo 'repo'"]
+    "postCreate": ["echo 'repo'"]
   }
 }
 ''');
@@ -219,14 +219,14 @@ shellIntegration:
         localConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd_prepend": ["echo 'local prepend'"]
+    "postCreate_prepend": ["echo 'local prepend'"]
   }
 }
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, [
+        expect(config.hooks.postCreate?.commands, [
           'echo \'local prepend\'',
           'echo \'repo\'',
         ]);
@@ -237,7 +237,7 @@ shellIntegration:
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": ["echo 'repo'"]
+    "postCreate": ["echo 'repo'"]
   }
 }
 ''');
@@ -246,14 +246,14 @@ shellIntegration:
         localConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd_append": ["echo 'local append'"]
+    "postCreate_append": ["echo 'local append'"]
   }
 }
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, [
+        expect(config.hooks.postCreate?.commands, [
           'echo \'repo\'',
           'echo \'local append\'',
         ]);
@@ -264,7 +264,7 @@ shellIntegration:
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": ["echo 'repo'"]
+    "postCreate": ["echo 'repo'"]
   }
 }
 ''');
@@ -273,15 +273,15 @@ shellIntegration:
         localConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd_prepend": ["echo 'prepend'"],
-    "postAdd_append": ["echo 'append'"]
+    "postCreate_prepend": ["echo 'prepend'"],
+    "postCreate_append": ["echo 'append'"]
   }
 }
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, [
+        expect(config.hooks.postCreate?.commands, [
           'echo \'prepend\'',
           'echo \'repo\'',
           'echo \'append\'',
@@ -293,7 +293,7 @@ shellIntegration:
         repoConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": {
+    "postCreate": {
       "commands": ["echo 'repo'"],
       "timeout": 45
     }
@@ -305,20 +305,20 @@ shellIntegration:
         localConfig.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd_prepend": ["echo 'prepend'"],
-    "postAdd_append": ["echo 'append'"]
+    "postCreate_prepend": ["echo 'prepend'"],
+    "postCreate_append": ["echo 'append'"]
   }
 }
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, [
+        expect(config.hooks.postCreate?.commands, [
           'echo \'prepend\'',
           'echo \'repo\'',
           'echo \'append\'',
         ]);
-        expect(config.hooks.postAdd?.timeout, 45);
+        expect(config.hooks.postCreate?.timeout, 45);
       });
     });
 
@@ -328,18 +328,18 @@ shellIntegration:
         configFile.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": ["echo 'hello'", "echo 'world'"]
+    "postCreate": ["echo 'hello'", "echo 'world'"]
   }
 }
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, [
+        expect(config.hooks.postCreate?.commands, [
           'echo \'hello\'',
           'echo \'world\'',
         ]);
-        expect(config.hooks.postAdd?.timeout, isNull);
+        expect(config.hooks.postCreate?.timeout, isNull);
       });
 
       test('supports object format hooks', () async {
@@ -347,7 +347,7 @@ shellIntegration:
         configFile.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": {
+    "postCreate": {
       "commands": ["echo 'hello'"],
       "timeout": 120
     }
@@ -357,8 +357,8 @@ shellIntegration:
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, ['echo \'hello\'']);
-        expect(config.hooks.postAdd?.timeout, 120);
+        expect(config.hooks.postCreate?.commands, ['echo \'hello\'']);
+        expect(config.hooks.postCreate?.timeout, 120);
       });
 
       test('supports string format hooks', () async {
@@ -366,15 +366,15 @@ shellIntegration:
         configFile.writeAsStringSync('''
 {
   "hooks": {
-    "postAdd": "echo 'single command'"
+    "postCreate": "echo 'single command'"
   }
 }
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, ['echo \'single command\'']);
-        expect(config.hooks.postAdd?.timeout, isNull);
+        expect(config.hooks.postCreate?.commands, ['echo \'single command\'']);
+        expect(config.hooks.postCreate?.timeout, isNull);
       });
 
       test('supports string format hooks in YAML', () async {
@@ -382,15 +382,15 @@ shellIntegration:
         configFile.writeAsStringSync('''
 version: "1.0"
 hooks:
-  postAdd: "echo 'yaml single command'"
+  postCreate: "echo 'yaml single command'"
 ''');
 
         final config = await configService.loadConfig(repoRoot: tempDir.path);
 
-        expect(config.hooks.postAdd?.commands, [
+        expect(config.hooks.postCreate?.commands, [
           'echo \'yaml single command\'',
         ]);
-        expect(config.hooks.postAdd?.timeout, isNull);
+        expect(config.hooks.postCreate?.timeout, isNull);
       });
     });
 

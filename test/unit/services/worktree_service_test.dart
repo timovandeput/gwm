@@ -82,7 +82,7 @@ void main() {
         });
 
         // Act
-        final result = await worktreeService.addWorktree(
+        final result = await worktreeService.createWorktree(
           branch,
           createBranch: true,
         );
@@ -118,7 +118,7 @@ void main() {
           ).thenAnswer((_) async => repoPath);
 
           // Act
-          final result = await worktreeService.addWorktree(branch);
+          final result = await worktreeService.createWorktree(branch);
 
           // Assert
           expect(result, ExitCode.worktreeExistsButSwitched);
@@ -139,7 +139,7 @@ void main() {
         when(() => mockGitClient.isWorktree()).thenAnswer((_) async => true);
 
         // Act
-        final result = await worktreeService.addWorktree(branch);
+        final result = await worktreeService.createWorktree(branch);
 
         // Assert
         expect(result, ExitCode.generalError);
@@ -173,7 +173,7 @@ void main() {
         ).thenThrow(Exception('Git command failed'));
 
         // Act
-        final result = await worktreeService.addWorktree(branch);
+        final result = await worktreeService.createWorktree(branch);
 
         // Assert
         expect(result, ExitCode.gitFailed);
@@ -204,7 +204,7 @@ void main() {
         });
 
         // Act
-        final result = await worktreeService.addWorktree(branch);
+        final result = await worktreeService.createWorktree(branch);
 
         // Assert
         expect(result, ExitCode.success);
@@ -250,7 +250,7 @@ void main() {
         ).thenAnswer((_) async {});
 
         // Act
-        final result = await worktreeService.addWorktree(
+        final result = await worktreeService.createWorktree(
           branch,
           config: config,
         );
@@ -300,7 +300,7 @@ void main() {
           ).thenAnswer((_) async {});
 
           // Act
-          final result = await worktreeService.addWorktree(branch);
+          final result = await worktreeService.createWorktree(branch);
 
           // Assert
           expect(result, ExitCode.success);
@@ -333,7 +333,7 @@ void main() {
           ).thenAnswer((_) async => '${tempDir.path}/repo');
 
           // Act
-          final result = await worktreeService.addWorktree(branch);
+          final result = await worktreeService.createWorktree(branch);
 
           // Assert
           expect(result, ExitCode.branchNotFound);

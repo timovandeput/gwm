@@ -16,21 +16,21 @@ class HookService {
 
   HookService(this._processWrapper);
 
-  /// Executes hooks for the 'preAdd' phase.
+  /// Executes hooks for the 'preCreate' phase.
   ///
   /// [config] contains the hook configuration.
   /// [worktreePath] is the path to the worktree being created.
   /// [originPath] is the path to the origin repository.
   /// [branch] is the branch name for the new worktree.
-  Future<void> executePreAdd(
+  Future<void> executePreCreate(
     HooksConfig config,
     String worktreePath,
     String originPath,
     String branch,
   ) async {
     await _executeHook(
-      config.preAdd,
-      'preAdd',
+      config.preCreate,
+      'preCreate',
       config.timeout,
       originPath, // Use origin path as working directory since worktree doesn't exist yet
       worktreePath,
@@ -39,21 +39,21 @@ class HookService {
     );
   }
 
-  /// Executes hooks for the 'postAdd' phase.
+  /// Executes hooks for the 'postCreate' phase.
   ///
   /// [config] contains the hook configuration.
   /// [worktreePath] is the path to the worktree that was created.
   /// [originPath] is the path to the origin repository.
   /// [branch] is the branch name for the new worktree.
-  Future<void> executePostAdd(
+  Future<void> executePostCreate(
     HooksConfig config,
     String worktreePath,
     String originPath,
     String branch,
   ) async {
     await _executeHook(
-      config.postAdd,
-      'postAdd',
+      config.postCreate,
+      'postCreate',
       config.timeout,
       worktreePath, // Worktree exists now
       worktreePath,

@@ -20,7 +20,7 @@ void main() {
       fakeProcessWrapper.clearResponses();
     });
 
-    group('executePreAdd with complex scenarios', () {
+    group('executePreCreate with complex scenarios', () {
       test(
         'executes multiple commands with environment variable expansion',
         () async {
@@ -39,14 +39,14 @@ void main() {
 
           final config = HooksConfig(
             timeout: 30,
-            preAdd: Hook.fromList([
+            preCreate: Hook.fromList([
               'echo "Worktree: \$GWM_WORKTREE_PATH"',
               'echo "Origin: \$GWM_ORIGIN_PATH"',
               'echo "Branch: \$GWM_BRANCH"',
             ]),
           );
 
-          await hookService.executePreAdd(
+          await hookService.executePreCreate(
             config,
             '/complex/worktree',
             '/complex/origin',
@@ -73,7 +73,7 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook.fromList([
+          preCreate: Hook.fromList([
             'echo "success"',
             'exit 1',
             'echo "should not execute"',
@@ -81,7 +81,7 @@ void main() {
         );
 
         expect(
-          () => hookService.executePreAdd(
+          () => hookService.executePreCreate(
             config,
             '/fake/worktree',
             '/fake/origin',
@@ -106,13 +106,13 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30, // Global timeout
-          preAdd: Hook(
+          preCreate: Hook(
             commands: ['echo "hook timeout test"'],
             timeout: 60, // Hook-specific timeout
           ),
         );
 
-        await hookService.executePreAdd(
+        await hookService.executePreCreate(
           config,
           '/fake/worktree',
           '/fake/origin',
@@ -122,7 +122,7 @@ void main() {
     });
 
     group('all hook phases', () {
-      test('executePostAdd works', () async {
+      test('executePostCreate works', () async {
         fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "post-add integration test"',
@@ -130,10 +130,10 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          postAdd: Hook.fromList(['echo "post-add integration test"']),
+          postCreate: Hook.fromList(['echo "post-add integration test"']),
         );
 
-        await hookService.executePostAdd(
+        await hookService.executePostCreate(
           config,
           '/fake/worktree',
           '/fake/origin',

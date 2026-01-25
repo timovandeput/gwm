@@ -21,8 +21,8 @@ void main() {
       fakeProcessWrapper.clearResponses();
     });
 
-    group('executePreAdd', () {
-      test('executes preAdd hook commands sequentially', () async {
+    group('executePreCreate', () {
+      test('executes preCreate hook commands sequentially', () async {
         fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "first command"',
@@ -34,14 +34,14 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook.fromList([
+          preCreate: Hook.fromList([
             'echo "first command"',
             'echo "second command"',
           ]),
         );
 
         // Should complete without throwing
-        await hookService.executePreAdd(
+        await hookService.executePreCreate(
           config,
           '/path/to/worktree',
           '/path/to/origin',
@@ -58,12 +58,12 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook.fromList([
+          preCreate: Hook.fromList([
             'echo "\$GWM_WORKTREE_PATH \$GWM_ORIGIN_PATH \$GWM_BRANCH"',
           ]),
         );
 
-        await hookService.executePreAdd(
+        await hookService.executePreCreate(
           config,
           '/expanded/worktree',
           '/expanded/origin',
@@ -81,10 +81,10 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook.fromList(['env | grep GWM_ | sort']),
+          preCreate: Hook.fromList(['env | grep GWM_ | sort']),
         );
 
-        await hookService.executePreAdd(
+        await hookService.executePreCreate(
           config,
           '/test/worktree',
           '/test/origin',
@@ -100,11 +100,14 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook(commands: ['echo "command with timeout"'], timeout: 60),
+          preCreate: Hook(
+            commands: ['echo "command with timeout"'],
+            timeout: 60,
+          ),
         );
 
         // Should complete without error - timeout handling is tested in integration
-        await hookService.executePreAdd(
+        await hookService.executePreCreate(
           config,
           '/path/to/worktree',
           '/path/to/origin',
@@ -130,7 +133,7 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook.fromList([
+          preCreate: Hook.fromList([
             'echo "success"',
             'exit 1',
             'echo "should not run"',
@@ -138,7 +141,7 @@ void main() {
         );
 
         expect(
-          () => hookService.executePreAdd(
+          () => hookService.executePreCreate(
             config,
             '/path/to/worktree',
             '/path/to/origin',
@@ -166,13 +169,13 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook.fromList([
+          preCreate: Hook.fromList([
             'echo "stdout message" && echo "stderr message" >&2',
           ]),
         );
 
         // Test that the method completes without error - output display is tested manually
-        await hookService.executePreAdd(
+        await hookService.executePreCreate(
           config,
           '/path/to/worktree',
           '/path/to/origin',
@@ -184,7 +187,7 @@ void main() {
         final config = HooksConfig(timeout: 30);
 
         // Should complete without executing any commands
-        await hookService.executePreAdd(
+        await hookService.executePreCreate(
           config,
           '/path/to/worktree',
           '/path/to/origin',
@@ -193,10 +196,10 @@ void main() {
       });
 
       test('does nothing when hook has empty commands', () async {
-        final config = HooksConfig(timeout: 30, preAdd: Hook.fromList([]));
+        final config = HooksConfig(timeout: 30, preCreate: Hook.fromList([]));
 
         // Should complete without executing any commands
-        await hookService.executePreAdd(
+        await hookService.executePreCreate(
           config,
           '/path/to/worktree',
           '/path/to/origin',
@@ -205,8 +208,8 @@ void main() {
       });
     });
 
-    group('executePostAdd', () {
-      test('executes postAdd hook commands', () async {
+    group('executePostCreate', () {
+      test('executes postCreate hook commands', () async {
         fakeProcessWrapper.addResponse('/bin/sh', [
           '-c',
           'echo "post-add command"',
@@ -214,10 +217,10 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          postAdd: Hook.fromList(['echo "post-add command"']),
+          postCreate: Hook.fromList(['echo "post-add command"']),
         );
 
-        await hookService.executePostAdd(
+        await hookService.executePostCreate(
           config,
           '/path/to/worktree',
           '/path/to/origin',
@@ -321,11 +324,11 @@ void main() {
 
         final config = HooksConfig(
           timeout: 30,
-          preAdd: Hook.fromList(['exit 1']),
+          preCreate: Hook.fromList(['exit 1']),
         );
 
         try {
-          await hookService.executePreAdd(
+          await hookService.executePreCreate(
             config,
             '/path/to/worktree',
             '/path/to/origin',
@@ -335,7 +338,7 @@ void main() {
         } catch (e) {
           expect(e, isA<HookExecutionException>());
           final exception = e as HookExecutionException;
-          expect(exception.hookName, 'preAdd');
+          expect(exception.hookName, 'preCreate');
           expect(exception.command, 'exit 1');
           expect(exception.output, 'command failed with error');
           expect(exception.exitCode, ExitCode.hookFailed);

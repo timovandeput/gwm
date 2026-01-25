@@ -52,7 +52,7 @@ void main() {
 
       final content = configFile.readAsStringSync();
       expect(content, contains('"timeout": 30'));
-      expect(content, contains('"preAdd": []'));
+      expect(content, contains('"preCreate": []'));
       expect(content, isNot(contains('"version"')));
       expect(content, isNot(contains('"enableEvalOutput"')));
     });

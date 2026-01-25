@@ -14,7 +14,7 @@ export 'src/models/exit_codes.dart';
 
 // Export commands
 export 'src/commands/base.dart';
-export 'src/commands/add.dart';
+export 'src/commands/create.dart';
 export 'src/commands/switch.dart';
 export 'src/commands/delete.dart';
 export 'src/commands/list.dart';

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:gwm/src/commands/add.dart';
+import 'package:gwm/src/commands/create.dart';
 import 'package:gwm/src/commands/base.dart';
 import 'package:gwm/src/commands/init.dart';
 import 'package:gwm/src/commands/switch.dart';
@@ -23,7 +23,7 @@ import 'package:gwm/src/services/completion_service.dart';
 import 'package:gwm/src/utils/output_formatter.dart';
 import 'package:gwm/src/models/config.dart';
 
-const String version = '0.1.1';
+const String version = '0.2.0';
 
 /// Handles tab completion requests.
 ///
@@ -119,8 +119,8 @@ ArgParser buildParser() {
           'Generate tab completion candidates (used by shell completion scripts).',
     )
     ..addCommand(
-      'add',
-      AddCommand(
+      'create',
+      CreateCommand(
         dummyWorktreeService,
         dummyConfigService,
         dummyShellIntegration,
@@ -214,8 +214,8 @@ Future<void> main(List<String> arguments) async {
     final skipEvalCheck = results.flag('no-eval-check');
 
     switch (commandName) {
-      case 'add':
-        command = AddCommand(
+      case 'create':
+        command = CreateCommand(
           worktreeService,
           configService,
           shellIntegration,

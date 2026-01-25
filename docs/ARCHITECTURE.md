@@ -105,7 +105,7 @@ classDiagram
         #handleError(error) ExitCode
     }
 
-    class AddCommand {
+    class CreateCommand {
         +String branch
         +bool createBranch
         +execute() ExitCode
@@ -127,7 +127,7 @@ classDiagram
         +execute() ExitCode
     }
 
-    BaseCommand <|-- AddCommand
+    BaseCommand <|-- CreateCommand
     BaseCommand <|-- SwitchCommand
     BaseCommand <|-- DeleteCommand
     BaseCommand <|-- ListCommand
@@ -156,9 +156,9 @@ sequenceDiagram
     CS ->> FS: readFiles()
     CS ->> FS: writeFiles()
     CS -->> WS: success
-    WS ->> HS: executeHooks('pre_add', env)
+    WS ->> HS: executeHooks('pre_create', env)
     HS -->> WS: success
-    WS ->> HS: executeHooks('post_add', env)
+    WS ->> HS: executeHooks('post_create', env)
     HS -->> WS: success
     WS -->> CMD: ExitCode.success
 ```
@@ -400,13 +400,13 @@ try {
 }
 ```
 
-#### Command Layer (AddCommand, SwitchCommand, etc.)
+#### Command Layer (CreateCommand, SwitchCommand, etc.)
 - **Returns**: `ExitCode` from `execute()` method
 - **Catches**: `GwmException` and converts to appropriate exit codes
 - **Purpose**: CLI interface with proper exit codes
 - **Example**:
 ```dart
-// AddCommand.execute()
+// CreateCommand.execute()
 try {
   // ... command logic
 } on ShellWrapperMissingException catch (e) {
