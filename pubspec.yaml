@@ -1,6 +1,6 @@
 name: gwm
 description: Git Worktree Manager - Streamlined Git worktree management
-version: 0.2.0
+version: 0.2.1
 
 environment:
   sdk: ^3.10.4
