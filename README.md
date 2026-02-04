@@ -46,7 +46,7 @@ repository.
 Note that because GWM updates the shell environment by switching directories, GWM requires shell integration via wrapper
 functions. Carefully follow the Shell Integration instructions below to set it up correctly.
 
-Issues and feature requests are welcome on the [GitHub repository](
+Issues and feature requests are welcome on the [GitHub repository](https://github.com/timovandeput/gwm).
 
 <a href="https://www.buymeacoffee.com/software101" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me a Coffee" height="41" width="174"></a>
 
@@ -208,6 +208,9 @@ gwm init
 
 # Create a worktree with a new branch 🌳
 gwm create -b feature/new-ui
+
+# Create a worktree with an existing branch 🌴
+gwm create fix/failing-ui
 
 # List all worktrees 📋
 gwm list -v
