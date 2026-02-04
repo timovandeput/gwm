@@ -290,6 +290,7 @@ void main() {
               worktreePath,
               branch,
               createBranch: true,
+              from: 'origin/$branch',
             ),
           ).thenAnswer((_) async {
             Directory(worktreePath).createSync(recursive: true);
@@ -309,6 +310,7 @@ void main() {
               worktreePath,
               branch,
               createBranch: true,
+              from: 'origin/$branch',
             ),
           ).called(1);
           verify(() => mockGitClient.setUpstreamBranch(branch)).called(1);

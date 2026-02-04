@@ -18,10 +18,16 @@ class GitClientImpl implements GitClient {
     String path,
     String branch, {
     bool createBranch = false,
+    String? from,
   }) async {
     final args = ['worktree', 'add'];
     if (createBranch) {
-      args.addAll(['-b', branch, path]);
+      args.addAll(['-b', branch]);
+      // If 'from' is specified, add it as the starting point
+      if (from != null) {
+        args.add(from);
+      }
+      args.add(path);
     } else {
       args.addAll([path, branch]);
     }

@@ -81,11 +81,12 @@ class WorktreeService {
               }
             }
 
-            // Create worktree with branch and tracking
+            // Create worktree with branch from origin to avoid creating from current HEAD
             final actualPath = await _gitClient.createWorktree(
               worktreePath,
               branch,
               createBranch: true,
+              from: 'origin/$branch',
             );
 
             // Set up tracking

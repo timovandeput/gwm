@@ -8,10 +8,15 @@ import '../models/worktree.dart';
 /// (using actual Git CLI) and test code (using mock implementations).
 abstract class GitClient {
   /// Creates a new worktree at the specified path for the given branch.
+  ///
+  /// [from] optionally specifies the commit/branch to create the new branch from.
+  /// When [createBranch] is true and [from] is provided, the new branch will be
+  /// created starting from [from] instead of the current HEAD.
   Future<String> createWorktree(
     String path,
     String branch, {
     bool createBranch = false,
+    String? from,
   });
 
   /// Lists all worktrees in the repository.
