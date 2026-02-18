@@ -88,9 +88,12 @@ void main() {
 
   group('WorktreeStatus', () {
     test('has all expected values', () {
+      expect(WorktreeStatus.values, hasLength(6));
       expect(WorktreeStatus.clean, equals(WorktreeStatus.clean));
       expect(WorktreeStatus.modified, equals(WorktreeStatus.modified));
       expect(WorktreeStatus.ahead, equals(WorktreeStatus.ahead));
+      expect(WorktreeStatus.behind, equals(WorktreeStatus.behind));
+      expect(WorktreeStatus.diverged, equals(WorktreeStatus.diverged));
       expect(WorktreeStatus.detached, equals(WorktreeStatus.detached));
     });
   });

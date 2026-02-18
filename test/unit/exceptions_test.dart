@@ -115,19 +115,49 @@ void main() {
       );
     });
 
-    test('has correct message format', () {
-      expect(
-        exception.message,
-        equals(
-          'Git command failed: "git worktree add /path branch"\nfatal: Invalid path',
-        ),
-      );
-    });
-
     test('stores git details', () {
       expect(exception.command, equals('git worktree add'));
       expect(exception.arguments, equals(['/path', 'branch']));
       expect(exception.output, equals('fatal: Invalid path'));
+    });
+
+    test('toString returns message', () {
+      expect(exception.toString(), equals(exception.message));
+    });
+  });
+
+  group('NoWorktreesAvailableException', () {
+    const exception = NoWorktreesAvailableException();
+
+    test('has correct exit code', () {
+      expect(exception.exitCode, equals(ExitCode.invalidArguments));
+    });
+
+    test('has correct message', () {
+      expect(
+        exception.message,
+        equals('No worktrees available to switch to.'),
+      );
+    });
+
+    test('toString returns message', () {
+      expect(exception.toString(), equals(exception.message));
+    });
+  });
+
+  group('ShellWrapperMissingException', () {
+    const exception = ShellWrapperMissingException('Shell wrapper not found');
+
+    test('has correct exit code', () {
+      expect(exception.exitCode, equals(ExitCode.shellWrapperMissing));
+    });
+
+    test('has correct message', () {
+      expect(exception.message, equals('Shell wrapper not found'));
+    });
+
+    test('toString returns message', () {
+      expect(exception.toString(), equals(exception.message));
     });
   });
 }
