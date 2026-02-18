@@ -94,7 +94,7 @@ class WorktreeService {
 
             // Verify the worktree was created successfully
             if (!await Directory(actualPath).exists()) {
-              stderr.writeln('Error: Failed to create worktree at $actualPath');
+              printSafe('Error: Failed to create worktree at $actualPath');
               return ExitCode.gitFailed;
             }
 
@@ -185,7 +185,7 @@ class WorktreeService {
 
       // Verify the worktree was created successfully
       if (!await Directory(actualPath).exists()) {
-        stderr.writeln('Error: Failed to create worktree at $actualPath');
+        printSafe('Error: Failed to create worktree at $actualPath');
         return ExitCode.gitFailed;
       }
 

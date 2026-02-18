@@ -18,8 +18,7 @@ class ListCommand extends BaseCommand {
 
   ListCommand(this._gitClient, this._formatter, {super.skipEvalCheck = false});
 
-  @override
-  ArgParser get parser {
+  static ArgParser buildArgParser() {
     return ArgParser()
       ..addFlag(
         'verbose',
@@ -34,6 +33,9 @@ class ListCommand extends BaseCommand {
         help: 'Print usage information for this command.',
       );
   }
+
+  @override
+  ArgParser get parser => buildArgParser();
 
   @override
   Future<ExitCode> execute(ArgResults results) async {

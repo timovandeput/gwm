@@ -74,25 +74,6 @@ Future<ExitCode> handleCompletion(
 }
 
 ArgParser buildParser() {
-  // Create dummy commands just for their parsers
-  // These won't be used for actual execution
-  final dummyProcessWrapper = ProcessWrapperImpl();
-  final dummyGitClient = GitClientImpl(dummyProcessWrapper);
-  final dummyFileSystemAdapter = FileSystemAdapterImpl();
-  final dummyPromptSelector = PromptSelectorImpl();
-  final dummyOutputFormatter = OutputFormatter();
-  final dummyConfigService = ConfigService();
-  final dummyHookService = HookService(dummyProcessWrapper);
-  final dummyCopyService = CopyService(dummyFileSystemAdapter);
-  final dummyShellIntegration = ShellIntegration(
-    ShellIntegrationConfig(enableEvalOutput: true),
-  );
-  final dummyWorktreeService = WorktreeService(
-    dummyGitClient,
-    dummyHookService,
-    dummyCopyService,
-  );
-
   return ArgParser()
     ..addFlag(
       'help',
@@ -118,41 +99,11 @@ ArgParser buildParser() {
       help:
           'Generate tab completion candidates (used by shell completion scripts).',
     )
-    ..addCommand(
-      'create',
-      CreateCommand(
-        dummyWorktreeService,
-        dummyConfigService,
-        dummyShellIntegration,
-        dummyHookService,
-        dummyGitClient,
-      ).parser,
-    )
-    ..addCommand(
-      'switch',
-      SwitchCommand(
-        dummyGitClient,
-        dummyPromptSelector,
-        dummyConfigService,
-        dummyHookService,
-        dummyCopyService,
-        dummyShellIntegration,
-      ).parser,
-    )
-    ..addCommand(
-      'delete',
-      DeleteCommand(
-        dummyGitClient,
-        dummyConfigService,
-        dummyHookService,
-        dummyShellIntegration,
-      ).parser,
-    )
-    ..addCommand(
-      'list',
-      ListCommand(dummyGitClient, dummyOutputFormatter).parser,
-    )
-    ..addCommand('init', InitCommand(dummyGitClient).parser);
+    ..addCommand('create', CreateCommand.buildArgParser())
+    ..addCommand('switch', SwitchCommand.buildArgParser())
+    ..addCommand('delete', DeleteCommand.buildArgParser())
+    ..addCommand('list', ListCommand.buildArgParser())
+    ..addCommand('init', InitCommand.buildArgParser());
 }
 
 Future<void> main(List<String> arguments) async {

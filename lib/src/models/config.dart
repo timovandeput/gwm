@@ -1,3 +1,4 @@
+import '../utils/list_equals.dart';
 import 'hook.dart';
 
 /// Configuration for the GWM CLI tool.
@@ -88,8 +89,8 @@ class CopyConfig {
     if (identical(this, other)) return true;
 
     return other is CopyConfig &&
-        _listEquals(other.files, files) &&
-        _listEquals(other.directories, directories);
+        listEquals(other.files, files) &&
+        listEquals(other.directories, directories);
   }
 
   @override
@@ -219,15 +220,4 @@ class ShellIntegrationConfig {
   String toString() {
     return 'ShellIntegrationConfig(enableEvalOutput: $enableEvalOutput)';
   }
-}
-
-/// Helper function to compare lists for equality
-bool _listEquals<T>(List<T>? a, List<T>? b) {
-  if (a == null) return b == null;
-  if (b == null) return false;
-  if (a.length != b.length) return false;
-  for (int i = 0; i < a.length; i++) {
-    if (a[i] != b[i]) return false;
-  }
-  return true;
 }

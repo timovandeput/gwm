@@ -17,8 +17,7 @@ class InitCommand extends BaseCommand {
 
   InitCommand(this._gitClient, {super.skipEvalCheck = false});
 
-  @override
-  ArgParser get parser {
+  static ArgParser buildArgParser() {
     return ArgParser()..addFlag(
       'help',
       abbr: 'h',
@@ -26,6 +25,9 @@ class InitCommand extends BaseCommand {
       help: 'Print usage information for this command.',
     );
   }
+
+  @override
+  ArgParser get parser => buildArgParser();
 
   @override
   Future<ExitCode> execute(ArgResults results) async {

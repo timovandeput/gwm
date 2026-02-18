@@ -352,22 +352,24 @@ branch refs/heads/main
         expect(status, WorktreeStatus.clean);
       });
 
-      test('returns modified status when there are uncommitted changes',
-          () async {
-        fakeProcessWrapper.addResponse('git', [
-          'status',
-          '--porcelain',
-        ], stdout: ' M file.txt\n');
-        fakeProcessWrapper.addResponse('git', [
-          'status',
-          '-b',
-          '--ahead-behind',
-        ], stdout: '## main...origin/main\n');
+      test(
+        'returns modified status when there are uncommitted changes',
+        () async {
+          fakeProcessWrapper.addResponse('git', [
+            'status',
+            '--porcelain',
+          ], stdout: ' M file.txt\n');
+          fakeProcessWrapper.addResponse('git', [
+            'status',
+            '-b',
+            '--ahead-behind',
+          ], stdout: '## main...origin/main\n');
 
-        final status = await gitClient.getBranchStatus('main', '/some/path');
+          final status = await gitClient.getBranchStatus('main', '/some/path');
 
-        expect(status, WorktreeStatus.modified);
-      });
+          expect(status, WorktreeStatus.modified);
+        },
+      );
 
       test('returns ahead status when ahead of remote', () async {
         fakeProcessWrapper.addResponse('git', [
@@ -486,10 +488,7 @@ branch refs/heads/main
         final time = await gitClient.getLastCommitTime('/some/path');
 
         expect(time, isNotNull);
-        expect(
-          time,
-          DateTime.fromMillisecondsSinceEpoch(1700000000 * 1000),
-        );
+        expect(time, DateTime.fromMillisecondsSinceEpoch(1700000000 * 1000));
       });
 
       test('returns null when no commits exist', () async {
@@ -615,11 +614,7 @@ branch refs/heads/main
       test('throws exception on git failure', () async {
         fakeProcessWrapper.addResponse(
           'git',
-          [
-            'branch',
-            '--set-upstream-to=origin/nonexistent',
-            'nonexistent',
-          ],
+          ['branch', '--set-upstream-to=origin/nonexistent', 'nonexistent'],
           exitCode: 1,
           stderr: 'error: the requested upstream branch does not exist',
         );

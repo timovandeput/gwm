@@ -521,10 +521,7 @@ void main() {
 
       test('rejects non-object shellIntegration', () {
         expect(
-          () => validateConfigFile(
-            {'shellIntegration': 'invalid'},
-            configPath,
-          ),
+          () => validateConfigFile({'shellIntegration': 'invalid'}, configPath),
           throwsA(
             isA<ConfigException>().having(
               (e) => e.reason,

@@ -1,3 +1,5 @@
+import '../utils/list_equals.dart';
+
 /// Represents a hook configuration that can be either a simple list of commands
 /// or an object with timeout and commands.
 ///
@@ -36,7 +38,7 @@ class Hook {
     if (identical(this, other)) return true;
 
     return other is Hook &&
-        _listEquals(other.commands, commands) &&
+        listEquals(other.commands, commands) &&
         other.timeout == timeout;
   }
 
@@ -47,15 +49,4 @@ class Hook {
   String toString() {
     return 'Hook(commands: $commands, timeout: $timeout)';
   }
-}
-
-/// Helper function to compare lists for equality
-bool _listEquals<T>(List<T>? a, List<T>? b) {
-  if (a == null) return b == null;
-  if (b == null) return false;
-  if (a.length != b.length) return false;
-  for (int i = 0; i < a.length; i++) {
-    if (a[i] != b[i]) return false;
-  }
-  return true;
 }

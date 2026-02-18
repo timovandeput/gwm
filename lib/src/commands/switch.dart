@@ -12,6 +12,7 @@ import '../services/config_service.dart';
 import '../services/hook_service.dart';
 import '../services/copy_service.dart';
 import '../utils/eval_validator.dart';
+import '../utils/path_utils.dart' show getRepoRootOrNull;
 import '../exceptions.dart';
 import '../cli_utils.dart';
 
@@ -36,8 +37,7 @@ class SwitchCommand extends BaseCommand {
     super.skipEvalCheck = false,
   });
 
-  @override
-  ArgParser get parser {
+  static ArgParser buildArgParser() {
     return ArgParser()
       ..addFlag(
         'help',
@@ -53,6 +53,9 @@ class SwitchCommand extends BaseCommand {
             'Reconfigure the worktree by copying files and running add hooks.',
       );
   }
+
+  @override
+  ArgParser get parser => buildArgParser();
 
   @override
   Future<ExitCode> execute(ArgResults results) async {
@@ -106,7 +109,7 @@ class SwitchCommand extends BaseCommand {
       }
 
       // Load configuration for hooks
-      final repoRoot = await _getRepoRoot();
+      final repoRoot = await getRepoRootOrNull(_gitClient);
       final config = repoRoot != null
           ? await _configService.loadConfig(repoRoot: repoRoot)
           : null;
@@ -235,18 +238,6 @@ class SwitchCommand extends BaseCommand {
     // The command should work from main repo or existing worktrees
     // We don't restrict it further as the requirements don't specify
     return true;
-  }
-
-  /// Gets the repository root directory.
-  ///
-  /// Returns null if not in a git repo.
-  Future<String?> _getRepoRoot() async {
-    try {
-      return await _gitClient.getRepoRoot();
-    } catch (e) {
-      // If not in a git repo, return null
-      return null;
-    }
   }
 
   /// Resolves the target worktree based on the provided name or interactive selection.

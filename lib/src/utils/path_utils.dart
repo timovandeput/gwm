@@ -1,5 +1,7 @@
 import 'package:path/path.dart' as path;
 
+import '../infrastructure/git_client.dart';
+
 /// Utility class for platform-appropriate path handling.
 ///
 /// This class provides cross-platform path operations using the `path` package
@@ -42,4 +44,13 @@ class PathUtils {
   /// Removes the extension from a path.
   static String withoutExtension(String path) =>
       _context.withoutExtension(path);
+}
+
+/// Gets the repository root directory, returning null if not in a git repo.
+Future<String?> getRepoRootOrNull(GitClient gitClient) async {
+  try {
+    return await gitClient.getRepoRoot();
+  } catch (e) {
+    return null;
+  }
 }

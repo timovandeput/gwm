@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import '../models/worktree.dart';
 
 /// Interface for Git operations.

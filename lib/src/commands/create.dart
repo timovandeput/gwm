@@ -11,6 +11,7 @@ import '../services/hook_service.dart';
 import '../infrastructure/git_client.dart';
 import '../services/shell_integration.dart';
 import '../utils/eval_validator.dart';
+import '../utils/path_utils.dart' show getRepoRootOrNull;
 import '../exceptions.dart';
 import '../cli_utils.dart';
 
@@ -32,8 +33,8 @@ class CreateCommand extends BaseCommand {
     this._gitClient, {
     super.skipEvalCheck = false,
   });
-  @override
-  ArgParser get parser {
+
+  static ArgParser buildArgParser() {
     return ArgParser()
       ..addFlag(
         'branch',
@@ -47,6 +48,9 @@ class CreateCommand extends BaseCommand {
         help: 'Print usage information for this command.',
       );
   }
+
+  @override
+  ArgParser get parser => buildArgParser();
 
   @override
   Future<ExitCode> execute(ArgResults results) async {
@@ -74,7 +78,7 @@ class CreateCommand extends BaseCommand {
       EvalValidator.validate(skipCheck: skipEvalCheck);
 
       // Load configuration for hooks and other settings
-      final repoRoot = await _getRepoRoot();
+      final repoRoot = await getRepoRootOrNull(_gitClient);
       final config = await _configService.loadConfig(repoRoot: repoRoot);
 
       // Use the worktree service to create the worktree
@@ -88,7 +92,8 @@ class CreateCommand extends BaseCommand {
       if (exitCode == ExitCode.success ||
           exitCode == ExitCode.worktreeExistsButSwitched) {
         final worktreePath = await _worktreeService.getWorktreePath(branch);
-        final originPath = await _getRepoRoot() ?? Directory.current.path;
+        final originPath =
+            await getRepoRootOrNull(_gitClient) ?? Directory.current.path;
 
         if (exitCode == ExitCode.success) {
           _shellIntegration.outputWorktreeCreated(worktreePath);
@@ -137,18 +142,6 @@ class CreateCommand extends BaseCommand {
     } catch (e) {
       printSafe('Unexpected error: Failed to create worktree: $e');
       return ExitCode.generalError;
-    }
-  }
-
-  /// Gets the repository root directory.
-  ///
-  /// Returns the current directory if not in a git repo (for error handling).
-  Future<String?> _getRepoRoot() async {
-    try {
-      return await _gitClient.getRepoRoot();
-    } catch (e) {
-      // If not in a git repo, return null - config will use global only
-      return null;
     }
   }
 

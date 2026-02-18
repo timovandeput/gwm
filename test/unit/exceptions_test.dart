@@ -134,10 +134,7 @@ void main() {
     });
 
     test('has correct message', () {
-      expect(
-        exception.message,
-        equals('No worktrees available to switch to.'),
-      );
+      expect(exception.message, equals('No worktrees available to switch to.'));
     });
 
     test('toString returns message', () {

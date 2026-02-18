@@ -27,8 +27,7 @@ class DeleteCommand extends BaseCommand {
     super.skipEvalCheck = false,
   });
 
-  @override
-  ArgParser get parser {
+  static ArgParser buildArgParser() {
     return ArgParser()
       ..addFlag(
         'force',
@@ -42,6 +41,9 @@ class DeleteCommand extends BaseCommand {
         help: 'Print usage information for this command.',
       );
   }
+
+  @override
+  ArgParser get parser => buildArgParser();
 
   @override
   Future<ExitCode> execute(ArgResults results) async {
