@@ -4,11 +4,9 @@ import 'dart:io';
 
 import 'package:gwm/src/commands/init.dart';
 import 'package:gwm/src/models/exit_codes.dart';
-import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/exceptions.dart';
 
-// Mock classes
-class MockGitClient extends Mock implements GitClient {}
+import '../../mock_objects/mock_git_client.dart';
 
 void main() {
   late MockGitClient mockGitClient;

@@ -11,8 +11,6 @@ import 'package:gwm/src/services/shell_integration.dart';
 import 'package:gwm/src/exceptions.dart';
 
 import '../../mock_objects/mock_git_client.dart';
-// Use the shared MockGitClient
-// class MockGitClient extends Mock implements GitClient {}
 
 class MockConfigService extends Mock implements ConfigService {}
 

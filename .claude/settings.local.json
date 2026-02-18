@@ -4,7 +4,8 @@
       "Bash(wc -l:*)",
       "Bash(dart test:*)",
       "Bash(dart analyze:*)",
-      "Bash(dart format:*)"
+      "Bash(dart format:*)",
+      "Bash(find:*)"
     ]
   }
 }

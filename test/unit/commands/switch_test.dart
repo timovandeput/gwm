@@ -6,7 +6,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:gwm/src/commands/switch.dart';
 import 'package:gwm/src/models/exit_codes.dart';
 import 'package:gwm/src/models/worktree.dart';
-import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/infrastructure/prompt_selector.dart';
 import 'package:gwm/src/services/shell_integration.dart';
 import 'package:gwm/src/services/copy_service.dart';
@@ -15,8 +14,7 @@ import 'package:gwm/src/services/hook_service.dart';
 import 'package:gwm/src/models/config.dart';
 import 'package:gwm/src/exceptions.dart';
 
-// Mock classes
-class MockGitClient extends Mock implements GitClient {}
+import '../../mock_objects/mock_git_client.dart';
 
 class MockPromptSelector extends Mock implements PromptSelector {}
 

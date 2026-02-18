@@ -5,16 +5,14 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:gwm/src/services/worktree_service.dart';
 import 'package:gwm/src/models/exit_codes.dart';
-import 'package:gwm/src/infrastructure/git_client.dart';
 import 'package:gwm/src/services/copy_service.dart';
 import 'package:gwm/src/services/hook_service.dart';
 import 'package:gwm/src/models/config.dart';
 
+import '../../mock_objects/mock_git_client.dart';
+
 // Fake classes for fallbacks
 class FakeCopyConfig extends Fake implements CopyConfig {}
-
-// Mock classes
-class MockGitClient extends Mock implements GitClient {}
 
 class MockCopyService extends Mock implements CopyService {}
 
