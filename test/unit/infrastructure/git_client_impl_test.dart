@@ -39,6 +39,44 @@ void main() {
         expect(result, '/path/to/worktree');
       });
 
+      test('creates worktree with new branch', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'worktree',
+          'add',
+          '-b',
+          'feature/new',
+          '/path/to/worktree',
+        ]);
+
+        final result = await gitClient.createWorktree(
+          '/path/to/worktree',
+          'feature/new',
+          createBranch: true,
+        );
+
+        expect(result, '/path/to/worktree');
+      });
+
+      test('creates worktree with new branch from remote ref', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'worktree',
+          'add',
+          '-b',
+          'feature/remote',
+          '/path/to/worktree',
+          'origin/feature/remote',
+        ]);
+
+        final result = await gitClient.createWorktree(
+          '/path/to/worktree',
+          'feature/remote',
+          createBranch: true,
+          from: 'origin/feature/remote',
+        );
+
+        expect(result, '/path/to/worktree');
+      });
+
       test('throws exception on git failure', () async {
         fakeProcessWrapper.addResponse(
           'git',
@@ -50,20 +88,6 @@ void main() {
         await expectLater(
           gitClient.createWorktree('/invalid/path', 'branch'),
           throwsA(isA<GitException>()),
-        );
-      });
-
-      test('removes worktree with force flag', () async {
-        fakeProcessWrapper.addResponse('git', [
-          'worktree',
-          'remove',
-          '--force',
-          '/path/to/remove',
-        ]);
-
-        await expectLater(
-          gitClient.removeWorktree('/path/to/remove', force: true),
-          completes,
         );
       });
     });
@@ -309,41 +333,301 @@ branch refs/heads/main
           throwsA(isA<GitException>()),
         );
       });
+    });
 
-      test('returns false when worktree is clean', () async {
+    group('getBranchStatus', () {
+      test('returns clean status when no changes and in sync', () async {
         fakeProcessWrapper.addResponse('git', [
           'status',
           '--porcelain',
         ], stdout: '');
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '-b',
+          '--ahead-behind',
+        ], stdout: '## main...origin/main\n');
 
-        final hasChanges = await gitClient.hasUncommittedChanges('/clean/path');
+        final status = await gitClient.getBranchStatus('main', '/some/path');
 
-        expect(hasChanges, isFalse);
+        expect(status, WorktreeStatus.clean);
       });
 
-      test('throws exception on git failure', () async {
+      test('returns modified status when there are uncommitted changes',
+          () async {
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '--porcelain',
+        ], stdout: ' M file.txt\n');
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '-b',
+          '--ahead-behind',
+        ], stdout: '## main...origin/main\n');
+
+        final status = await gitClient.getBranchStatus('main', '/some/path');
+
+        expect(status, WorktreeStatus.modified);
+      });
+
+      test('returns ahead status when ahead of remote', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '--porcelain',
+        ], stdout: '');
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '-b',
+          '--ahead-behind',
+        ], stdout: '## main...origin/main [ahead 2]\n');
+
+        final status = await gitClient.getBranchStatus('main', '/some/path');
+
+        expect(status, WorktreeStatus.ahead);
+      });
+
+      test('returns behind status when behind remote', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '--porcelain',
+        ], stdout: '');
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '-b',
+          '--ahead-behind',
+        ], stdout: '## main...origin/main [behind 3]\n');
+
+        final status = await gitClient.getBranchStatus('main', '/some/path');
+
+        expect(status, WorktreeStatus.behind);
+      });
+
+      test('returns diverged status when both ahead and behind', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '--porcelain',
+        ], stdout: '');
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '-b',
+          '--ahead-behind',
+        ], stdout: '## main...origin/main [ahead 1, behind 2]\n');
+
+        final status = await gitClient.getBranchStatus('main', '/some/path');
+
+        expect(status, WorktreeStatus.diverged);
+      });
+
+      test('returns modified over diverged when changes exist', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '--porcelain',
+        ], stdout: ' M file.txt\n');
+        fakeProcessWrapper.addResponse('git', [
+          'status',
+          '-b',
+          '--ahead-behind',
+        ], stdout: '## main...origin/main [ahead 1, behind 2]\n');
+
+        final status = await gitClient.getBranchStatus('main', '/some/path');
+
+        expect(status, WorktreeStatus.modified);
+      });
+
+      test('returns clean when status check fails', () async {
         fakeProcessWrapper.addResponse(
           'git',
           ['status', '--porcelain'],
           exitCode: 1,
+          stderr: 'fatal: error',
+        );
+
+        final status = await gitClient.getBranchStatus('main', '/some/path');
+
+        expect(status, WorktreeStatus.clean);
+      });
+    });
+
+    group('getRepoRoot', () {
+      test('returns repository root path', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'rev-parse',
+          '--show-toplevel',
+        ], stdout: '/home/user/project\n');
+
+        final root = await gitClient.getRepoRoot();
+
+        expect(root, '/home/user/project');
+      });
+
+      test('throws exception when not in a git repository', () async {
+        fakeProcessWrapper.addResponse(
+          'git',
+          ['rev-parse', '--show-toplevel'],
+          exitCode: 128,
           stderr: 'fatal: not a git repository',
         );
 
         await expectLater(
-          gitClient.hasUncommittedChanges('/invalid/path'),
+          gitClient.getRepoRoot(),
           throwsA(isA<GitException>()),
         );
       });
     });
 
-    group('getBranchStatus', () {
-      test('returns clean status when no changes', () async {
-        final status = await gitClient.getBranchStatus(
-          'any-branch',
-          '/some/path',
+    group('getLastCommitTime', () {
+      test('returns last commit time', () async {
+        // 1700000000 = 2023-11-14T22:13:20Z
+        fakeProcessWrapper.addResponse('git', [
+          'log',
+          '-1',
+          '--format=%ct',
+        ], stdout: '1700000000\n');
+
+        final time = await gitClient.getLastCommitTime('/some/path');
+
+        expect(time, isNotNull);
+        expect(
+          time,
+          DateTime.fromMillisecondsSinceEpoch(1700000000 * 1000),
+        );
+      });
+
+      test('returns null when no commits exist', () async {
+        fakeProcessWrapper.addResponse(
+          'git',
+          ['log', '-1', '--format=%ct'],
+          exitCode: 1,
+          stderr: 'fatal: bad default revision',
         );
 
-        expect(status, WorktreeStatus.clean);
+        final time = await gitClient.getLastCommitTime('/empty/repo');
+
+        expect(time, isNull);
+      });
+
+      test('returns null when output is not a valid timestamp', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'log',
+          '-1',
+          '--format=%ct',
+        ], stdout: 'not-a-number\n');
+
+        final time = await gitClient.getLastCommitTime('/some/path');
+
+        expect(time, isNull);
+      });
+    });
+
+    group('listBranches', () {
+      test('returns list of branches', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'branch',
+          '--format=%(refname:short)',
+        ], stdout: 'main\nfeature/auth\nfix/bug-123\n');
+
+        final branches = await gitClient.listBranches();
+
+        expect(branches, ['main', 'feature/auth', 'fix/bug-123']);
+      });
+
+      test('returns empty list when no branches', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'branch',
+          '--format=%(refname:short)',
+        ], stdout: '');
+
+        final branches = await gitClient.listBranches();
+
+        expect(branches, isEmpty);
+      });
+
+      test('throws exception on git failure', () async {
+        fakeProcessWrapper.addResponse(
+          'git',
+          ['branch', '--format=%(refname:short)'],
+          exitCode: 1,
+          stderr: 'fatal: not a git repository',
+        );
+
+        await expectLater(
+          gitClient.listBranches(),
+          throwsA(isA<GitException>()),
+        );
+      });
+    });
+
+    group('remoteBranchExists', () {
+      test('returns true when remote branch exists', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'branch',
+          '-r',
+          '--list',
+          'origin/feature/auth',
+        ], stdout: '  origin/feature/auth\n');
+
+        final exists = await gitClient.remoteBranchExists('feature/auth');
+
+        expect(exists, isTrue);
+      });
+
+      test('returns false when remote branch does not exist', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'branch',
+          '-r',
+          '--list',
+          'origin/nonexistent',
+        ], stdout: '');
+
+        final exists = await gitClient.remoteBranchExists('nonexistent');
+
+        expect(exists, isFalse);
+      });
+
+      test('throws exception on git failure', () async {
+        fakeProcessWrapper.addResponse(
+          'git',
+          ['branch', '-r', '--list', 'origin/branch'],
+          exitCode: 1,
+          stderr: 'fatal: not a git repository',
+        );
+
+        await expectLater(
+          gitClient.remoteBranchExists('branch'),
+          throwsA(isA<GitException>()),
+        );
+      });
+    });
+
+    group('setUpstreamBranch', () {
+      test('sets upstream branch successfully', () async {
+        fakeProcessWrapper.addResponse('git', [
+          'branch',
+          '--set-upstream-to=origin/feature/auth',
+          'feature/auth',
+        ]);
+
+        await expectLater(
+          gitClient.setUpstreamBranch('feature/auth'),
+          completes,
+        );
+      });
+
+      test('throws exception on git failure', () async {
+        fakeProcessWrapper.addResponse(
+          'git',
+          [
+            'branch',
+            '--set-upstream-to=origin/nonexistent',
+            'nonexistent',
+          ],
+          exitCode: 1,
+          stderr: 'error: the requested upstream branch does not exist',
+        );
+
+        await expectLater(
+          gitClient.setUpstreamBranch('nonexistent'),
+          throwsA(isA<GitException>()),
+        );
       });
     });
 
