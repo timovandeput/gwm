@@ -23,11 +23,11 @@ class GitClientImpl implements GitClient {
     final args = ['worktree', 'add'];
     if (createBranch) {
       args.addAll(['-b', branch]);
-      // If 'from' is specified, add it as the starting point
+      args.add(path);
+      // If 'from' is specified, add it as the starting point after the path
       if (from != null) {
         args.add(from);
       }
-      args.add(path);
     } else {
       args.addAll([path, branch]);
     }
